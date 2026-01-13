@@ -3,6 +3,7 @@ export interface Client {
   nome: string;
   telefone: string;
   discord?: string;
+  telegram?: string;
   plano: 'VIP Completo' | 'Delay' | 'Básico';
   preco: number;
   dataEntrada: string;

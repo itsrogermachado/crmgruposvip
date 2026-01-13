@@ -1,4 +1,4 @@
-import { MessageCircle, Pencil, Trash2 } from 'lucide-react';
+import { MessageCircle, Pencil, Trash2, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -63,7 +63,14 @@ export function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
                 </div>
                 {client.discord && (
                   <span className="text-xs text-muted-foreground block mt-0.5">
+                    <MessageCircle className="w-3 h-3 inline mr-1" />
                     {client.discord}
+                  </span>
+                )}
+                {client.telegram && (
+                  <span className="text-xs text-stat-cyan block mt-0.5">
+                    <Send className="w-3 h-3 inline mr-1" />
+                    {client.telegram}
                   </span>
                 )}
               </TableCell>
