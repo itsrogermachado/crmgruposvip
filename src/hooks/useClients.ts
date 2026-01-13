@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
+import { calculateStatus } from '@/lib/dateUtils';
 
 export interface Client {
   id: string;
@@ -14,6 +15,7 @@ export interface Client {
   data_entrada: string;
   data_vencimento: string;
   status: 'Ativo' | 'Vencido' | 'Próximo';
+  observacoes?: string;
 }
 
 export function useClients() {
@@ -37,18 +39,24 @@ export function useClients() {
 
       if (error) throw error;
 
-      const mappedClients: Client[] = (data || []).map((c) => ({
-        id: c.id,
-        nome: c.nome,
-        telefone: c.telefone,
-        discord: c.discord || undefined,
-        telegram: c.telegram || undefined,
-        plano: c.plano as Client['plano'],
-        preco: Number(c.preco),
-        data_entrada: c.data_entrada,
-        data_vencimento: c.data_vencimento,
-        status: c.status as Client['status'],
-      }));
+      const mappedClients: Client[] = (data || []).map((c) => {
+        // Auto-calculate status based on due date
+        const autoStatus = calculateStatus(c.data_vencimento);
+        
+        return {
+          id: c.id,
+          nome: c.nome,
+          telefone: c.telefone,
+          discord: c.discord || undefined,
+          telegram: c.telegram || undefined,
+          plano: c.plano as Client['plano'],
+          preco: Number(c.preco),
+          data_entrada: c.data_entrada,
+          data_vencimento: c.data_vencimento,
+          status: autoStatus,
+          observacoes: c.observacoes || undefined,
+        };
+      });
 
       setClients(mappedClients);
     } catch (error) {
@@ -84,6 +92,7 @@ export function useClients() {
           data_entrada: clientData.data_entrada,
           data_vencimento: clientData.data_vencimento,
           status: clientData.status,
+          observacoes: clientData.observacoes || null,
         })
         .select()
         .single();
@@ -100,7 +109,8 @@ export function useClients() {
         preco: Number(data.preco),
         data_entrada: data.data_entrada,
         data_vencimento: data.data_vencimento,
-        status: data.status as Client['status'],
+        status: calculateStatus(data.data_vencimento),
+        observacoes: data.observacoes || undefined,
       };
 
       setClients((prev) => [newClient, ...prev]);
@@ -136,13 +146,21 @@ export function useClients() {
           data_entrada: clientData.data_entrada,
           data_vencimento: clientData.data_vencimento,
           status: clientData.status,
+          observacoes: clientData.observacoes || null,
         })
         .eq('id', id);
 
       if (error) throw error;
 
       setClients((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, ...clientData } : c))
+        prev.map((c) => {
+          if (c.id === id) {
+            const updated = { ...c, ...clientData };
+            updated.status = calculateStatus(updated.data_vencimento);
+            return updated;
+          }
+          return c;
+        })
       );
 
       toast({
@@ -205,6 +223,7 @@ export function useClients() {
         data_entrada: c.data_entrada,
         data_vencimento: c.data_vencimento,
         status: c.status,
+        observacoes: c.observacoes || null,
       }));
 
       const { data, error } = await supabase
@@ -224,7 +243,8 @@ export function useClients() {
         preco: Number(c.preco),
         data_entrada: c.data_entrada,
         data_vencimento: c.data_vencimento,
-        status: c.status as Client['status'],
+        status: calculateStatus(c.data_vencimento),
+        observacoes: c.observacoes || undefined,
       }));
 
       setClients((prev) => [...insertedClients, ...prev]);

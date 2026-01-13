@@ -22,6 +22,7 @@ export type Database = {
           discord: string | null
           id: string
           nome: string
+          observacoes: string | null
           plano: string
           preco: number
           status: string
@@ -37,6 +38,7 @@ export type Database = {
           discord?: string | null
           id?: string
           nome: string
+          observacoes?: string | null
           plano?: string
           preco?: number
           status?: string
@@ -52,6 +54,7 @@ export type Database = {
           discord?: string | null
           id?: string
           nome?: string
+          observacoes?: string | null
           plano?: string
           preco?: number
           status?: string

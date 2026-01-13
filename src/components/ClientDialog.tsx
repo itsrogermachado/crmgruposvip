@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { CalendarIcon } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -9,6 +12,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -17,6 +27,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Client } from '@/types/client';
+import { cn } from '@/lib/utils';
+import { parseBRDate, formatToBRDate, calculateStatus } from '@/lib/dateUtils';
 
 interface ClientDialogProps {
   open: boolean;
@@ -35,8 +47,11 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
     preco: 150,
     dataEntrada: '',
     dataVencimento: '',
-    status: 'Ativo' as Client['status'],
+    observacoes: '',
   });
+
+  const [dataEntradaDate, setDataEntradaDate] = useState<Date | undefined>();
+  const [dataVencimentoDate, setDataVencimentoDate] = useState<Date | undefined>();
 
   useEffect(() => {
     if (client) {
@@ -49,8 +64,13 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
         preco: client.preco,
         dataEntrada: client.dataEntrada,
         dataVencimento: client.dataVencimento,
-        status: client.status,
+        observacoes: client.observacoes || '',
       });
+      
+      const entradaParsed = parseBRDate(client.dataEntrada);
+      const vencimentoParsed = parseBRDate(client.dataVencimento);
+      setDataEntradaDate(entradaParsed || undefined);
+      setDataVencimentoDate(vencimentoParsed || undefined);
     } else {
       const today = new Date();
       const nextMonth = new Date(today);
@@ -63,27 +83,49 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
         telegram: '',
         plano: 'VIP Completo',
         preco: 150,
-        dataEntrada: today.toLocaleDateString('pt-BR'),
-        dataVencimento: nextMonth.toLocaleDateString('pt-BR'),
-        status: 'Ativo',
+        dataEntrada: formatToBRDate(today),
+        dataVencimento: formatToBRDate(nextMonth),
+        observacoes: '',
       });
+      setDataEntradaDate(today);
+      setDataVencimentoDate(nextMonth);
     }
   }, [client, open]);
 
+  const handleDataEntradaSelect = (date: Date | undefined) => {
+    setDataEntradaDate(date);
+    if (date) {
+      setFormData({ ...formData, dataEntrada: formatToBRDate(date) });
+    }
+  };
+
+  const handleDataVencimentoSelect = (date: Date | undefined) => {
+    setDataVencimentoDate(date);
+    if (date) {
+      setFormData({ ...formData, dataVencimento: formatToBRDate(date) });
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Auto-calculate status based on due date
+    const status = calculateStatus(formData.dataVencimento);
+    
     onSave({
       ...(client ? { id: client.id } : {}),
       ...formData,
+      status,
       discord: formData.discord || undefined,
       telegram: formData.telegram || undefined,
+      observacoes: formData.observacoes || undefined,
     });
     onOpenChange(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{client ? 'Editar Cliente' : 'Novo Cliente'}</DialogTitle>
         </DialogHeader>
@@ -167,43 +209,69 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
           
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="dataEntrada">Data de Entrada</Label>
-              <Input
-                id="dataEntrada"
-                value={formData.dataEntrada}
-                onChange={(e) => setFormData({ ...formData, dataEntrada: e.target.value })}
-                placeholder="DD/MM/AAAA"
-                required
-              />
+              <Label>Data de Entrada</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !dataEntradaDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dataEntradaDate ? format(dataEntradaDate, "dd/MM/yyyy", { locale: ptBR }) : "Selecione"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={dataEntradaDate}
+                    onSelect={handleDataEntradaSelect}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="dataVencimento">Data de Vencimento</Label>
-              <Input
-                id="dataVencimento"
-                value={formData.dataVencimento}
-                onChange={(e) => setFormData({ ...formData, dataVencimento: e.target.value })}
-                placeholder="DD/MM/AAAA"
-                required
-              />
+              <Label>Data de Vencimento</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !dataVencimentoDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dataVencimentoDate ? format(dataVencimentoDate, "dd/MM/yyyy", { locale: ptBR }) : "Selecione"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={dataVencimentoDate}
+                    onSelect={handleDataVencimentoSelect}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
-          
+
           <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
-            <Select
-              value={formData.status}
-              onValueChange={(v) => setFormData({ ...formData, status: v as Client['status'] })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Ativo">Ativo</SelectItem>
-                <SelectItem value="Próximo">Próximo</SelectItem>
-                <SelectItem value="Vencido">Vencido</SelectItem>
-              </SelectContent>
-            </Select>
+            <Label htmlFor="observacoes">Observações (opcional)</Label>
+            <Textarea
+              id="observacoes"
+              value={formData.observacoes}
+              onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
+              placeholder="Anotações sobre o cliente..."
+              rows={3}
+            />
           </div>
           
           <DialogFooter>

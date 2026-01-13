@@ -11,8 +11,9 @@ export function StatsGrid({ clients }: StatsGridProps) {
   const clientesAtivos = clients.filter(c => c.status === 'Ativo').length;
   const proximosVencimento = clients.filter(c => c.status === 'Próximo').length;
   const clientesVencidos = clients.filter(c => c.status === 'Vencido').length;
+  const clientesAtivosData = clients.filter(c => c.status === 'Ativo');
   const faturamentoMensal = clients.reduce((acc, c) => acc + c.preco, 0);
-  const lucroEsperado = faturamentoMensal * 0.87; // 87% lucro esperado
+  const lucroEsperado = clientesAtivosData.reduce((acc, c) => acc + c.preco, 0);
 
   const formatCurrency = (value: number) => {
     return `R$ ${value.toFixed(2).replace('.', ',')}`;
