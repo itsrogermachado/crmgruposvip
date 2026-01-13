@@ -1,4 +1,4 @@
-import { RefreshCw, Upload, Download, UserPlus, Moon, Sun } from 'lucide-react';
+import { RefreshCw, Upload, Download, UserPlus, Moon, Sun, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 
@@ -7,9 +7,11 @@ interface HeaderProps {
   onExport: () => void;
   onNewClient: () => void;
   onRefresh: () => void;
+  onLogout: () => void;
+  userEmail?: string;
 }
 
-export function Header({ onImport, onExport, onNewClient, onRefresh }: HeaderProps) {
+export function Header({ onImport, onExport, onNewClient, onRefresh, onLogout, userEmail }: HeaderProps) {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -25,7 +27,12 @@ export function Header({ onImport, onExport, onNewClient, onRefresh }: HeaderPro
 
   return (
     <header className="flex items-center justify-between py-4 px-6 bg-card border-b">
-      <h1 className="text-xl font-bold text-foreground">CRM Grupos VIP</h1>
+      <div>
+        <h1 className="text-xl font-bold text-foreground">CRM Grupos VIP</h1>
+        {userEmail && (
+          <p className="text-xs text-muted-foreground">{userEmail}</p>
+        )}
+      </div>
       
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="icon" onClick={onRefresh}>
@@ -49,6 +56,10 @@ export function Header({ onImport, onExport, onNewClient, onRefresh }: HeaderPro
         
         <Button variant="ghost" size="icon" onClick={toggleTheme}>
           {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+        </Button>
+
+        <Button variant="ghost" size="icon" onClick={onLogout} title="Sair">
+          <LogOut className="w-5 h-5" />
         </Button>
       </div>
     </header>
