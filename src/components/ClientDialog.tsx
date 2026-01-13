@@ -30,6 +30,7 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
     nome: '',
     telefone: '',
     discord: '',
+    telegram: '',
     plano: 'VIP Completo' as Client['plano'],
     preco: 150,
     dataEntrada: '',
@@ -43,6 +44,7 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
         nome: client.nome,
         telefone: client.telefone,
         discord: client.discord || '',
+        telegram: client.telegram || '',
         plano: client.plano,
         preco: client.preco,
         dataEntrada: client.dataEntrada,
@@ -58,6 +60,7 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
         nome: '',
         telefone: '',
         discord: '',
+        telegram: '',
         plano: 'VIP Completo',
         preco: 150,
         dataEntrada: today.toLocaleDateString('pt-BR'),
@@ -73,6 +76,7 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
       ...(client ? { id: client.id } : {}),
       ...formData,
       discord: formData.discord || undefined,
+      telegram: formData.telegram || undefined,
     });
     onOpenChange(false);
   };
@@ -108,14 +112,26 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
             </div>
           </div>
           
-          <div className="space-y-2">
-            <Label htmlFor="discord">Discord (opcional)</Label>
-            <Input
-              id="discord"
-              value={formData.discord}
-              onChange={(e) => setFormData({ ...formData, discord: e.target.value })}
-              placeholder="username"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="discord">Discord (opcional)</Label>
+              <Input
+                id="discord"
+                value={formData.discord}
+                onChange={(e) => setFormData({ ...formData, discord: e.target.value })}
+                placeholder="username"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="telegram">Telegram (opcional)</Label>
+              <Input
+                id="telegram"
+                value={formData.telegram}
+                onChange={(e) => setFormData({ ...formData, telegram: e.target.value })}
+                placeholder="@username"
+              />
+            </div>
           </div>
           
           <div className="grid grid-cols-2 gap-4">
