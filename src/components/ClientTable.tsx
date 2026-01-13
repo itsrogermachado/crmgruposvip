@@ -22,6 +22,16 @@ export function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
     return `R$ ${value.toFixed(2).replace('.', ',')}`;
   };
 
+  const formatWhatsAppNumber = (phone: string) => {
+    // Remove all non-numeric characters
+    return phone.replace(/\D/g, '');
+  };
+
+  const openWhatsApp = (phone: string) => {
+    const formattedNumber = formatWhatsAppNumber(phone);
+    window.open(`https://wa.me/${formattedNumber}`, '_blank');
+  };
+
   return (
     <div className="data-table mx-6 mb-6">
       <Table>
@@ -57,10 +67,13 @@ export function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
                 {client.nome}
               </TableCell>
               <TableCell>
-                <div className="flex items-center gap-2">
+                <button
+                  onClick={() => openWhatsApp(client.telefone)}
+                  className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                >
                   <span className="text-primary">{client.telefone}</span>
-                  <MessageCircle className="w-4 h-4 text-primary cursor-pointer hover:text-primary/80" />
-                </div>
+                  <MessageCircle className="w-4 h-4 text-stat-green" />
+                </button>
                 {client.discord && (
                   <span className="text-xs text-muted-foreground block mt-0.5">
                     <MessageCircle className="w-3 h-3 inline mr-1" />
