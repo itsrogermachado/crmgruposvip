@@ -1,30 +1,22 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import { Header } from '@/components/Header';
 import { StatsGrid } from '@/components/StatsGrid';
 import { FilterSection } from '@/components/FilterSection';
 import { ClientTable } from '@/components/ClientTable';
 import { ClientDialog } from '@/components/ClientDialog';
-import { mockClients } from '@/data/mockClients';
-import { Client, StatusFilter, PlanoFilter } from '@/types/client';
+import { StatusFilter, PlanoFilter } from '@/types/client';
 import { useToast } from '@/hooks/use-toast';
-
-const STORAGE_KEY = 'crm-grupos-vip-clients';
-
-const getInitialClients = (): Client[] => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      return JSON.parse(stored);
-    }
-  } catch (error) {
-    console.error('Erro ao carregar dados do localStorage:', error);
-  }
-  return mockClients;
-};
+import { useAuth } from '@/hooks/useAuth';
+import { useClients, Client } from '@/hooks/useClients';
+import { Loader2 } from 'lucide-react';
 
 const Index = () => {
-  const [clients, setClients] = useState<Client[]>(getInitialClients);
+  const navigate = useNavigate();
+  const { user, loading: authLoading, signOut } = useAuth();
+  const { clients, loading: clientsLoading, fetchClients, addClient, updateClient, deleteClient, importClients } = useClients();
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('Todos');
   const [planoFilter, setPlanoFilter] = useState<PlanoFilter>('Todos');
@@ -33,14 +25,11 @@ const Index = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  // Salvar no localStorage sempre que clients mudar
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
-    } catch (error) {
-      console.error('Erro ao salvar dados no localStorage:', error);
-    }
-  }, [clients]);
+  // Redirect to auth if not logged in
+  if (!authLoading && !user) {
+    navigate('/auth');
+    return null;
+  }
 
   const filteredClients = useMemo(() => {
     return clients.filter((client) => {
@@ -56,45 +45,94 @@ const Index = () => {
     });
   }, [clients, searchTerm, statusFilter, planoFilter]);
 
+  // Convert Client to table format
+  const tableClients = useMemo(() => {
+    return filteredClients.map((c) => ({
+      id: c.id,
+      nome: c.nome,
+      telefone: c.telefone,
+      discord: c.discord,
+      telegram: c.telegram,
+      plano: c.plano,
+      preco: c.preco,
+      dataEntrada: c.data_entrada,
+      dataVencimento: c.data_vencimento,
+      status: c.status,
+    }));
+  }, [filteredClients]);
+
+  // Convert for stats
+  const statsClients = useMemo(() => {
+    return clients.map((c) => ({
+      id: c.id,
+      nome: c.nome,
+      telefone: c.telefone,
+      discord: c.discord,
+      telegram: c.telegram,
+      plano: c.plano,
+      preco: c.preco,
+      dataEntrada: c.data_entrada,
+      dataVencimento: c.data_vencimento,
+      status: c.status,
+    }));
+  }, [clients]);
+
   const handleNewClient = () => {
     setEditingClient(null);
     setDialogOpen(true);
   };
 
-  const handleEditClient = (client: Client) => {
-    setEditingClient(client);
+  const handleEditClient = (client: { id: string; nome: string; telefone: string; discord?: string; telegram?: string; plano: string; preco: number; dataEntrada: string; dataVencimento: string; status: string }) => {
+    const clientToEdit: Client = {
+      id: client.id,
+      nome: client.nome,
+      telefone: client.telefone,
+      discord: client.discord,
+      telegram: client.telegram,
+      plano: client.plano as Client['plano'],
+      preco: client.preco,
+      data_entrada: client.dataEntrada,
+      data_vencimento: client.dataVencimento,
+      status: client.status as Client['status'],
+    };
+    setEditingClient(clientToEdit);
     setDialogOpen(true);
   };
 
-  const handleDeleteClient = (clientId: string) => {
-    setClients(clients.filter((c) => c.id !== clientId));
-    toast({
-      title: 'Cliente removido',
-      description: 'O cliente foi removido com sucesso.',
-    });
+  const handleDeleteClient = async (clientId: string) => {
+    await deleteClient(clientId);
   };
 
-  const handleSaveClient = (clientData: Omit<Client, 'id'> & { id?: string }) => {
+  const handleSaveClient = async (clientData: { id?: string; nome: string; telefone: string; discord?: string; telegram?: string; plano: string; preco: number; dataEntrada: string; dataVencimento: string; status: string }) => {
     if (clientData.id) {
-      setClients(clients.map((c) => (c.id === clientData.id ? { ...clientData, id: c.id } as Client : c)));
-      toast({
-        title: 'Cliente atualizado',
-        description: 'As informações do cliente foram atualizadas.',
+      await updateClient(clientData.id, {
+        nome: clientData.nome,
+        telefone: clientData.telefone,
+        discord: clientData.discord,
+        telegram: clientData.telegram,
+        plano: clientData.plano as Client['plano'],
+        preco: clientData.preco,
+        data_entrada: clientData.dataEntrada,
+        data_vencimento: clientData.dataVencimento,
+        status: clientData.status as Client['status'],
       });
     } else {
-      const newClient: Client = {
-        ...clientData,
-        id: Date.now().toString(),
-      } as Client;
-      setClients([...clients, newClient]);
-      toast({
-        title: 'Cliente criado',
-        description: 'O novo cliente foi adicionado com sucesso.',
+      await addClient({
+        nome: clientData.nome,
+        telefone: clientData.telefone,
+        discord: clientData.discord,
+        telegram: clientData.telegram,
+        plano: clientData.plano as Client['plano'],
+        preco: clientData.preco,
+        data_entrada: clientData.dataEntrada,
+        data_vencimento: clientData.dataVencimento,
+        status: clientData.status as Client['status'],
       });
     }
   };
 
   const handleRefresh = () => {
+    fetchClients();
     toast({
       title: 'Dados atualizados',
       description: 'A lista de clientes foi atualizada.',
@@ -110,7 +148,7 @@ const Index = () => {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       try {
         const data = new Uint8Array(event.target?.result as ArrayBuffer);
         const workbook = XLSX.read(data, { type: 'array' });
@@ -118,24 +156,19 @@ const Index = () => {
         const worksheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet) as Record<string, unknown>[];
 
-        const importedClients: Client[] = jsonData.map((row, index) => ({
-          id: Date.now().toString() + index,
+        const importedClients: Omit<Client, 'id'>[] = jsonData.map((row) => ({
           nome: String(row['Nome'] || row['nome'] || ''),
           telefone: String(row['Telefone'] || row['telefone'] || ''),
           discord: row['Discord'] || row['discord'] ? String(row['Discord'] || row['discord']) : undefined,
           telegram: row['Telegram'] || row['telegram'] ? String(row['Telegram'] || row['telegram']) : undefined,
           plano: (row['Plano'] || row['plano'] || 'VIP Completo') as Client['plano'],
           preco: Number(row['Preço'] || row['preco'] || row['Preco'] || 0),
-          dataEntrada: String(row['Data Entrada'] || row['dataEntrada'] || ''),
-          dataVencimento: String(row['Data Vencimento'] || row['dataVencimento'] || ''),
+          data_entrada: String(row['Data Entrada'] || row['dataEntrada'] || row['data_entrada'] || ''),
+          data_vencimento: String(row['Data Vencimento'] || row['dataVencimento'] || row['data_vencimento'] || ''),
           status: (row['Status'] || row['status'] || 'Ativo') as Client['status'],
         }));
 
-        setClients([...clients, ...importedClients]);
-        toast({
-          title: 'Importação concluída',
-          description: `${importedClients.length} clientes foram importados.`,
-        });
+        await importClients(importedClients);
       } catch (error) {
         toast({
           title: 'Erro na importação',
@@ -156,8 +189,8 @@ const Index = () => {
       Telegram: c.telegram || '',
       Plano: c.plano,
       Preço: c.preco,
-      'Data Entrada': c.dataEntrada,
-      'Data Vencimento': c.dataVencimento,
+      'Data Entrada': c.data_entrada,
+      'Data Vencimento': c.data_vencimento,
       Status: c.status,
     }));
 
@@ -172,6 +205,19 @@ const Index = () => {
     });
   };
 
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/auth');
+  };
+
+  if (authLoading || clientsLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header
@@ -179,9 +225,11 @@ const Index = () => {
         onExport={handleExport}
         onNewClient={handleNewClient}
         onRefresh={handleRefresh}
+        onLogout={handleLogout}
+        userEmail={user?.email}
       />
 
-      <StatsGrid clients={clients} />
+      <StatsGrid clients={statsClients} />
 
       <FilterSection
         searchTerm={searchTerm}
@@ -194,7 +242,7 @@ const Index = () => {
 
       <div className="mt-6">
         <ClientTable
-          clients={filteredClients}
+          clients={tableClients}
           onEdit={handleEditClient}
           onDelete={handleDeleteClient}
         />
@@ -203,7 +251,18 @@ const Index = () => {
       <ClientDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        client={editingClient}
+        client={editingClient ? {
+          id: editingClient.id,
+          nome: editingClient.nome,
+          telefone: editingClient.telefone,
+          discord: editingClient.discord,
+          telegram: editingClient.telegram,
+          plano: editingClient.plano,
+          preco: editingClient.preco,
+          dataEntrada: editingClient.data_entrada,
+          dataVencimento: editingClient.data_vencimento,
+          status: editingClient.status,
+        } : null}
         onSave={handleSaveClient}
       />
 
