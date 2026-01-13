@@ -57,6 +57,25 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        stat: {
+          blue: "hsl(var(--stat-blue))",
+          purple: "hsl(var(--stat-purple))",
+          yellow: "hsl(var(--stat-yellow))",
+          red: "hsl(var(--stat-red))",
+          cyan: "hsl(var(--stat-cyan))",
+          green: "hsl(var(--stat-green))",
+        },
+        status: {
+          active: "hsl(var(--status-active))",
+          "active-bg": "hsl(var(--status-active-bg))",
+          warning: "hsl(var(--status-warning))",
+          "warning-bg": "hsl(var(--status-warning-bg))",
+          expired: "hsl(var(--status-expired))",
+          "expired-bg": "hsl(var(--status-expired-bg))",
+        },
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",
