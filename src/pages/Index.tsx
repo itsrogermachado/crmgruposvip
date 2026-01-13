@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { Header } from '@/components/Header';
 import { StatsGrid } from '@/components/StatsGrid';
@@ -9,8 +9,22 @@ import { mockClients } from '@/data/mockClients';
 import { Client, StatusFilter, PlanoFilter } from '@/types/client';
 import { useToast } from '@/hooks/use-toast';
 
+const STORAGE_KEY = 'crm-grupos-vip-clients';
+
+const getInitialClients = (): Client[] => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (error) {
+    console.error('Erro ao carregar dados do localStorage:', error);
+  }
+  return mockClients;
+};
+
 const Index = () => {
-  const [clients, setClients] = useState<Client[]>(mockClients);
+  const [clients, setClients] = useState<Client[]>(getInitialClients);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('Todos');
   const [planoFilter, setPlanoFilter] = useState<PlanoFilter>('Todos');
@@ -18,6 +32,15 @@ const Index = () => {
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // Salvar no localStorage sempre que clients mudar
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
+    } catch (error) {
+      console.error('Erro ao salvar dados no localStorage:', error);
+    }
+  }, [clients]);
 
   const filteredClients = useMemo(() => {
     return clients.filter((client) => {
