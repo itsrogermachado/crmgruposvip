@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { MessageCircle, Pencil, Trash2, Send, FileText, Users, Receipt, X } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { MessageCircle, Pencil, Trash2, Send, FileText, Users, Receipt, Upload, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -21,19 +21,27 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import { StatusBadge } from './StatusBadge';
 import { WhatsAppMessageDialog } from './WhatsAppMessageDialog';
 import { MobileClientCard } from './MobileClientCard';
 import { Client } from '@/types/client';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface ClientTableProps {
   clients: Client[];
   onEdit: (client: Client) => void;
   onDelete: (clientId: string) => void;
+  onClientUpdate?: () => void;
 }
 
-export function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
+export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: ClientTableProps) {
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  
   const [whatsappDialog, setWhatsappDialog] = useState<{ 
     open: boolean; 
     client: Client | null 
@@ -46,14 +54,91 @@ export function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
     open: boolean;
     url: string | null;
     clientName: string;
+    clientId: string;
   }>({
     open: false,
     url: null,
     clientName: '',
+    clientId: '',
   });
 
-  const openComprovanteModal = (url: string, clientName: string) => {
-    setComprovanteDialog({ open: true, url, clientName });
+  const openComprovanteModal = (url: string, clientName: string, clientId: string) => {
+    setComprovanteDialog({ open: true, url, clientName, clientId });
+  };
+
+  const handleUpdateComprovante = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !comprovanteDialog.clientId) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Erro",
+        description: "Por favor, selecione apenas imagens.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Erro",
+        description: "A imagem deve ter no máximo 5MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${comprovanteDialog.clientId}-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('comprovantes')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('comprovantes')
+        .getPublicUrl(filePath);
+
+      // Update client record
+      const { error: updateError } = await supabase
+        .from('clients')
+        .update({ comprovante_url: publicUrl })
+        .eq('id', comprovanteDialog.clientId);
+
+      if (updateError) throw updateError;
+
+      // Update modal with new URL
+      setComprovanteDialog(prev => ({ ...prev, url: publicUrl }));
+
+      toast({
+        title: "Sucesso",
+        description: "Comprovante atualizado com sucesso!",
+      });
+
+      // Notify parent to refresh list
+      onClientUpdate?.();
+    } catch (error) {
+      console.error('Error updating comprovante:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao atualizar comprovante. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   const formatCurrency = (value: number) => {
@@ -90,6 +175,7 @@ export function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
               onEdit={onEdit}
               onDelete={onDelete}
               onWhatsApp={openWhatsAppDialog}
+              onClientUpdate={onClientUpdate}
             />
           </div>
         ))}
@@ -196,7 +282,7 @@ export function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => openComprovanteModal(client.comprovanteUrl!, client.nome)}
+                              onClick={() => openComprovanteModal(client.comprovanteUrl!, client.nome, client.id)}
                               className="h-8 w-8 text-stat-green hover:text-stat-green hover:bg-stat-green/10 transition-all duration-300"
                             >
                               <Receipt className="w-4 h-4" />
@@ -263,6 +349,33 @@ export function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
               />
             )}
           </div>
+          <DialogFooter>
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              onChange={handleUpdateComprovante}
+              className="hidden"
+            />
+            <Button
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="gap-2"
+            >
+              {uploading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Enviando...
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4" />
+                  Atualizar Comprovante
+                </>
+              )}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
