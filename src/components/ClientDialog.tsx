@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CalendarIcon, Upload, X, Image as ImageIcon } from 'lucide-react';
+import { CalendarIcon, Upload, X, Image as ImageIcon, Plus } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -26,12 +26,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import { Client } from '@/types/client';
 import { cn } from '@/lib/utils';
 import { parseBRDate, formatToBRDate, calculateStatus } from '@/lib/dateUtils';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useClientPlans } from '@/hooks/useClientPlans';
 
 interface ClientDialogProps {
   open: boolean;
@@ -44,13 +46,14 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
   const { user } = useAuth();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { plans, addPlan } = useClientPlans();
   
   const [formData, setFormData] = useState({
     nome: '',
     telefone: '',
     discord: '',
     telegram: '',
-    plano: 'VIP Completo' as Client['plano'],
+    plano: 'VIP Completo',
     preco: 150,
     dataEntrada: '',
     dataVencimento: '',
@@ -62,6 +65,17 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
   const [dataVencimentoDate, setDataVencimentoDate] = useState<Date | undefined>();
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [newPlanDialogOpen, setNewPlanDialogOpen] = useState(false);
+  const [newPlanName, setNewPlanName] = useState('');
+
+  const handleCreatePlan = () => {
+    if (newPlanName.trim()) {
+      addPlan(newPlanName.trim());
+      setFormData({ ...formData, plano: newPlanName.trim() });
+      setNewPlanName('');
+      setNewPlanDialogOpen(false);
+    }
+  };
 
   useEffect(() => {
     if (client) {
@@ -263,15 +277,28 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
               <Label htmlFor="plano">Plano</Label>
               <Select
                 value={formData.plano}
-                onValueChange={(v) => setFormData({ ...formData, plano: v as Client['plano'] })}
+                onValueChange={(v) => {
+                  if (v === '__new__') {
+                    setNewPlanDialogOpen(true);
+                  } else {
+                    setFormData({ ...formData, plano: v });
+                  }
+                }}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="VIP Completo">VIP Completo</SelectItem>
-                  <SelectItem value="Delay">Delay</SelectItem>
-                  <SelectItem value="Básico">Básico</SelectItem>
+                  {plans.map((plan) => (
+                    <SelectItem key={plan} value={plan}>{plan}</SelectItem>
+                  ))}
+                  <Separator className="my-1" />
+                  <SelectItem value="__new__">
+                    <span className="flex items-center gap-2 text-primary">
+                      <Plus className="w-3 h-3" />
+                      Novo Plano
+                    </span>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -415,6 +442,35 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
           </DialogFooter>
         </form>
       </DialogContent>
+
+      {/* Dialog para criar novo plano */}
+      <Dialog open={newPlanDialogOpen} onOpenChange={setNewPlanDialogOpen}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Novo Plano</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="newPlanName">Nome do Plano</Label>
+              <Input
+                id="newPlanName"
+                value={newPlanName}
+                onChange={(e) => setNewPlanName(e.target.value)}
+                placeholder="Ex: Premium, Gold..."
+                autoFocus
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setNewPlanDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleCreatePlan} disabled={!newPlanName.trim()}>
+              Criar Plano
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }
