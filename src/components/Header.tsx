@@ -1,4 +1,4 @@
-import { RefreshCw, Upload, Download, UserPlus, Moon, Sun, LogOut, Shield, CreditCard } from 'lucide-react';
+import { RefreshCw, Upload, Download, UserPlus, Moon, Sun, LogOut, Shield, CreditCard, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -48,18 +48,24 @@ export function Header({
   return (
     <header className="flex items-center justify-between py-4 px-6 bg-card border-b">
       <div className="flex items-center gap-4">
-        <Avatar className="h-10 w-10">
-          <AvatarImage src={avatarUrl || undefined} alt={displayName} />
-          <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-            {initials}
-          </AvatarFallback>
-        </Avatar>
-        <div>
-          <h1 className="text-xl font-bold text-foreground">{displayName}</h1>
-          {userEmail && (
-            <p className="text-xs text-muted-foreground">{userEmail}</p>
-          )}
-        </div>
+        <button 
+          onClick={() => navigate('/settings')} 
+          className="flex items-center gap-4 hover:opacity-80 transition-opacity cursor-pointer"
+          title="Clique para editar seu perfil"
+        >
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={avatarUrl || undefined} alt={displayName} />
+            <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <div className="text-left">
+            <h1 className="text-xl font-bold text-foreground">{displayName}</h1>
+            {userEmail && (
+              <p className="text-xs text-muted-foreground">{userEmail}</p>
+            )}
+          </div>
+        </button>
         <SubscriptionCountdown />
       </div>
       
@@ -95,6 +101,10 @@ export function Header({
           Novo Cliente
         </Button>
         
+        <Button variant="ghost" size="icon" onClick={() => navigate('/settings')} title="Configurações">
+          <Settings className="w-5 h-5" />
+        </Button>
+
         <Button variant="ghost" size="icon" onClick={toggleTheme}>
           {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
         </Button>
