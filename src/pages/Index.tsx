@@ -29,10 +29,10 @@ const Index = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  // Clients near expiration for notifications
-  const clientsNearExpiration = useMemo(() => {
+  // Expired clients for notifications
+  const clientsExpired = useMemo(() => {
     return clients
-      .filter(c => c.status === 'Próximo')
+      .filter(c => c.status === 'Vencido')
       .map(c => ({
         id: c.id,
         nome: c.nome,
@@ -253,14 +253,14 @@ const Index = () => {
       <ChartsSection clients={statsClients} />
 
       {/* Notification Button */}
-      {clientsNearExpiration.length > 0 && (
+      {clientsExpired.length > 0 && (
         <div className="px-6 mb-4">
           <Button
             onClick={() => setNotifyDialogOpen(true)}
-            className="bg-yellow-600 hover:bg-yellow-700 text-white"
+            className="bg-red-600 hover:bg-red-700 text-white"
           >
             <Bell className="h-4 w-4 mr-2" />
-            Notificar {clientsNearExpiration.length} cliente{clientsNearExpiration.length !== 1 ? 's' : ''} próximo{clientsNearExpiration.length !== 1 ? 's' : ''} do vencimento
+            Notificar {clientsExpired.length} cliente{clientsExpired.length !== 1 ? 's' : ''} vencido{clientsExpired.length !== 1 ? 's' : ''}
           </Button>
         </div>
       )}
@@ -304,7 +304,7 @@ const Index = () => {
       <NotifyClientsDialog
         open={notifyDialogOpen}
         onOpenChange={setNotifyDialogOpen}
-        clients={clientsNearExpiration}
+        clients={clientsExpired}
       />
 
       <input
