@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,8 @@ interface WhatsAppMessageDialogProps {
   onOpenChange: (open: boolean) => void;
   clientName: string;
   phone: string;
+  status?: string;
+  dataVencimento?: string;
 }
 
 const MESSAGE_TEMPLATES = [
@@ -25,8 +27,18 @@ const MESSAGE_TEMPLATES = [
   { label: 'Cobrança', message: 'Olá {nome}! Notamos que seu plano venceu. Podemos ajudar com a renovação?' },
 ];
 
-export function WhatsAppMessageDialog({ open, onOpenChange, clientName, phone }: WhatsAppMessageDialogProps) {
+export function WhatsAppMessageDialog({ open, onOpenChange, clientName, phone, status, dataVencimento }: WhatsAppMessageDialogProps) {
   const [message, setMessage] = useState('');
+
+  // Auto-fill message when dialog opens and client is expired
+  useEffect(() => {
+    if (open && status === 'Vencido' && dataVencimento) {
+      const expiredMessage = `Olá ${clientName}! 👋\n\nNotamos que sua assinatura VIP venceu em ${dataVencimento}.\n\nPara continuar aproveitando todos os benefícios exclusivos, entre em contato conosco para renovar seu plano.\n\nAguardamos seu retorno! 🚀`;
+      setMessage(expiredMessage);
+    } else if (open) {
+      setMessage('');
+    }
+  }, [open, status, dataVencimento, clientName]);
 
   const formatWhatsAppNumber = (phoneNumber: string) => {
     return phoneNumber.replace(/\D/g, '');

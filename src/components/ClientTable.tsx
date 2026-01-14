@@ -26,7 +26,10 @@ interface ClientTableProps {
 }
 
 export function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
-  const [whatsappDialog, setWhatsappDialog] = useState<{ open: boolean; client: Client | null }>({
+  const [whatsappDialog, setWhatsappDialog] = useState<{ 
+    open: boolean; 
+    client: Client | null 
+  }>({
     open: false,
     client: null,
   });
@@ -154,6 +157,8 @@ export function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
           onOpenChange={(open) => setWhatsappDialog({ ...whatsappDialog, open })}
           clientName={whatsappDialog.client.nome}
           phone={whatsappDialog.client.telefone}
+          status={whatsappDialog.client.status}
+          dataVencimento={whatsappDialog.client.dataVencimento}
         />
       )}
     </>

@@ -7,13 +7,11 @@ import { ChartsSection } from '@/components/ChartsSection';
 import { FilterSection } from '@/components/FilterSection';
 import { ClientTable } from '@/components/ClientTable';
 import { ClientDialog } from '@/components/ClientDialog';
-import { NotifyClientsDialog } from '@/components/NotifyClientsDialog';
 import { StatusFilter, PlanoFilter } from '@/types/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useClients, Client } from '@/hooks/useClients';
-import { Loader2, Bell } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -24,23 +22,10 @@ const Index = () => {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('Todos');
   const [planoFilter, setPlanoFilter] = useState<PlanoFilter>('Todos');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [notifyDialogOpen, setNotifyDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  // Expired clients for notifications
-  const clientsExpired = useMemo(() => {
-    return clients
-      .filter(c => c.status === 'Vencido')
-      .map(c => ({
-        id: c.id,
-        nome: c.nome,
-        telefone: c.telefone,
-        dataVencimento: c.data_vencimento,
-        status: c.status,
-      }));
-  }, [clients]);
 
   // Redirect to auth if not logged in
   if (!authLoading && !user) {
@@ -252,18 +237,6 @@ const Index = () => {
 
       <ChartsSection clients={statsClients} />
 
-      {/* Notification Button */}
-      {clientsExpired.length > 0 && (
-        <div className="px-6 mb-4">
-          <Button
-            onClick={() => setNotifyDialogOpen(true)}
-            className="bg-red-600 hover:bg-red-700 text-white"
-          >
-            <Bell className="h-4 w-4 mr-2" />
-            Notificar {clientsExpired.length} cliente{clientsExpired.length !== 1 ? 's' : ''} vencido{clientsExpired.length !== 1 ? 's' : ''}
-          </Button>
-        </div>
-      )}
 
       <FilterSection
         searchTerm={searchTerm}
@@ -301,11 +274,6 @@ const Index = () => {
         onSave={handleSaveClient}
       />
 
-      <NotifyClientsDialog
-        open={notifyDialogOpen}
-        onOpenChange={setNotifyDialogOpen}
-        clients={clientsExpired}
-      />
 
       <input
         ref={fileInputRef}
