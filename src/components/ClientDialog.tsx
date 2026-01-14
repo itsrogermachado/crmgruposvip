@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { CalendarIcon, Upload, X, Image as ImageIcon } from 'lucide-react';
+import { PaymentHistorySection } from './PaymentHistorySection';
 import {
   Dialog,
   DialogContent,
@@ -403,6 +404,11 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
               />
             </div>
           </div>
+
+          {/* Payment History - Only show when editing existing client */}
+          {client && (
+            <PaymentHistorySection clientId={client.id} clientName={client.nome} />
+          )}
           
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

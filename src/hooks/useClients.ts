@@ -17,9 +17,10 @@ export interface Client {
   status: 'Ativo' | 'Vencido' | 'Próximo';
   observacoes?: string;
   comprovante_url?: string;
+  group_id?: string;
 }
 
-export function useClients() {
+export function useClients(groupId?: string | null) {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
@@ -33,10 +34,17 @@ export function useClients() {
     }
 
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('clients')
         .select('*')
         .order('created_at', { ascending: false });
+
+      // Filter by group if provided
+      if (groupId) {
+        query = query.eq('group_id', groupId);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
 
@@ -57,6 +65,7 @@ export function useClients() {
           status: autoStatus,
           observacoes: c.observacoes || undefined,
           comprovante_url: c.comprovante_url || undefined,
+          group_id: c.group_id || undefined,
         };
       });
 
@@ -71,7 +80,7 @@ export function useClients() {
     } finally {
       setLoading(false);
     }
-  }, [user, toast]);
+  }, [user, toast, groupId]);
 
   useEffect(() => {
     fetchClients();
@@ -96,6 +105,7 @@ export function useClients() {
           status: clientData.status,
           observacoes: clientData.observacoes || null,
           comprovante_url: clientData.comprovante_url || null,
+          group_id: clientData.group_id || null,
         })
         .select()
         .single();
@@ -115,6 +125,7 @@ export function useClients() {
         status: calculateStatus(data.data_vencimento),
         observacoes: data.observacoes || undefined,
         comprovante_url: data.comprovante_url || undefined,
+        group_id: data.group_id || undefined,
       };
 
       setClients((prev) => [newClient, ...prev]);
@@ -152,6 +163,7 @@ export function useClients() {
           status: clientData.status,
           observacoes: clientData.observacoes || null,
           comprovante_url: clientData.comprovante_url || null,
+          group_id: clientData.group_id || null,
         })
         .eq('id', id);
 
