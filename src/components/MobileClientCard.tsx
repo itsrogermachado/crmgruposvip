@@ -115,12 +115,18 @@ export function MobileClientCard({ client, onEdit, onDelete, onWhatsApp, onClien
           </DialogDescription>
         </DialogHeader>
         <div className="flex items-center justify-center p-4">
-          {(currentUrl || client.comprovanteUrl) && (
+          {(currentUrl || client.comprovanteUrl) ? (
             <img
               src={currentUrl || client.comprovanteUrl}
               alt={`Comprovante de ${client.nome}`}
               className="max-w-full max-h-[60vh] object-contain rounded-lg border border-border"
             />
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <Upload className="w-12 h-12 text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">Nenhum comprovante cadastrado</p>
+              <p className="text-sm text-muted-foreground/60">Clique no botão abaixo para adicionar</p>
+            </div>
           )}
         </div>
         <DialogFooter>
@@ -194,17 +200,23 @@ export function MobileClientCard({ client, onEdit, onDelete, onWhatsApp, onClien
           <MessageCircle style={{ width: 'clamp(0.875rem, 3.5vw, 1rem)', height: 'clamp(0.875rem, 3.5vw, 1rem)' }} />
           WhatsApp
         </Button>
-        {client.comprovanteUrl && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setComprovanteOpen(true)}
-            className="text-stat-green hover:text-stat-green hover:bg-stat-green/10"
-            style={{ width: 'clamp(2rem, 8vw, 2.25rem)', height: 'clamp(2rem, 8vw, 2.25rem)' }}
-          >
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setComprovanteOpen(true)}
+          className={`${
+            client.comprovanteUrl || currentUrl
+              ? 'text-stat-green hover:text-stat-green hover:bg-stat-green/10'
+              : 'text-primary hover:text-primary hover:bg-primary/10'
+          }`}
+          style={{ width: 'clamp(2rem, 8vw, 2.25rem)', height: 'clamp(2rem, 8vw, 2.25rem)' }}
+        >
+          {client.comprovanteUrl || currentUrl ? (
             <Receipt style={{ width: 'clamp(0.875rem, 3.5vw, 1rem)', height: 'clamp(0.875rem, 3.5vw, 1rem)' }} />
-          </Button>
-        )}
+          ) : (
+            <Upload style={{ width: 'clamp(0.875rem, 3.5vw, 1rem)', height: 'clamp(0.875rem, 3.5vw, 1rem)' }} />
+          )}
+        </Button>
         <Button
           variant="ghost"
           size="icon"

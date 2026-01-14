@@ -275,25 +275,31 @@ export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: Clien
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-1">
-                    {client.comprovanteUrl && (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => openComprovanteModal(client.comprovanteUrl!, client.nome, client.id)}
-                              className="h-8 w-8 text-stat-green hover:text-stat-green hover:bg-stat-green/10 transition-all duration-300"
-                            >
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => openComprovanteModal(client.comprovanteUrl || '', client.nome, client.id)}
+                            className={`h-8 w-8 transition-all duration-300 ${
+                              client.comprovanteUrl 
+                                ? 'text-stat-green hover:text-stat-green hover:bg-stat-green/10' 
+                                : 'text-primary hover:text-primary hover:bg-primary/10'
+                            }`}
+                          >
+                            {client.comprovanteUrl ? (
                               <Receipt className="w-4 h-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Ver comprovante</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    )}
+                            ) : (
+                              <Upload className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{client.comprovanteUrl ? 'Ver comprovante' : 'Adicionar comprovante'}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -341,12 +347,18 @@ export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: Clien
             </DialogDescription>
           </DialogHeader>
           <div className="flex items-center justify-center p-4">
-            {comprovanteDialog.url && (
+            {comprovanteDialog.url ? (
               <img
                 src={comprovanteDialog.url}
                 alt={`Comprovante de ${comprovanteDialog.clientName}`}
                 className="max-w-full max-h-[60vh] object-contain rounded-lg border border-border"
               />
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <Upload className="w-12 h-12 text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">Nenhum comprovante cadastrado</p>
+                <p className="text-sm text-muted-foreground/60">Clique no botão abaixo para adicionar</p>
+              </div>
             )}
           </div>
           <DialogFooter>
