@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MessageCircle, Pencil, Trash2, Send, FileText, Users } from 'lucide-react';
+import { MessageCircle, Pencil, Trash2, Send, FileText, Users, Receipt, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -15,6 +15,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { StatusBadge } from './StatusBadge';
 import { WhatsAppMessageDialog } from './WhatsAppMessageDialog';
 import { MobileClientCard } from './MobileClientCard';
@@ -34,6 +41,20 @@ export function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
     open: false,
     client: null,
   });
+
+  const [comprovanteDialog, setComprovanteDialog] = useState<{
+    open: boolean;
+    url: string | null;
+    clientName: string;
+  }>({
+    open: false,
+    url: null,
+    clientName: '',
+  });
+
+  const openComprovanteModal = (url: string, clientName: string) => {
+    setComprovanteDialog({ open: true, url, clientName });
+  };
 
   const formatCurrency = (value: number) => {
     return `R$ ${value.toFixed(2).replace('.', ',')}`;
@@ -168,6 +189,25 @@ export function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-1">
+                    {client.comprovanteUrl && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => openComprovanteModal(client.comprovanteUrl!, client.nome)}
+                              className="h-8 w-8 text-stat-green hover:text-stat-green hover:bg-stat-green/10 transition-all duration-300"
+                            >
+                              <Receipt className="w-4 h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Ver comprovante</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
                     <Button
                       variant="ghost"
                       size="icon"
@@ -202,6 +242,29 @@ export function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
           dataVencimento={whatsappDialog.client.dataVencimento}
         />
       )}
+
+      <Dialog open={comprovanteDialog.open} onOpenChange={(open) => setComprovanteDialog({ ...comprovanteDialog, open })}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Receipt className="w-5 h-5 text-stat-green" />
+              Comprovante - {comprovanteDialog.clientName}
+            </DialogTitle>
+            <DialogDescription>
+              Visualização do comprovante de pagamento do cliente.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center justify-center p-4">
+            {comprovanteDialog.url && (
+              <img
+                src={comprovanteDialog.url}
+                alt={`Comprovante de ${comprovanteDialog.clientName}`}
+                className="max-w-full max-h-[60vh] object-contain rounded-lg border border-border"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
