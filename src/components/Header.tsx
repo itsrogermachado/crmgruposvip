@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/hooks/useAdmin';
-import { GroupSelector } from './GroupSelector';
 import { ReminderSettingsDialog } from './ReminderSettingsDialog';
 import { SubscriptionCountdown } from './SubscriptionCountdown';
 
@@ -46,8 +45,6 @@ export function Header({ onImport, onExport, onNewClient, onRefresh, onLogout, u
       </div>
       
       <div className="flex items-center gap-3">
-        <GroupSelector />
-
         <Button variant="outline" size="icon" onClick={() => setReminderDialogOpen(true)} title="Configurar Lembretes">
           <Bell className="w-4 h-4" />
         </Button>
