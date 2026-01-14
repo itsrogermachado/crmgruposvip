@@ -337,6 +337,7 @@ const Index = () => {
             dataVencimento: editingClient.data_vencimento,
             status: editingClient.status,
             comprovanteUrl: editingClient.comprovante_url,
+            observacoes: editingClient.observacoes,
           } : null}
           onSave={handleSaveClient}
         />
