@@ -13,7 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useClients, Client } from '@/hooks/useClients';
 import { useProfile } from '@/hooks/useProfile';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Sparkles } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -29,8 +29,6 @@ const Index = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-
-  // Redirect to auth if not logged in
   if (!authLoading && !user) {
     navigate('/auth');
     return null;
@@ -50,7 +48,6 @@ const Index = () => {
     });
   }, [clients, searchTerm, statusFilter, planoFilter]);
 
-  // Convert Client to table format
   const tableClients = useMemo(() => {
     return filteredClients.map((c) => ({
       id: c.id,
@@ -66,7 +63,6 @@ const Index = () => {
     }));
   }, [filteredClients]);
 
-  // Convert for stats
   const statsClients = useMemo(() => {
     return clients.map((c) => ({
       id: c.id,
@@ -173,7 +169,7 @@ const Index = () => {
       });
 
       worksheet.eachRow((row, rowNumber) => {
-        if (rowNumber === 1) return; // Skip header
+        if (rowNumber === 1) return;
         const rowData: Record<string, unknown> = {};
         row.eachCell((cell, colNumber) => {
           const header = headers[colNumber];
@@ -239,7 +235,6 @@ const Index = () => {
       });
     });
 
-    // Style header row
     worksheet.getRow(1).font = { bold: true };
 
     const buffer = await workbook.xlsx.writeBuffer();
@@ -264,15 +259,19 @@ const Index = () => {
 
   if (authLoading || clientsLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4 animated-bg dark:animated-bg animated-bg-light">
+        <div className="relative">
+          <Loader2 className="w-12 h-12 animate-spin text-primary" />
+          <Sparkles className="w-5 h-5 text-primary absolute -top-1 -right-1 animate-pulse" />
+        </div>
+        <p className="text-muted-foreground animate-pulse">Carregando seu CRM...</p>
       </div>
     );
   }
 
   return (
     <SubscriptionRequired>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen animated-bg dark:animated-bg animated-bg-light">
         <Header
           onImport={handleImport}
           onExport={handleExport}
@@ -284,27 +283,28 @@ const Index = () => {
           avatarUrl={profile?.avatar_url}
         />
 
-        <StatsGrid clients={statsClients} />
+        <main className="pb-8">
+          <StatsGrid clients={statsClients} />
 
-        <ChartsSection clients={statsClients} />
+          <ChartsSection clients={statsClients} />
 
-
-        <FilterSection
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          statusFilter={statusFilter}
-          onStatusChange={setStatusFilter}
-          planoFilter={planoFilter}
-          onPlanoChange={setPlanoFilter}
-        />
-
-        <div className="mt-6">
-          <ClientTable
-            clients={tableClients}
-            onEdit={handleEditClient}
-            onDelete={handleDeleteClient}
+          <FilterSection
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            statusFilter={statusFilter}
+            onStatusChange={setStatusFilter}
+            planoFilter={planoFilter}
+            onPlanoChange={setPlanoFilter}
           />
-        </div>
+
+          <div className="mt-6">
+            <ClientTable
+              clients={tableClients}
+              onEdit={handleEditClient}
+              onDelete={handleDeleteClient}
+            />
+          </div>
+        </main>
 
         <ClientDialog
           open={dialogOpen}
@@ -324,7 +324,6 @@ const Index = () => {
           } : null}
           onSave={handleSaveClient}
         />
-
 
         <input
           ref={fileInputRef}

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Users, Upload, X } from 'lucide-react';
+import { Users, Upload, X, Sparkles, Mail, Lock, User } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const Auth = () => {
@@ -25,7 +25,6 @@ const Auth = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file size (2MB max)
     if (file.size > 2 * 1024 * 1024) {
       toast({
         title: 'Arquivo muito grande',
@@ -35,7 +34,6 @@ const Auth = () => {
       return;
     }
 
-    // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
       toast({
@@ -105,7 +103,6 @@ const Auth = () => {
         });
         navigate('/');
       } else {
-        // Validate group name
         if (!groupName.trim()) {
           toast({
             title: 'Nome do grupo obrigatório',
@@ -126,16 +123,13 @@ const Auth = () => {
 
         if (error) throw error;
 
-        // If user was created, update profile with group name and avatar
         if (authData.user) {
           let avatarUrl: string | null = null;
 
-          // Upload avatar if selected
           if (avatarFile) {
             avatarUrl = await uploadAvatar(authData.user.id);
           }
 
-          // Update profile with group name and avatar
           const { error: profileError } = await supabase
             .from('profiles')
             .update({
@@ -168,74 +162,100 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto w-12 h-12 bg-primary rounded-full flex items-center justify-center mb-4">
-            <Users className="w-6 h-6 text-primary-foreground" />
+    <div className="min-h-screen flex items-center justify-center p-4 animated-bg dark:animated-bg animated-bg-light">
+      {/* Decorative elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-stat-purple/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-stat-cyan/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+      </div>
+
+      <Card className="w-full max-w-md glass-card animate-scale-in relative overflow-hidden">
+        {/* Shimmer effect */}
+        <div className="absolute inset-0 shimmer pointer-events-none" />
+        
+        <CardHeader className="text-center relative">
+          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-primary/60 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-primary/30 animate-float">
+            <Users className="w-8 h-8 text-primary-foreground" />
           </div>
-          <CardTitle className="text-2xl">CRM Grupos VIP</CardTitle>
-          <CardDescription>
+          <div className="flex items-center justify-center gap-2">
+            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+              CRM Grupos VIP
+            </CardTitle>
+            <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+          </div>
+          <CardDescription className="text-muted-foreground">
             {isLogin ? 'Entre na sua conta para continuar' : 'Crie sua conta para começar'}
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <CardContent className="relative">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="seu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="pl-10 input-glow transition-all duration-300 bg-background/50"
+                />
+              </div>
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-              />
+              <Label htmlFor="password" className="text-sm font-medium">Senha</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  className="pl-10 input-glow transition-all duration-300 bg-background/50"
+                />
+              </div>
             </div>
 
-            {/* Campos extras apenas no cadastro */}
             {!isLogin && (
               <>
-                <div className="space-y-2">
-                  <Label htmlFor="groupName">Nome do Grupo VIP *</Label>
-                  <Input
-                    id="groupName"
-                    type="text"
-                    placeholder="Ex: Sinais VIP Premium"
-                    value={groupName}
-                    onChange={(e) => setGroupName(e.target.value)}
-                    required
-                  />
+                <div className="space-y-2 animate-fade-in-up">
+                  <Label htmlFor="groupName" className="text-sm font-medium">Nome do Grupo VIP *</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="groupName"
+                      type="text"
+                      placeholder="Ex: Sinais VIP Premium"
+                      value={groupName}
+                      onChange={(e) => setGroupName(e.target.value)}
+                      required
+                      className="pl-10 input-glow transition-all duration-300 bg-background/50"
+                    />
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Logo/Foto do Grupo (opcional)</Label>
+                <div className="space-y-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+                  <Label className="text-sm font-medium">Logo/Foto do Grupo (opcional)</Label>
                   <div className="flex items-center gap-4">
                     {avatarPreview ? (
-                      <div className="relative">
-                        <Avatar className="w-16 h-16">
+                      <div className="relative group">
+                        <Avatar className="w-16 h-16 ring-2 ring-primary/30 ring-offset-2 ring-offset-background">
                           <AvatarImage src={avatarPreview} alt="Preview" />
-                          <AvatarFallback>
+                          <AvatarFallback className="bg-gradient-to-br from-primary to-primary/60 text-primary-foreground font-bold">
                             {groupName.charAt(0).toUpperCase() || 'G'}
                           </AvatarFallback>
                         </Avatar>
                         <button
                           type="button"
                           onClick={removeAvatar}
-                          className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5"
+                          className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-1 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -243,7 +263,7 @@ const Auth = () => {
                     ) : (
                       <div
                         onClick={() => fileInputRef.current?.click()}
-                        className="w-16 h-16 rounded-full border-2 border-dashed border-muted-foreground/50 flex items-center justify-center cursor-pointer hover:border-primary transition-colors"
+                        className="w-16 h-16 rounded-full border-2 border-dashed border-primary/30 flex items-center justify-center cursor-pointer hover:border-primary/60 hover:bg-primary/5 transition-all duration-300"
                       >
                         <Upload className="w-5 h-5 text-muted-foreground" />
                       </div>
@@ -254,6 +274,7 @@ const Auth = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => fileInputRef.current?.click()}
+                        className="border-primary/20 hover:border-primary/50"
                       >
                         {avatarPreview ? 'Trocar imagem' : 'Selecionar imagem'}
                       </Button>
@@ -273,16 +294,27 @@ const Auth = () => {
               </>
             )}
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Carregando...' : isLogin ? 'Entrar' : 'Criar conta'}
+            <Button 
+              type="submit" 
+              className="w-full btn-premium h-11 text-base font-semibold" 
+              disabled={loading}
+            >
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Carregando...
+                </span>
+              ) : (
+                isLogin ? 'Entrar' : 'Criar conta'
+              )}
             </Button>
           </form>
 
-          <div className="mt-4 text-center">
+          <div className="mt-6 text-center">
             <button
               type="button"
               onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-primary hover:underline"
+              className="text-sm text-primary hover:text-primary/80 transition-colors font-medium"
             >
               {isLogin ? 'Não tem conta? Criar agora' : 'Já tem conta? Entrar'}
             </button>

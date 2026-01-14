@@ -1,4 +1,4 @@
-import { RefreshCw, Upload, Download, UserPlus, Moon, Sun, LogOut, Shield, CreditCard, Settings } from 'lucide-react';
+import { RefreshCw, Upload, Download, UserPlus, Moon, Sun, LogOut, Shield, CreditCard, Settings, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -28,6 +28,7 @@ export function Header({
   avatarUrl
 }: HeaderProps) {
   const [isDark, setIsDark] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const navigate = useNavigate();
   const { isAdmin } = useAdmin();
 
@@ -42,76 +43,135 @@ export function Header({
     document.documentElement.classList.toggle('dark', newIsDark);
   };
 
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    onRefresh();
+    setTimeout(() => setIsRefreshing(false), 1000);
+  };
+
   const displayName = groupName || 'CRM Grupos VIP';
   const initials = displayName.substring(0, 2).toUpperCase();
 
   return (
-    <header className="flex items-center justify-between py-4 px-6 bg-card border-b">
-      <div className="flex items-center gap-4">
-        <button 
-          onClick={() => navigate('/settings')} 
-          className="flex items-center gap-4 hover:opacity-80 transition-opacity cursor-pointer"
-          title="Clique para editar seu perfil"
-        >
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={avatarUrl || undefined} alt={displayName} />
-            <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
-          <div className="text-left">
-            <h1 className="text-xl font-bold text-foreground">{displayName}</h1>
-            {userEmail && (
-              <p className="text-xs text-muted-foreground">{userEmail}</p>
-            )}
-          </div>
-        </button>
-        <SubscriptionCountdown />
-      </div>
-      
-      <div className="flex items-center gap-3">
-        <Button variant="outline" onClick={() => navigate('/plans')}>
-          <CreditCard className="w-4 h-4 mr-2" />
-          Ver Planos
-        </Button>
-
-        {isAdmin && (
-          <Button variant="outline" onClick={() => navigate('/admin')}>
-            <Shield className="w-4 h-4 mr-2" />
-            Painel Admin
+    <header className="header-premium sticky top-0 z-50 animate-fade-in-down">
+      <div className="flex items-center justify-between py-4 px-6">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => navigate('/settings')} 
+            className="group flex items-center gap-4 transition-all duration-300 hover:scale-[1.02]"
+            title="Clique para editar seu perfil"
+          >
+            <div className="relative">
+              <Avatar className="h-12 w-12 ring-2 ring-primary/20 ring-offset-2 ring-offset-background transition-all duration-300 group-hover:ring-primary/50">
+                <AvatarImage src={avatarUrl || undefined} alt={displayName} />
+                <AvatarFallback className="bg-gradient-to-br from-primary to-primary/60 text-primary-foreground font-bold text-lg">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-status-active rounded-full border-2 border-background animate-pulse" />
+            </div>
+            <div className="text-left">
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                  {displayName}
+                </h1>
+                <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+              </div>
+              {userEmail && (
+                <p className="text-sm text-muted-foreground">{userEmail}</p>
+              )}
+            </div>
+          </button>
+          <SubscriptionCountdown />
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/plans')}
+            className="hidden md:flex border-primary/20 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
+          >
+            <CreditCard className="w-4 h-4 mr-2" />
+            Ver Planos
           </Button>
-        )}
-        
-        <Button variant="ghost" size="icon" onClick={onRefresh}>
-          <RefreshCw className="w-5 h-5" />
-        </Button>
-        
-        <Button onClick={onImport} className="bg-stat-green hover:bg-stat-green/90">
-          <Upload className="w-4 h-4 mr-2" />
-          Importar Excel
-        </Button>
-        
-        <Button onClick={onExport} className="bg-stat-cyan hover:bg-stat-cyan/90">
-          <Download className="w-4 h-4 mr-2" />
-          Exportar
-        </Button>
-        
-        <Button onClick={onNewClient}>
-          <UserPlus className="w-4 h-4 mr-2" />
-          Novo Cliente
-        </Button>
-        
-        <Button variant="ghost" size="icon" onClick={() => navigate('/settings')} title="Configurações">
-          <Settings className="w-5 h-5" />
-        </Button>
 
-        <Button variant="ghost" size="icon" onClick={toggleTheme}>
-          {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-        </Button>
+          {isAdmin && (
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/admin')}
+              className="hidden md:flex border-stat-purple/20 hover:border-stat-purple/50 hover:bg-stat-purple/5 transition-all duration-300"
+            >
+              <Shield className="w-4 h-4 mr-2 text-stat-purple" />
+              Admin
+            </Button>
+          )}
+          
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={handleRefresh}
+            className="hover:bg-primary/10 transition-all duration-300"
+          >
+            <RefreshCw className={`w-5 h-5 transition-transform duration-500 ${isRefreshing ? 'animate-spin' : ''}`} />
+          </Button>
+          
+          <Button 
+            onClick={onImport} 
+            className="hidden lg:flex btn-premium bg-gradient-to-r from-stat-green to-stat-green/80 hover:from-stat-green/90 hover:to-stat-green/70 text-white border-0"
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            Importar
+          </Button>
+          
+          <Button 
+            onClick={onExport} 
+            className="hidden lg:flex btn-premium bg-gradient-to-r from-stat-cyan to-stat-cyan/80 hover:from-stat-cyan/90 hover:to-stat-cyan/70 text-white border-0"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Exportar
+          </Button>
+          
+          <Button 
+            onClick={onNewClient}
+            className="btn-premium bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 border-0"
+          >
+            <UserPlus className="w-4 h-4 mr-2" />
+            <span className="hidden sm:inline">Novo Cliente</span>
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => navigate('/settings')} 
+            title="Configurações"
+            className="hover:bg-primary/10 transition-all duration-300"
+          >
+            <Settings className="w-5 h-5" />
+          </Button>
 
-        <Button variant="ghost" size="icon" onClick={onLogout} title="Sair">
-          <LogOut className="w-5 h-5" />
-        </Button>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={toggleTheme}
+            className="hover:bg-primary/10 transition-all duration-300"
+          >
+            {isDark ? (
+              <Sun className="w-5 h-5 text-stat-yellow transition-transform duration-300 hover:rotate-45" />
+            ) : (
+              <Moon className="w-5 h-5 transition-transform duration-300 hover:-rotate-12" />
+            )}
+          </Button>
+
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onLogout} 
+            title="Sair"
+            className="hover:bg-destructive/10 hover:text-destructive transition-all duration-300"
+          >
+            <LogOut className="w-5 h-5" />
+          </Button>
+        </div>
       </div>
     </header>
   );
