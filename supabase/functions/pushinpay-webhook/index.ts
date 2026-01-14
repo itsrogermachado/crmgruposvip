@@ -11,7 +11,24 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const body = await req.json()
+    const contentType = req.headers.get('content-type') || ''
+    let body: Record<string, string>
+
+    if (contentType.includes('application/json')) {
+      body = await req.json()
+    } else if (contentType.includes('application/x-www-form-urlencoded')) {
+      const formData = await req.text()
+      body = Object.fromEntries(new URLSearchParams(formData))
+    } else {
+      // Tentar parsear - PushinPay pode enviar sem Content-Type correto
+      const text = await req.text()
+      try {
+        body = JSON.parse(text)
+      } catch {
+        body = Object.fromEntries(new URLSearchParams(text))
+      }
+    }
+
     console.log('Webhook received:', JSON.stringify(body))
 
     const { id, status, payer_name, payer_national_registration, end_to_end_id } = body
