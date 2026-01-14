@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/hooks/useAdmin';
 import { SubscriptionCountdown } from './SubscriptionCountdown';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { WhatsAppSupport } from './WhatsAppSupport';
 
 interface HeaderProps {
   onImport: () => void;
@@ -86,6 +87,7 @@ export function Header({
         </div>
         
         <div className="flex items-center gap-2">
+          <WhatsAppSupport variant="inline" className="hidden md:flex" />
           <Button 
             variant="outline" 
             onClick={() => navigate('/plans')}
