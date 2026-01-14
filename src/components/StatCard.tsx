@@ -79,11 +79,15 @@ export function StatCard({ title, value, icon: Icon, variant, delay = 0 }: StatC
   return (
     <div 
       className={cn(
-        'stat-card opacity-0 p-4 md:p-6',
+        'stat-card opacity-0',
         isVisible && 'animate-fade-in-up',
         `hover:shadow-xl ${styles.glow}`
       )}
-      style={{ animationDelay: `${delay * 100}ms`, animationFillMode: 'forwards' }}
+      style={{ 
+        animationDelay: `${delay * 100}ms`, 
+        animationFillMode: 'forwards',
+        padding: 'clamp(0.75rem, 2vw, 1.5rem)'
+      }}
     >
       {/* Gradient overlay */}
       <div className={cn(
@@ -92,17 +96,23 @@ export function StatCard({ title, value, icon: Icon, variant, delay = 0 }: StatC
       )} />
       
       {/* Content */}
-      <div className="relative z-10">
-        <p className="text-xs md:text-sm font-medium text-muted-foreground mb-1 md:mb-2 truncate">{title}</p>
-        <p className="text-xl md:text-3xl font-bold text-foreground tracking-tight">{displayValue}</p>
+      <div className="relative z-10 pr-12 md:pr-16">
+        <p className="text-responsive-sm font-medium text-muted-foreground mb-1 truncate">{title}</p>
+        <p className="text-responsive-xl font-bold text-foreground tracking-tight">{displayValue}</p>
       </div>
       
       {/* Icon */}
-      <div className={cn(
-        'stat-icon bg-gradient-to-br text-white w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl',
-        styles.icon
-      )}>
-        <Icon className="w-5 h-5 md:w-7 md:h-7 animate-float" />
+      <div 
+        className={cn(
+          'stat-icon bg-gradient-to-br text-white rounded-xl',
+          styles.icon
+        )}
+        style={{
+          width: 'clamp(2.25rem, 4vw, 3.5rem)',
+          height: 'clamp(2.25rem, 4vw, 3.5rem)',
+        }}
+      >
+        <Icon style={{ width: 'clamp(1.125rem, 2vw, 1.75rem)', height: 'clamp(1.125rem, 2vw, 1.75rem)' }} className="animate-float" />
       </div>
     </div>
   );

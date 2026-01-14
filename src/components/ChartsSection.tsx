@@ -44,16 +44,16 @@ export function ChartsSection({ clients }: ChartsSectionProps) {
   return (
     <div className="px-4 md:px-6 pb-4 md:pb-6 animate-scale-in" style={{ animationDelay: '0.2s' }}>
       <Card className="max-w-sm mx-auto glass-card overflow-hidden">
-        <CardHeader className="pb-2 px-4 pt-4">
+        <CardHeader className="pb-2 px-3 sm:px-4 pt-3 sm:pt-4">
           <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5">
               <PieChartIcon className="w-4 h-4 text-primary" />
             </div>
-            <CardTitle className="text-base font-semibold">Distribuição por Status</CardTitle>
+            <CardTitle className="text-sm sm:text-base font-semibold">Distribuição por Status</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
-          <div className="h-[200px] md:h-[220px] relative">
+        <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+          <div style={{ height: 'clamp(160px, 30vw, 220px)' }} className="relative">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <defs>
@@ -106,21 +106,21 @@ export function ChartsSection({ clients }: ChartsSectionProps) {
             
             {/* Center text */}
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-2xl md:text-3xl font-bold text-foreground">{totalClients}</span>
-              <span className="text-xs md:text-sm text-muted-foreground">Total</span>
+              <span className="text-responsive-xl font-bold text-foreground">{totalClients}</span>
+              <span className="text-responsive-sm text-muted-foreground">Total</span>
             </div>
           </div>
           
           {/* Legend */}
-          <div className="flex flex-wrap justify-center gap-4 mt-3">
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mt-2 sm:mt-3">
             {statusDistribution.map((item) => (
-              <div key={item.name} className="flex items-center gap-1.5">
+              <div key={item.name} className="flex items-center gap-1 sm:gap-1.5">
                 <div 
-                  className="w-2.5 h-2.5 rounded-full" 
+                  className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full flex-shrink-0" 
                   style={{ backgroundColor: item.color }}
                 />
-                <span className="text-xs text-muted-foreground">{item.name}</span>
-                <span className="text-xs font-semibold text-foreground">{item.value}</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground">{item.name}</span>
+                <span className="text-[10px] sm:text-xs font-semibold text-foreground">{item.value}</span>
               </div>
             ))}
           </div>

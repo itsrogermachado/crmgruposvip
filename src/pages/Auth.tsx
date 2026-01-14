@@ -163,29 +163,29 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 animated-bg dark:animated-bg animated-bg-light">
+    <div className="min-h-screen flex items-center justify-center p-3 sm:p-4 animated-bg dark:animated-bg animated-bg-light">
       {/* Decorative elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-stat-purple/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-stat-cyan/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute -top-20 -right-20 sm:-top-40 sm:-right-40 w-40 h-40 sm:w-80 sm:h-80 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute -bottom-20 -left-20 sm:-bottom-40 sm:-left-40 w-40 h-40 sm:w-80 sm:h-80 bg-stat-purple/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 sm:w-96 sm:h-96 bg-stat-cyan/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
       </div>
 
-      <Card className="w-full max-w-md glass-card animate-scale-in relative overflow-hidden">
+      <Card className="w-full max-w-[95vw] sm:max-w-md glass-card animate-scale-in relative overflow-hidden">
         {/* Shimmer effect */}
         <div className="absolute inset-0 shimmer pointer-events-none" />
         
-        <CardHeader className="text-center relative">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-primary/60 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-primary/30 animate-float">
-            <Users className="w-8 h-8 text-primary-foreground" />
+        <CardHeader className="text-center relative px-4 sm:px-6">
+          <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary to-primary/60 rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-4 shadow-lg shadow-primary/30 animate-float">
+            <Users className="w-6 h-6 sm:w-8 sm:h-8 text-primary-foreground" />
           </div>
-          <div className="flex items-center justify-center gap-2">
-            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+          <div className="flex items-center justify-center gap-1.5 sm:gap-2">
+            <CardTitle className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
               CRM Grupos VIP
             </CardTitle>
-            <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary animate-pulse" />
           </div>
-          <CardDescription className="text-muted-foreground">
+          <CardDescription className="text-muted-foreground text-sm sm:text-base">
             {isLogin ? 'Entre na sua conta para continuar' : 'Crie sua conta para começar'}
           </CardDescription>
           {!isLogin && (
@@ -195,8 +195,8 @@ const Auth = () => {
             </div>
           )}
         </CardHeader>
-        <CardContent className="relative">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        <CardContent className="relative px-4 sm:px-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium">Email</Label>
               <div className="relative">

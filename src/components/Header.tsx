@@ -1,8 +1,9 @@
-import { RefreshCw, Upload, Download, UserPlus, Moon, Sun, LogOut, Shield, CreditCard, Settings, Sparkles } from 'lucide-react';
+import { RefreshCw, Upload, Download, UserPlus, Moon, Sun, LogOut, Shield, CreditCard, Settings, Sparkles, Monitor } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/hooks/useAdmin';
+import { useTheme } from '@/hooks/useTheme';
 import { SubscriptionCountdown } from './SubscriptionCountdown';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { WhatsAppSupport } from './WhatsAppSupport';
@@ -28,20 +29,15 @@ export function Header({
   groupName,
   avatarUrl
 }: HeaderProps) {
-  const [isDark, setIsDark] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const navigate = useNavigate();
   const { isAdmin } = useAdmin();
+  const { mode, isDark, cycleTheme } = useTheme();
 
-  useEffect(() => {
-    const isDarkMode = document.documentElement.classList.contains('dark');
-    setIsDark(isDarkMode);
-  }, []);
-
-  const toggleTheme = () => {
-    const newIsDark = !isDark;
-    setIsDark(newIsDark);
-    document.documentElement.classList.toggle('dark', newIsDark);
+  const getThemeIcon = () => {
+    if (mode === 'system') return <Monitor className="w-5 h-5 transition-transform duration-300" />;
+    if (mode === 'light') return <Sun className="w-5 h-5 text-stat-yellow transition-transform duration-300 hover:rotate-45" />;
+    return <Moon className="w-5 h-5 transition-transform duration-300 hover:-rotate-12" />;
   };
 
   const handleRefresh = () => {
@@ -159,14 +155,11 @@ export function Header({
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={toggleTheme}
+            onClick={cycleTheme}
             className="hover:bg-primary/10 transition-all duration-300"
+            title={`Tema: ${mode === 'system' ? 'Sistema' : mode === 'light' ? 'Claro' : 'Escuro'}`}
           >
-            {isDark ? (
-              <Sun className="w-5 h-5 text-stat-yellow transition-transform duration-300 hover:rotate-45" />
-            ) : (
-              <Moon className="w-5 h-5 transition-transform duration-300 hover:-rotate-12" />
-            )}
+            {getThemeIcon()}
           </Button>
 
           <Button 

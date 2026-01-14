@@ -58,7 +58,7 @@ export function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
   return (
     <>
       {/* Mobile: Card List */}
-      <div className="md:hidden mx-4 mb-20 space-y-3">
+      <div className="lg:hidden mx-4 pb-24 space-y-2.5 sm:space-y-3">
         {clients.map((client, index) => (
           <div
             key={client.id}
@@ -75,7 +75,7 @@ export function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
       </div>
 
       {/* Desktop: Table */}
-      <div className="hidden md:block data-table mx-6 mb-6 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+      <div className="hidden lg:block data-table mx-4 md:mx-6 mb-6 animate-fade-in" style={{ animationDelay: '0.4s' }}>
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
