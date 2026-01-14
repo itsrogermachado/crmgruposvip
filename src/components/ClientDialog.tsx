@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Upload, X, Image as ImageIcon } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -29,6 +29,9 @@ import {
 import { Client } from '@/types/client';
 import { cn } from '@/lib/utils';
 import { parseBRDate, formatToBRDate, calculateStatus } from '@/lib/dateUtils';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 interface ClientDialogProps {
   open: boolean;
@@ -38,6 +41,10 @@ interface ClientDialogProps {
 }
 
 export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialogProps) {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const [formData, setFormData] = useState({
     nome: '',
     telefone: '',
@@ -48,10 +55,13 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
     dataEntrada: '',
     dataVencimento: '',
     observacoes: '',
+    comprovanteUrl: '',
   });
 
   const [dataEntradaDate, setDataEntradaDate] = useState<Date | undefined>();
   const [dataVencimentoDate, setDataVencimentoDate] = useState<Date | undefined>();
+  const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (client) {
@@ -65,12 +75,14 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
         dataEntrada: client.dataEntrada,
         dataVencimento: client.dataVencimento,
         observacoes: client.observacoes || '',
+        comprovanteUrl: client.comprovanteUrl || '',
       });
       
       const entradaParsed = parseBRDate(client.dataEntrada);
       const vencimentoParsed = parseBRDate(client.dataVencimento);
       setDataEntradaDate(entradaParsed || undefined);
       setDataVencimentoDate(vencimentoParsed || undefined);
+      setPreviewUrl(client.comprovanteUrl || null);
     } else {
       const today = new Date();
       const nextMonth = new Date(today);
@@ -86,11 +98,80 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
         dataEntrada: formatToBRDate(today),
         dataVencimento: formatToBRDate(nextMonth),
         observacoes: '',
+        comprovanteUrl: '',
       });
       setDataEntradaDate(today);
       setDataVencimentoDate(nextMonth);
+      setPreviewUrl(null);
     }
   }, [client, open]);
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: 'Erro',
+        description: 'Por favor, selecione apenas arquivos de imagem.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: 'Erro',
+        description: 'A imagem deve ter no máximo 5MB.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('comprovantes')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('comprovantes')
+        .getPublicUrl(fileName);
+
+      setFormData({ ...formData, comprovanteUrl: urlData.publicUrl });
+      setPreviewUrl(urlData.publicUrl);
+      
+      toast({
+        title: 'Upload concluído',
+        description: 'O comprovante foi enviado com sucesso.',
+      });
+    } catch (error) {
+      console.error('Erro no upload:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível enviar o comprovante.',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeComprovante = () => {
+    setFormData({ ...formData, comprovanteUrl: '' });
+    setPreviewUrl(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleDataEntradaSelect = (date: Date | undefined) => {
     setDataEntradaDate(date);
@@ -119,6 +200,7 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
       discord: formData.discord || undefined,
       telegram: formData.telegram || undefined,
       observacoes: formData.observacoes || undefined,
+      comprovanteUrl: formData.comprovanteUrl || undefined,
     });
     onOpenChange(false);
   };
@@ -272,6 +354,54 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
               placeholder="Anotações sobre o cliente..."
               rows={3}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Comprovante (opcional)</Label>
+            <div className="flex flex-col gap-2">
+              {previewUrl ? (
+                <div className="relative group">
+                  <img 
+                    src={previewUrl} 
+                    alt="Comprovante" 
+                    className="w-full h-32 object-cover rounded-md border"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={removeComprovante}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-md cursor-pointer hover:bg-muted/50 transition-colors"
+                >
+                  {uploading ? (
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full" />
+                      <span>Enviando...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <ImageIcon className="h-8 w-8 text-muted-foreground mb-2" />
+                      <span className="text-sm text-muted-foreground">Clique para adicionar comprovante</span>
+                    </>
+                  )}
+                </div>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+            </div>
           </div>
           
           <DialogFooter>

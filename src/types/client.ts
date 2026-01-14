@@ -10,6 +10,7 @@ export interface Client {
   dataVencimento: string;
   status: 'Ativo' | 'Vencido' | 'Próximo';
   observacoes?: string;
+  comprovanteUrl?: string;
 }
 
 export type StatusFilter = 'Todos' | 'Ativo' | 'Vencido' | 'Próximo';

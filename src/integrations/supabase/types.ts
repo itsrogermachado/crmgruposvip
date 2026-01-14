@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       clients: {
         Row: {
+          comprovante_url: string | null
           created_at: string
           data_entrada: string
           data_vencimento: string
@@ -32,6 +33,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          comprovante_url?: string | null
           created_at?: string
           data_entrada: string
           data_vencimento: string
@@ -48,6 +50,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          comprovante_url?: string | null
           created_at?: string
           data_entrada?: string
           data_vencimento?: string

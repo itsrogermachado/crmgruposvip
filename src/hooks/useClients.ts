@@ -16,6 +16,7 @@ export interface Client {
   data_vencimento: string;
   status: 'Ativo' | 'Vencido' | 'Próximo';
   observacoes?: string;
+  comprovante_url?: string;
 }
 
 export function useClients() {
@@ -55,6 +56,7 @@ export function useClients() {
           data_vencimento: c.data_vencimento,
           status: autoStatus,
           observacoes: c.observacoes || undefined,
+          comprovante_url: c.comprovante_url || undefined,
         };
       });
 
@@ -93,6 +95,7 @@ export function useClients() {
           data_vencimento: clientData.data_vencimento,
           status: clientData.status,
           observacoes: clientData.observacoes || null,
+          comprovante_url: clientData.comprovante_url || null,
         })
         .select()
         .single();
@@ -111,6 +114,7 @@ export function useClients() {
         data_vencimento: data.data_vencimento,
         status: calculateStatus(data.data_vencimento),
         observacoes: data.observacoes || undefined,
+        comprovante_url: data.comprovante_url || undefined,
       };
 
       setClients((prev) => [newClient, ...prev]);
@@ -147,6 +151,7 @@ export function useClients() {
           data_vencimento: clientData.data_vencimento,
           status: clientData.status,
           observacoes: clientData.observacoes || null,
+          comprovante_url: clientData.comprovante_url || null,
         })
         .eq('id', id);
 
@@ -245,6 +250,7 @@ export function useClients() {
         data_vencimento: c.data_vencimento,
         status: calculateStatus(c.data_vencimento),
         observacoes: c.observacoes || undefined,
+        comprovante_url: c.comprovante_url || undefined,
       }));
 
       setClients((prev) => [...insertedClients, ...prev]);
