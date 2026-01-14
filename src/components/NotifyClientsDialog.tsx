@@ -30,7 +30,7 @@ interface NotifyClientsDialogProps {
 
 export function NotifyClientsDialog({ open, onOpenChange, clients }: NotifyClientsDialogProps) {
   const [message, setMessage] = useState(
-    'Olá {nome}! 👋\n\nNotamos que sua assinatura VIP vence em {dataVencimento}.\n\nPara continuar aproveitando todos os benefícios exclusivos, entre em contato conosco para renovar seu plano.\n\nAguardamos seu retorno! 🚀'
+    'Olá {nome}! 👋\n\nNotamos que sua assinatura VIP venceu em {dataVencimento}.\n\nPara continuar aproveitando todos os benefícios exclusivos, entre em contato conosco para renovar seu plano.\n\nAguardamos seu retorno! 🚀'
   );
   const [selectedClients, setSelectedClients] = useState<Set<string>>(
     new Set(clients.map(c => c.id))
@@ -124,7 +124,7 @@ export function NotifyClientsDialog({ open, onOpenChange, clients }: NotifyClien
             <ScrollArea className="h-[200px] border rounded-md p-2">
               {clients.length === 0 ? (
                 <div className="text-center text-muted-foreground py-8">
-                  Nenhum cliente próximo do vencimento
+                  Nenhum cliente vencido
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -142,8 +142,8 @@ export function NotifyClientsDialog({ open, onOpenChange, clients }: NotifyClien
                         <p className="text-sm text-muted-foreground">{client.telefone}</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-yellow-600 border-yellow-600">
-                          Vence: {client.dataVencimento}
+                        <Badge variant="outline" className="text-red-600 border-red-600">
+                          Venceu: {client.dataVencimento}
                         </Badge>
                         {sentTo.has(client.id) && (
                           <Badge className="bg-green-500">Enviado</Badge>
