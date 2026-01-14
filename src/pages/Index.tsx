@@ -12,12 +12,14 @@ import { StatusFilter, PlanoFilter } from '@/types/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useClients, Client } from '@/hooks/useClients';
+import { useProfile } from '@/hooks/useProfile';
 import { Loader2 } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, signOut } = useAuth();
   const { clients, loading: clientsLoading, fetchClients, addClient, updateClient, deleteClient, importClients } = useClients();
+  const { profile } = useProfile();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('Todos');
@@ -278,6 +280,8 @@ const Index = () => {
           onRefresh={handleRefresh}
           onLogout={handleLogout}
           userEmail={user?.email}
+          groupName={profile?.group_name}
+          avatarUrl={profile?.avatar_url}
         />
 
         <StatsGrid clients={statsClients} />
