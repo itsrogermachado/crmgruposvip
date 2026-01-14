@@ -86,7 +86,8 @@ export function StatCard({ title, value, icon: Icon, variant, delay = 0 }: StatC
       style={{ 
         animationDelay: `${delay * 100}ms`, 
         animationFillMode: 'forwards',
-        padding: 'clamp(0.75rem, 2vw, 1.5rem)'
+        padding: 'clamp(0.75rem, 2vw, 1.5rem)',
+        minHeight: 'clamp(80px, 12vw, 120px)'
       }}
     >
       {/* Gradient overlay */}

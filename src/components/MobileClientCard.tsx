@@ -16,23 +16,23 @@ export function MobileClientCard({ client, onEdit, onDelete, onWhatsApp }: Mobil
   };
 
   return (
-    <div className="glass-card p-3 sm:p-4 rounded-xl space-y-2.5 sm:space-y-3 animate-fade-in">
+    <div className="glass-card rounded-xl animate-fade-in" style={{ padding: 'clamp(0.75rem, 3vw, 1rem)' }}>
       {/* Header: Name + Status */}
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex items-start justify-between" style={{ gap: 'clamp(0.5rem, 2vw, 0.75rem)', marginBottom: 'clamp(0.5rem, 2vw, 0.75rem)' }}>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <h3 className="font-semibold text-foreground truncate text-sm sm:text-base">{client.nome}</h3>
+          <div className="flex items-center" style={{ gap: 'clamp(0.375rem, 1.5vw, 0.5rem)' }}>
+            <h3 className="font-semibold text-foreground truncate" style={{ fontSize: 'clamp(0.875rem, 3.5vw, 1rem)' }}>{client.nome}</h3>
             {client.observacoes && (
-              <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary/60 flex-shrink-0" />
+              <FileText className="text-primary/60 flex-shrink-0" style={{ width: 'clamp(0.875rem, 3.5vw, 1rem)', height: 'clamp(0.875rem, 3.5vw, 1rem)' }} />
             )}
           </div>
-          <p className="text-xs sm:text-sm text-muted-foreground">{client.telefone}</p>
+          <p className="text-muted-foreground" style={{ fontSize: 'clamp(0.75rem, 3vw, 0.875rem)' }}>{client.telefone}</p>
         </div>
         <StatusBadge status={client.status} />
       </div>
 
       {/* Info Row */}
-      <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+      <div className="flex flex-wrap items-center" style={{ gap: 'clamp(0.5rem, 2vw, 0.75rem)', fontSize: 'clamp(0.75rem, 3vw, 0.875rem)', marginBottom: 'clamp(0.5rem, 2vw, 0.75rem)' }}>
         <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md bg-primary/10 text-primary font-medium">
           {client.plano}
         </span>
@@ -47,31 +47,34 @@ export function MobileClientCard({ client, onEdit, onDelete, onWhatsApp }: Mobil
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-1.5 sm:gap-2 pt-0.5 sm:pt-1">
+      <div className="flex items-center" style={{ gap: 'clamp(0.375rem, 1.5vw, 0.5rem)', paddingTop: 'clamp(0.125rem, 0.5vw, 0.25rem)' }}>
         <Button
           variant="outline"
           size="sm"
           onClick={() => onWhatsApp(client)}
-          className="flex-1 gap-1.5 sm:gap-2 border-stat-green/30 text-stat-green hover:bg-stat-green/10 h-8 sm:h-9 text-xs sm:text-sm"
+          className="flex-1 border-stat-green/30 text-stat-green hover:bg-stat-green/10"
+          style={{ gap: 'clamp(0.375rem, 1.5vw, 0.5rem)', height: 'clamp(2rem, 8vw, 2.25rem)', fontSize: 'clamp(0.75rem, 3vw, 0.875rem)' }}
         >
-          <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          <MessageCircle style={{ width: 'clamp(0.875rem, 3.5vw, 1rem)', height: 'clamp(0.875rem, 3.5vw, 1rem)' }} />
           WhatsApp
         </Button>
         <Button
           variant="ghost"
           size="icon"
           onClick={() => onEdit(client)}
-          className="h-8 w-8 sm:h-9 sm:w-9 text-muted-foreground hover:text-primary hover:bg-primary/10"
+          className="text-muted-foreground hover:text-primary hover:bg-primary/10"
+          style={{ width: 'clamp(2rem, 8vw, 2.25rem)', height: 'clamp(2rem, 8vw, 2.25rem)' }}
         >
-          <Pencil className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          <Pencil style={{ width: 'clamp(0.875rem, 3.5vw, 1rem)', height: 'clamp(0.875rem, 3.5vw, 1rem)' }} />
         </Button>
         <Button
           variant="ghost"
           size="icon"
           onClick={() => onDelete(client.id)}
-          className="h-8 w-8 sm:h-9 sm:w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+          style={{ width: 'clamp(2rem, 8vw, 2.25rem)', height: 'clamp(2rem, 8vw, 2.25rem)' }}
         >
-          <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          <Trash2 style={{ width: 'clamp(0.875rem, 3.5vw, 1rem)', height: 'clamp(0.875rem, 3.5vw, 1rem)' }} />
         </Button>
       </div>
     </div>

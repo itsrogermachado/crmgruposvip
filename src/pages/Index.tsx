@@ -272,7 +272,7 @@ const Index = () => {
 
   return (
     <SubscriptionRequired>
-      <div className="min-h-screen animated-bg dark:animated-bg animated-bg-light pb-20 md:pb-0">
+      <div className="min-h-screen animated-bg dark:animated-bg animated-bg-light safe-area-pb" style={{ paddingBottom: 'clamp(5rem, 20vw, 0rem)' }}>
         <Header
           onImport={handleImport}
           onExport={handleExport}
