@@ -4,7 +4,7 @@ export interface Client {
   telefone: string;
   discord?: string;
   telegram?: string;
-  plano: 'VIP Completo' | 'Delay' | 'Básico';
+  plano: string;
   preco: number;
   dataEntrada: string;
   dataVencimento: string;
@@ -14,4 +14,4 @@ export interface Client {
 }
 
 export type StatusFilter = 'Todos' | 'Ativo' | 'Vencido' | 'Próximo';
-export type PlanoFilter = 'Todos' | 'VIP Completo' | 'Delay' | 'Básico';
+export type PlanoFilter = string;

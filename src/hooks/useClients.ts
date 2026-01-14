@@ -10,7 +10,7 @@ export interface Client {
   telefone: string;
   discord?: string;
   telegram?: string;
-  plano: 'VIP Completo' | 'Delay' | 'Básico';
+  plano: string;
   preco: number;
   data_entrada: string;
   data_vencimento: string;
