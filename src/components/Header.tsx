@@ -1,8 +1,10 @@
-import { RefreshCw, Upload, Download, UserPlus, Moon, Sun, LogOut, Shield, CreditCard } from 'lucide-react';
+import { RefreshCw, Upload, Download, UserPlus, Moon, Sun, LogOut, Shield, CreditCard, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/hooks/useAdmin';
+import { GroupSelector } from './GroupSelector';
+import { ReminderSettingsDialog } from './ReminderSettingsDialog';
 
 interface HeaderProps {
   onImport: () => void;
@@ -15,6 +17,7 @@ interface HeaderProps {
 
 export function Header({ onImport, onExport, onNewClient, onRefresh, onLogout, userEmail }: HeaderProps) {
   const [isDark, setIsDark] = useState(false);
+  const [reminderDialogOpen, setReminderDialogOpen] = useState(false);
   const navigate = useNavigate();
   const { isAdmin } = useAdmin();
 
@@ -39,6 +42,12 @@ export function Header({ onImport, onExport, onNewClient, onRefresh, onLogout, u
       </div>
       
       <div className="flex items-center gap-3">
+        <GroupSelector />
+
+        <Button variant="outline" size="icon" onClick={() => setReminderDialogOpen(true)} title="Configurar Lembretes">
+          <Bell className="w-4 h-4" />
+        </Button>
+        
         <Button variant="outline" onClick={() => navigate('/plans')}>
           <CreditCard className="w-4 h-4 mr-2" />
           Ver Planos
@@ -78,6 +87,8 @@ export function Header({ onImport, onExport, onNewClient, onRefresh, onLogout, u
           <LogOut className="w-5 h-5" />
         </Button>
       </div>
+
+      <ReminderSettingsDialog open={reminderDialogOpen} onOpenChange={setReminderDialogOpen} />
     </header>
   );
 }

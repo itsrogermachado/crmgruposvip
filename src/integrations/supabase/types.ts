@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      client_payments: {
+        Row: {
+          amount: number
+          client_id: string
+          comprovante_url: string | null
+          created_at: string | null
+          id: string
+          notes: string | null
+          payment_date: string
+          payment_method: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          client_id: string
+          comprovante_url?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          payment_date: string
+          payment_method?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          client_id?: string
+          comprovante_url?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          payment_date?: string
+          payment_method?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_payments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           comprovante_url: string | null
@@ -21,6 +65,7 @@ export type Database = {
           data_entrada: string
           data_vencimento: string
           discord: string | null
+          group_id: string | null
           id: string
           nome: string
           observacoes: string | null
@@ -38,6 +83,7 @@ export type Database = {
           data_entrada: string
           data_vencimento: string
           discord?: string | null
+          group_id?: string | null
           id?: string
           nome: string
           observacoes?: string | null
@@ -55,6 +101,7 @@ export type Database = {
           data_entrada?: string
           data_vencimento?: string
           discord?: string | null
+          group_id?: string | null
           id?: string
           nome?: string
           observacoes?: string | null
@@ -64,6 +111,47 @@ export type Database = {
           telefone?: string
           telegram?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      groups: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_default: boolean | null
+          name: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          name: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -147,6 +235,71 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      reminder_settings: {
+        Row: {
+          created_at: string | null
+          days_before: number
+          id: string
+          is_active: boolean | null
+          reminder_template: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          days_before?: number
+          id?: string
+          is_active?: boolean | null
+          reminder_template?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          days_before?: number
+          id?: string
+          is_active?: boolean | null
+          reminder_template?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sent_reminders: {
+        Row: {
+          client_id: string
+          id: string
+          message: string | null
+          reminder_type: string
+          sent_at: string | null
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          id?: string
+          message?: string | null
+          reminder_type: string
+          sent_at?: string | null
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          id?: string
+          message?: string | null
+          reminder_type?: string
+          sent_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sent_reminders_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscription_plans: {
         Row: {
