@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { Users, Upload, X, Sparkles, Mail, Lock, User } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { WhatsAppSupport } from '@/components/WhatsAppSupport';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -327,6 +328,9 @@ const Auth = () => {
           </div>
         </CardContent>
       </Card>
+      
+      {/* WhatsApp Support Button */}
+      <WhatsAppSupport variant="fixed" />
     </div>
   );
 };
