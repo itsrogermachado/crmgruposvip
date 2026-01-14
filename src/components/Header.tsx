@@ -1,4 +1,4 @@
-import { RefreshCw, Upload, Download, UserPlus, Moon, Sun, LogOut, Shield } from 'lucide-react';
+import { RefreshCw, Upload, Download, UserPlus, Moon, Sun, LogOut, Shield, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -39,6 +39,11 @@ export function Header({ onImport, onExport, onNewClient, onRefresh, onLogout, u
       </div>
       
       <div className="flex items-center gap-3">
+        <Button variant="outline" onClick={() => navigate('/plans')}>
+          <CreditCard className="w-4 h-4 mr-2" />
+          Ver Planos
+        </Button>
+
         {isAdmin && (
           <Button variant="outline" onClick={() => navigate('/admin')}>
             <Shield className="w-4 h-4 mr-2" />

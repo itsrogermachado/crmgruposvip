@@ -1,1 +1,7 @@
 project_id = "fpjzrijdruoknalrqcrt"
+
+[functions.create-pix]
+verify_jwt = false
+
+[functions.pushinpay-webhook]
+verify_jwt = false

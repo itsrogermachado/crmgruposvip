@@ -11,6 +11,9 @@ import AdminUsers from "./pages/admin/Users";
 import AdminSubscriptions from "./pages/admin/Subscriptions";
 import AdminPayments from "./pages/admin/Payments";
 import AdminPlans from "./pages/admin/Plans";
+import Plans from "./pages/Plans";
+import Checkout from "./pages/Checkout";
+import PaymentSuccess from "./pages/PaymentSuccess";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +26,9 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/plans" element={<Plans />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
