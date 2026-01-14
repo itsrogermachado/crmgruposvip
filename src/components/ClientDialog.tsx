@@ -231,7 +231,7 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
             </DialogDescription>
           </DialogHeader>
           
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form id="client-form" onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="nome">Nome</Label>
@@ -435,16 +435,16 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
                 />
               </div>
             </div>
-
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancelar
-              </Button>
-              <Button type="submit">
-                {client ? 'Salvar' : 'Criar Cliente'}
-              </Button>
-            </DialogFooter>
           </form>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit" form="client-form">
+              {client ? 'Salvar' : 'Criar Cliente'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
