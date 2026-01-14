@@ -5,36 +5,159 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Allowed payment statuses from PushinPay
+const ALLOWED_STATUSES = ['paid', 'completed', 'approved', 'pending', 'cancelled', 'expired', 'refunded']
+
+// Input validation functions
+function validateExternalId(id: unknown): string | null {
+  if (typeof id !== 'string') return null
+  // Only allow alphanumeric, hyphens, underscores - max 100 chars
+  if (!/^[a-zA-Z0-9_-]{1,100}$/.test(id)) return null
+  return id
+}
+
+function validateStatus(status: unknown): string | null {
+  if (typeof status !== 'string') return null
+  if (!ALLOWED_STATUSES.includes(status.toLowerCase())) return null
+  return status.toLowerCase()
+}
+
+function validatePayerName(name: unknown): string | null {
+  if (name === null || name === undefined || name === '') return null
+  if (typeof name !== 'string') return null
+  // Max 200 chars, basic sanitization
+  const sanitized = name.trim().slice(0, 200)
+  // Remove any potentially dangerous characters
+  return sanitized.replace(/[<>\"'&]/g, '')
+}
+
+function validateDocument(doc: unknown): string | null {
+  if (doc === null || doc === undefined || doc === '') return null
+  if (typeof doc !== 'string') return null
+  // CPF (11 digits) or CNPJ (14 digits) - only digits
+  const digitsOnly = doc.replace(/\D/g, '')
+  if (digitsOnly.length !== 11 && digitsOnly.length !== 14) return null
+  return digitsOnly
+}
+
+// HMAC signature verification
+async function verifySignature(body: string, signature: string | null, secret: string): Promise<boolean> {
+  if (!signature || !secret) {
+    console.warn('Missing signature or secret for webhook verification')
+    return false
+  }
+
+  try {
+    const encoder = new TextEncoder()
+    const keyData = encoder.encode(secret)
+    const messageData = encoder.encode(body)
+
+    const cryptoKey = await crypto.subtle.importKey(
+      'raw',
+      keyData,
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    )
+
+    const signatureBuffer = await crypto.subtle.sign('HMAC', cryptoKey, messageData)
+    const expectedSignature = Array.from(new Uint8Array(signatureBuffer))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('')
+
+    // Constant-time comparison to prevent timing attacks
+    if (signature.length !== expectedSignature.length) return false
+    
+    let result = 0
+    for (let i = 0; i < signature.length; i++) {
+      result |= signature.charCodeAt(i) ^ expectedSignature.charCodeAt(i)
+    }
+    return result === 0
+  } catch (error) {
+    console.error('Signature verification error:', error)
+    return false
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
+    // Get raw body for signature verification
+    const rawBody = await req.text()
+    
+    // Check for webhook signature (PushinPay may use different header names)
+    const signature = req.headers.get('X-Pushinpay-Signature') || 
+                      req.headers.get('X-Webhook-Signature') ||
+                      req.headers.get('X-Signature')
+    
+    const webhookSecret = Deno.env.get('PUSHINPAY_WEBHOOK_SECRET')
+    
+    // Verify signature if secret is configured
+    if (webhookSecret) {
+      const isValid = await verifySignature(rawBody, signature, webhookSecret)
+      if (!isValid) {
+        console.error('Invalid webhook signature')
+        return new Response(JSON.stringify({ error: 'Assinatura inválida' }), { 
+          status: 401, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        })
+      }
+    } else {
+      // Log warning but allow through if no secret configured (for backwards compatibility)
+      console.warn('PUSHINPAY_WEBHOOK_SECRET not configured - skipping signature verification')
+    }
+
+    // Parse body
     const contentType = req.headers.get('content-type') || ''
-    let body: Record<string, string>
+    let body: Record<string, unknown>
 
     if (contentType.includes('application/json')) {
-      body = await req.json()
-    } else if (contentType.includes('application/x-www-form-urlencoded')) {
-      const formData = await req.text()
-      body = Object.fromEntries(new URLSearchParams(formData))
-    } else {
-      // Tentar parsear - PushinPay pode enviar sem Content-Type correto
-      const text = await req.text()
       try {
-        body = JSON.parse(text)
+        body = JSON.parse(rawBody)
       } catch {
-        body = Object.fromEntries(new URLSearchParams(text))
+        return new Response(JSON.stringify({ error: 'JSON inválido' }), { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        })
+      }
+    } else if (contentType.includes('application/x-www-form-urlencoded')) {
+      body = Object.fromEntries(new URLSearchParams(rawBody))
+    } else {
+      // Try to parse - PushinPay may send without correct Content-Type
+      try {
+        body = JSON.parse(rawBody)
+      } catch {
+        body = Object.fromEntries(new URLSearchParams(rawBody))
       }
     }
 
-    console.log('Webhook received:', JSON.stringify(body))
+    console.log('Webhook received (sanitized):', JSON.stringify({
+      id: body.id,
+      status: body.status,
+      has_payer_name: !!body.payer_name,
+      has_document: !!body.payer_national_registration
+    }))
 
-    const { id, status, payer_name, payer_national_registration, end_to_end_id } = body
+    // Validate all inputs
+    const externalId = validateExternalId(body.id)
+    const status = validateStatus(body.status)
+    const payerName = validatePayerName(body.payer_name)
+    const payerDocument = validateDocument(body.payer_national_registration)
 
-    if (!id) {
-      return new Response(JSON.stringify({ error: 'ID é obrigatório' }), { 
+    if (!externalId) {
+      console.error('Invalid external_payment_id:', body.id)
+      return new Response(JSON.stringify({ error: 'ID inválido' }), { 
+        status: 400, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      })
+    }
+
+    if (!status) {
+      console.error('Invalid status:', body.status)
+      return new Response(JSON.stringify({ error: 'Status inválido' }), { 
         status: 400, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       })
@@ -49,7 +172,7 @@ Deno.serve(async (req) => {
     const { data: payment, error: paymentFetchError } = await supabase
       .from('payments')
       .select('*, subscriptions!inner(*, subscription_plans!inner(*))')
-      .eq('external_payment_id', id)
+      .eq('external_payment_id', externalId)
       .single()
 
     if (paymentFetchError || !payment) {
@@ -74,8 +197,8 @@ Deno.serve(async (req) => {
         .update({
           status: 'paid',
           paid_at: now.toISOString(),
-          payer_name: payer_name || null,
-          payer_document: payer_national_registration || null,
+          payer_name: payerName,
+          payer_document: payerDocument,
         })
         .eq('id', payment.id)
 
@@ -105,7 +228,7 @@ Deno.serve(async (req) => {
         })
       }
 
-      console.log('Payment and subscription updated successfully')
+      console.log('Payment and subscription updated successfully for payment:', payment.id)
     } else {
       console.log('Payment status not paid:', status)
     }
