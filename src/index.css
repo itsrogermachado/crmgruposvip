@@ -151,17 +151,36 @@ html.transitioning * {
   /* Responsive container utilities */
   .container-responsive {
     width: 100%;
-    max-width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: clamp(1rem, 3vw, 2rem);
-    padding-right: clamp(1rem, 3vw, 2rem);
+    max-width: min(100% - clamp(1rem, 4vw, 3rem), 1400px);
+    margin-inline: auto;
+    padding-inline: clamp(0.75rem, 3vw, 2rem);
+  }
+
+  /* Stats Grid - Responsive auto-fit */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: clamp(0.5rem, 2vw, 1rem);
+    padding: clamp(1rem, 3vw, 1.5rem);
   }
 
   @media (min-width: 1280px) {
-    .container-responsive {
-      max-width: 1400px;
+    .stats-grid {
+      grid-template-columns: repeat(6, 1fr);
     }
+  }
+
+  /* Responsive utility classes */
+  .gap-responsive {
+    gap: clamp(0.5rem, 2vw, 1.5rem);
+  }
+
+  .p-responsive {
+    padding: clamp(0.75rem, 3vw, 1.5rem);
+  }
+
+  .mb-responsive {
+    margin-bottom: clamp(0.5rem, 2vw, 1rem);
   }
 
   /* Responsive text utilities */
@@ -220,7 +239,19 @@ html.transitioning * {
 
   /* Safe area for mobile bottom nav */
   .safe-area-pb {
-    padding-bottom: env(safe-area-inset-bottom, 0);
+    padding-bottom: clamp(5rem, 20vw, 0rem);
+  }
+
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .safe-area-pb {
+      padding-bottom: max(clamp(5rem, 20vw, 0rem), env(safe-area-inset-bottom));
+    }
+  }
+
+  @media (min-width: 768px) {
+    .safe-area-pb {
+      padding-bottom: 0;
+    }
   }
 
   /* Premium Glass Card */
