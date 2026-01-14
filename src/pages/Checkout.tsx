@@ -3,24 +3,64 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { usePublicPlans } from '@/hooks/usePublicPlans';
 import { useCheckout } from '@/hooks/useCheckout';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { PlanCard } from '@/components/checkout/PlanCard';
 import { PixPayment } from '@/components/checkout/PixPayment';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Loader2, CreditCard } from 'lucide-react';
+import { ArrowLeft, Loader2, CreditCard, RefreshCw } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Checkout() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user, loading: authLoading } = useAuth();
   const { data: plans, isLoading: plansLoading } = usePublicPlans();
-  const { pixData, createPix, isCreatingPix, usePaymentStatus } = useCheckout();
+  const { pixData, createPix, isCreatingPix, usePaymentStatus, setPixData } = useCheckout();
+  const { toast } = useToast();
   
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(
     searchParams.get('planId') || sessionStorage.getItem('selectedPlanId')
   );
+  const [realtimeStatus, setRealtimeStatus] = useState<'pending' | 'paid'>('pending');
+  const [isManualChecking, setIsManualChecking] = useState(false);
 
-  const { data: paymentStatus, isLoading: isCheckingStatus } = usePaymentStatus(pixData?.paymentId || null);
+  const { data: paymentStatus, refetch: refetchPaymentStatus } = usePaymentStatus(pixData?.paymentId || null);
+
+  // Determine final status from realtime or polling
+  const finalStatus = realtimeStatus === 'paid' ? 'paid' : (paymentStatus?.status || 'pending');
+
+  // Subscribe to realtime updates on payments table
+  useEffect(() => {
+    if (!pixData?.paymentId) return;
+
+    const channel = supabase
+      .channel(`payment-${pixData.paymentId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'payments',
+          filter: `id=eq.${pixData.paymentId}`,
+        },
+        (payload) => {
+          console.log('Payment update received:', payload);
+          if (payload.new && payload.new.status === 'paid') {
+            setRealtimeStatus('paid');
+            toast({
+              title: 'Pagamento confirmado!',
+              description: 'Sua assinatura foi ativada com sucesso.',
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [pixData?.paymentId, toast]);
 
   // Redirect to auth if not logged in
   useEffect(() => {
@@ -43,18 +83,34 @@ export default function Checkout() {
 
   // Redirect on successful payment
   useEffect(() => {
-    if (paymentStatus?.status === 'paid') {
+    if (finalStatus === 'paid') {
       setTimeout(() => {
         navigate('/payment-success');
       }, 2000);
     }
-  }, [paymentStatus, navigate]);
+  }, [finalStatus, navigate]);
 
   const selectedPlan = plans?.find(p => p.id === selectedPlanId);
 
   const handleGeneratePix = () => {
     if (selectedPlanId) {
+      setRealtimeStatus('pending');
       createPix(selectedPlanId);
+    }
+  };
+
+  const handleManualCheck = async () => {
+    setIsManualChecking(true);
+    try {
+      await refetchPaymentStatus();
+      toast({
+        title: 'Status verificado',
+        description: 'Consultamos o status do pagamento.',
+      });
+    } catch (error) {
+      console.error('Error checking payment status:', error);
+    } finally {
+      setIsManualChecking(false);
     }
   };
 
@@ -127,13 +183,36 @@ export default function Checkout() {
             <h2 className="text-lg font-semibold">Pagamento</h2>
             
             {pixData ? (
-              <PixPayment
-                qrCode={pixData.qrCode}
-                qrCodeBase64={pixData.qrCodeBase64}
-                value={pixData.value}
-                paymentStatus={paymentStatus?.status || 'pending'}
-                isCheckingStatus={isCheckingStatus}
-              />
+              <div className="space-y-4">
+                <PixPayment
+                  qrCode={pixData.qrCode}
+                  qrCodeBase64={pixData.qrCodeBase64}
+                  value={pixData.value}
+                  paymentStatus={finalStatus}
+                  isCheckingStatus={isManualChecking}
+                />
+                
+                {finalStatus === 'pending' && (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleManualCheck}
+                    disabled={isManualChecking}
+                  >
+                    {isManualChecking ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Verificando...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        Já paguei, verificar agora
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
             ) : (
               <Card>
                 <CardHeader>

@@ -58,8 +58,9 @@ Deno.serve(async (req) => {
       )
     }
 
+    // Use correct PushinPay endpoint: /api/transactions/{id}
     const pushinpayResponse = await fetch(
-      `https://api.pushinpay.com.br/api/pix/cashIn/${externalId}`,
+      `https://api.pushinpay.com.br/api/transactions/${externalId}`,
       {
         method: 'GET',
         headers: {
@@ -70,7 +71,8 @@ Deno.serve(async (req) => {
     )
 
     if (!pushinpayResponse.ok) {
-      console.error('PushinPay API error:', pushinpayResponse.status)
+      const errorBody = await pushinpayResponse.text()
+      console.error('PushinPay API error:', pushinpayResponse.status, errorBody)
       return new Response(
         JSON.stringify({ status: 'pending', error: 'Erro ao consultar status' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

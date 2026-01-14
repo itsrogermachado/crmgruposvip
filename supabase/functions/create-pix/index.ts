@@ -65,7 +65,9 @@ Deno.serve(async (req) => {
     }
 
     // Create PIX charge on PushinPay
-    const webhookUrl = `${supabaseUrl}/functions/v1/pushinpay-webhook`
+    // Include webhook secret token in URL for authentication
+    const webhookSecret = Deno.env.get('PUSHINPAY_WEBHOOK_SECRET') || ''
+    const webhookUrl = `${supabaseUrl}/functions/v1/pushinpay-webhook?token=${encodeURIComponent(webhookSecret)}`
     
     const pushinPayResponse = await fetch('https://api.pushinpay.com.br/api/pix/cashIn', {
       method: 'POST',
