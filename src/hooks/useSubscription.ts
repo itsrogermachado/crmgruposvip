@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useAdmin } from './useAdmin';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 interface Subscription {
   id: string;
@@ -10,6 +12,8 @@ interface Subscription {
   expires_at: string | null;
   plan_id: string;
 }
+
+type UrgencyLevel = 'safe' | 'warning' | 'danger' | 'critical';
 
 export function useSubscription() {
   const { user, loading: authLoading } = useAuth();
@@ -70,10 +74,42 @@ export function useSubscription() {
 
   const hasActiveSubscription = isAdmin || !!subscription;
 
+  // Calculate days remaining and urgency level
+  const { daysRemaining, expiresAtFormatted, urgencyLevel } = useMemo(() => {
+    if (!subscription?.expires_at) {
+      return { daysRemaining: null, expiresAtFormatted: null, urgencyLevel: 'safe' as UrgencyLevel };
+    }
+
+    const now = new Date();
+    const expiresAt = new Date(subscription.expires_at);
+    const diffTime = expiresAt.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    const formatted = format(expiresAt, "dd/MM/yyyy", { locale: ptBR });
+
+    let level: UrgencyLevel = 'safe';
+    if (diffDays <= 3) {
+      level = 'critical';
+    } else if (diffDays <= 7) {
+      level = 'danger';
+    } else if (diffDays <= 30) {
+      level = 'warning';
+    }
+
+    return {
+      daysRemaining: diffDays,
+      expiresAtFormatted: formatted,
+      urgencyLevel: level
+    };
+  }, [subscription?.expires_at]);
+
   return { 
     hasActiveSubscription, 
     subscription, 
     isAdmin,
+    daysRemaining,
+    expiresAtFormatted,
+    urgencyLevel,
     loading: loading || authLoading || adminLoading 
   };
 }

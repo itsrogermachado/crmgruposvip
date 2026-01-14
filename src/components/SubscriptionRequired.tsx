@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Lock, CreditCard, Clock } from 'lucide-react';
+import { Lock, CreditCard, Clock, ShieldCheck, Database } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { Loader2 } from 'lucide-react';
 
@@ -40,6 +40,24 @@ export function SubscriptionRequired({ children }: SubscriptionRequiredProps) {
           </p>
         </div>
 
+        {/* Data preservation message */}
+        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 text-left">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+              <ShieldCheck className="w-5 h-5 text-green-600 dark:text-green-400" />
+            </div>
+            <div>
+              <p className="font-medium text-green-700 dark:text-green-400">
+                Seus dados estão seguros!
+              </p>
+              <p className="text-sm text-green-600/80 dark:text-green-400/80 mt-1">
+                Todos os seus clientes, grupos e histórico de pagamentos continuam salvos. 
+                Basta renovar sua assinatura para retomar o acesso normalmente.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div className="bg-card rounded-lg p-6 border space-y-4">
           <div className="flex items-center gap-3 text-left">
             <CreditCard className="w-5 h-5 text-primary flex-shrink-0" />
@@ -57,6 +75,16 @@ export function SubscriptionRequired({ children }: SubscriptionRequiredProps) {
               <p className="font-medium text-foreground">Acesso imediato</p>
               <p className="text-sm text-muted-foreground">
                 Após o pagamento, seu acesso é liberado automaticamente
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 text-left">
+            <Database className="w-5 h-5 text-primary flex-shrink-0" />
+            <div>
+              <p className="font-medium text-foreground">Dados preservados</p>
+              <p className="text-sm text-muted-foreground">
+                Nenhuma informação é perdida quando a assinatura vence
               </p>
             </div>
           </div>
