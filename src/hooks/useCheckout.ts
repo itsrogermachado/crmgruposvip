@@ -76,13 +76,10 @@ export function useCheckout() {
         return response.data as PaymentStatusResponse;
       },
       enabled: !!paymentId,
-      refetchInterval: (query) => {
-        // Stop polling when payment is confirmed
-        if (query.state.data?.status === 'paid') {
-          return false;
-        }
-        return 3000; // Poll every 3 seconds
-      },
+      // Disable aggressive polling - rely on realtime updates instead
+      // Only allow manual refresh via refetch
+      refetchInterval: false,
+      staleTime: Infinity,
     });
   };
 
