@@ -33,7 +33,7 @@ export function FilterSection({
   const hasActiveFilters = statusFilter !== 'Todos' || planoFilter !== 'Todos';
 
   return (
-    <div className="filter-section mx-4 md:mx-6 animate-slide-in-left" style={{ animationDelay: '0.3s' }}>
+    <div className="filter-section mx-4 md:mx-6 animate-slide-in-left p-4 sm:p-5 md:p-6" style={{ animationDelay: '0.3s' }}>
       {/* Mobile: Search + Toggle */}
       <div className="flex items-center gap-2 md:hidden">
         <div className="relative group flex-1">

@@ -1,4 +1,4 @@
-import { Home, Users, Plus, CreditCard, Menu } from 'lucide-react';
+import { Home, Users, Plus, CreditCard, Menu, Monitor } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
@@ -11,7 +11,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Upload, Download, Settings, LogOut, Shield, RefreshCw, Moon, Sun } from 'lucide-react';
 import { useAdmin } from '@/hooks/useAdmin';
-import { useState, useEffect } from 'react';
+import { useTheme } from '@/hooks/useTheme';
+import { useState } from 'react';
 
 interface BottomNavProps {
   onNewClient: () => void;
@@ -25,17 +26,18 @@ export function BottomNav({ onNewClient, onImport, onExport, onRefresh, onLogout
   const navigate = useNavigate();
   const { isAdmin } = useAdmin();
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [isDark, setIsDark] = useState(false);
+  const { mode, cycleTheme } = useTheme();
 
-  useEffect(() => {
-    const isDarkMode = document.documentElement.classList.contains('dark');
-    setIsDark(isDarkMode);
-  }, []);
+  const getThemeIcon = () => {
+    if (mode === 'system') return <Monitor className="w-5 h-5" />;
+    if (mode === 'light') return <Sun className="w-5 h-5 text-stat-yellow" />;
+    return <Moon className="w-5 h-5" />;
+  };
 
-  const toggleTheme = () => {
-    const newIsDark = !isDark;
-    setIsDark(newIsDark);
-    document.documentElement.classList.toggle('dark', newIsDark);
+  const getThemeLabel = () => {
+    if (mode === 'system') return 'Sistema';
+    if (mode === 'light') return 'Claro';
+    return 'Escuro';
   };
 
   const scrollToTop = () => {
@@ -137,16 +139,10 @@ export function BottomNav({ onNewClient, onImport, onExport, onRefresh, onLogout
                 <Button
                   variant="outline"
                   className="flex flex-col h-20 gap-2"
-                  onClick={() => {
-                    toggleTheme();
-                  }}
+                  onClick={cycleTheme}
                 >
-                  {isDark ? (
-                    <Sun className="w-5 h-5 text-stat-yellow" />
-                  ) : (
-                    <Moon className="w-5 h-5" />
-                  )}
-                  <span className="text-xs">Tema</span>
+                  {getThemeIcon()}
+                  <span className="text-xs">{getThemeLabel()}</span>
                 </Button>
                 
                 {isAdmin && (
