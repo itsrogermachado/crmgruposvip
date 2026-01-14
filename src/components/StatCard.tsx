@@ -1,13 +1,11 @@
 import { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
 
 interface StatCardProps {
   title: string;
   value: string | number;
   icon: LucideIcon;
   variant: 'blue' | 'purple' | 'yellow' | 'red' | 'cyan' | 'green';
-  delay?: number;
 }
 
 const variantStyles = {
@@ -43,49 +41,16 @@ const variantStyles = {
   },
 };
 
-export function StatCard({ title, value, icon: Icon, variant, delay = 0 }: StatCardProps) {
-  const [displayValue, setDisplayValue] = useState<string | number>(typeof value === 'number' ? 0 : value);
-  const [isVisible, setIsVisible] = useState(false);
+export function StatCard({ title, value, icon: Icon, variant }: StatCardProps) {
   const styles = variantStyles[variant];
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), delay * 100);
-    return () => clearTimeout(timer);
-  }, [delay]);
-
-  useEffect(() => {
-    if (typeof value === 'number' && isVisible) {
-      const duration = 1000;
-      const steps = 30;
-      const increment = value / steps;
-      let current = 0;
-      
-      const timer = setInterval(() => {
-        current += increment;
-        if (current >= value) {
-          setDisplayValue(value);
-          clearInterval(timer);
-        } else {
-          setDisplayValue(Math.floor(current));
-        }
-      }, duration / steps);
-      
-      return () => clearInterval(timer);
-    } else {
-      setDisplayValue(value);
-    }
-  }, [value, isVisible]);
 
   return (
     <div 
       className={cn(
-        'stat-card opacity-0',
-        isVisible && 'animate-fade-in-up',
+        'stat-card',
         `hover:shadow-xl ${styles.glow}`
       )}
       style={{ 
-        animationDelay: `${delay * 100}ms`, 
-        animationFillMode: 'forwards',
         padding: 'clamp(0.75rem, 2vw, 1.5rem)',
         minHeight: 'clamp(80px, 12vw, 120px)'
       }}
@@ -99,7 +64,7 @@ export function StatCard({ title, value, icon: Icon, variant, delay = 0 }: StatC
       {/* Content */}
       <div className="relative z-10 pr-12 md:pr-16">
         <p className="text-responsive-sm font-medium text-muted-foreground mb-1 truncate">{title}</p>
-        <p className="text-responsive-xl font-bold text-foreground tracking-tight">{displayValue}</p>
+        <p className="text-responsive-xl font-bold text-foreground tracking-tight">{value}</p>
       </div>
       
       {/* Icon */}
@@ -113,7 +78,7 @@ export function StatCard({ title, value, icon: Icon, variant, delay = 0 }: StatC
           height: 'clamp(2.25rem, 4vw, 3.5rem)',
         }}
       >
-        <Icon style={{ width: 'clamp(1.125rem, 2vw, 1.75rem)', height: 'clamp(1.125rem, 2vw, 1.75rem)' }} className="animate-float" />
+        <Icon style={{ width: 'clamp(1.125rem, 2vw, 1.75rem)', height: 'clamp(1.125rem, 2vw, 1.75rem)' }} />
       </div>
     </div>
   );

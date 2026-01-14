@@ -26,42 +26,36 @@ export function StatsGrid({ clients }: StatsGridProps) {
         value={totalClientes}
         icon={Users}
         variant="blue"
-        delay={0}
       />
       <StatCard
         title="Clientes Ativos"
         value={clientesAtivos}
         icon={TrendingUp}
         variant="purple"
-        delay={1}
       />
       <StatCard
         title="Próximos do Vencimento"
         value={proximosVencimento}
         icon={Clock}
         variant="yellow"
-        delay={2}
       />
       <StatCard
         title="Clientes Vencidos"
         value={clientesVencidos}
         icon={AlertCircle}
         variant="red"
-        delay={3}
       />
       <StatCard
         title="Faturamento Mensal"
         value={formatCurrency(faturamentoMensal)}
         icon={DollarSign}
         variant="cyan"
-        delay={4}
       />
       <StatCard
         title="Lucro Esperado"
         value={formatCurrency(lucroEsperado)}
         icon={Wallet}
         variant="green"
-        delay={5}
       />
     </div>
   );
