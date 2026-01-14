@@ -16,6 +16,7 @@ import { Separator } from '@/components/ui/separator';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
@@ -245,6 +246,9 @@ export function FilterSection({
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
             <DialogTitle>Novo Plano</DialogTitle>
+            <DialogDescription>
+              Crie um novo plano para categorizar seus clientes.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
