@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/hooks/useAdmin';
 import { GroupSelector } from './GroupSelector';
 import { ReminderSettingsDialog } from './ReminderSettingsDialog';
+import { SubscriptionCountdown } from './SubscriptionCountdown';
 
 interface HeaderProps {
   onImport: () => void;
@@ -34,11 +35,14 @@ export function Header({ onImport, onExport, onNewClient, onRefresh, onLogout, u
 
   return (
     <header className="flex items-center justify-between py-4 px-6 bg-card border-b">
-      <div>
-        <h1 className="text-xl font-bold text-foreground">CRM Grupos VIP</h1>
-        {userEmail && (
-          <p className="text-xs text-muted-foreground">{userEmail}</p>
-        )}
+      <div className="flex items-center gap-4">
+        <div>
+          <h1 className="text-xl font-bold text-foreground">CRM Grupos VIP</h1>
+          {userEmail && (
+            <p className="text-xs text-muted-foreground">{userEmail}</p>
+          )}
+        </div>
+        <SubscriptionCountdown />
       </div>
       
       <div className="flex items-center gap-3">
