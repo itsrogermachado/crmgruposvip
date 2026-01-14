@@ -95,19 +95,23 @@ Deno.serve(async (req) => {
     
     const webhookSecret = Deno.env.get('PUSHINPAY_WEBHOOK_SECRET')
     
-    // Verify signature if secret is configured
-    if (webhookSecret) {
-      const isValid = await verifySignature(rawBody, signature, webhookSecret)
-      if (!isValid) {
-        console.error('Invalid webhook signature')
-        return new Response(JSON.stringify({ error: 'Assinatura inválida' }), { 
-          status: 401, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        })
-      }
-    } else {
-      // Log warning but allow through if no secret configured (for backwards compatibility)
-      console.warn('PUSHINPAY_WEBHOOK_SECRET not configured - skipping signature verification')
+    // Webhook secret is REQUIRED - reject if not configured
+    if (!webhookSecret) {
+      console.error('PUSHINPAY_WEBHOOK_SECRET not configured - webhook rejected for security')
+      return new Response(JSON.stringify({ error: 'Webhook não configurado' }), { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      })
+    }
+    
+    // Verify signature - REQUIRED
+    const isValid = await verifySignature(rawBody, signature, webhookSecret)
+    if (!isValid) {
+      console.error('Invalid webhook signature')
+      return new Response(JSON.stringify({ error: 'Assinatura inválida' }), { 
+        status: 401, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      })
     }
 
     // Parse body
