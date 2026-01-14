@@ -145,7 +145,7 @@ const Auth = () => {
 
         toast({
           title: 'Conta criada!',
-          description: 'Sua conta foi criada com sucesso.',
+          description: 'Você tem 1 dia de teste grátis para experimentar o CRM.',
         });
         navigate('/');
       }
@@ -187,6 +187,12 @@ const Auth = () => {
           <CardDescription className="text-muted-foreground">
             {isLogin ? 'Entre na sua conta para continuar' : 'Crie sua conta para começar'}
           </CardDescription>
+          {!isLogin && (
+            <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium">
+              <Sparkles className="w-4 h-4" />
+              <span>1 dia de teste grátis incluso!</span>
+            </div>
+          )}
         </CardHeader>
         <CardContent className="relative">
           <form onSubmit={handleSubmit} className="space-y-5">
