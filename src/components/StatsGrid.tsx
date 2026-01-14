@@ -20,7 +20,7 @@ export function StatsGrid({ clients }: StatsGridProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
+    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 p-4 md:p-6">
       <StatCard
         title="Total de Clientes"
         value={totalClientes}

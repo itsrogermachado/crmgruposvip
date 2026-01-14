@@ -55,43 +55,48 @@ export function Header({
 
   return (
     <header className="header-premium sticky top-0 z-50 animate-fade-in-down">
-      <div className="flex items-center justify-between py-4 px-6">
-        <div className="flex items-center gap-4">
+      <div className="flex items-center justify-between py-3 px-4 md:py-4 md:px-6">
+        {/* Left: Avatar + Name */}
+        <div className="flex items-center gap-3 md:gap-4 min-w-0">
           <button 
             onClick={() => navigate('/settings')} 
-            className="group flex items-center gap-4 transition-all duration-300 hover:scale-[1.02]"
+            className="group flex items-center gap-3 md:gap-4 transition-all duration-300 hover:scale-[1.02] min-w-0"
             title="Clique para editar seu perfil"
           >
-            <div className="relative">
-              <Avatar className="h-12 w-12 ring-2 ring-primary/20 ring-offset-2 ring-offset-background transition-all duration-300 group-hover:ring-primary/50">
+            <div className="relative flex-shrink-0">
+              <Avatar className="h-10 w-10 md:h-12 md:w-12 ring-2 ring-primary/20 ring-offset-2 ring-offset-background transition-all duration-300 group-hover:ring-primary/50">
                 <AvatarImage src={avatarUrl || undefined} alt={displayName} />
-                <AvatarFallback className="bg-gradient-to-br from-primary to-primary/60 text-primary-foreground font-bold text-lg">
+                <AvatarFallback className="bg-gradient-to-br from-primary to-primary/60 text-primary-foreground font-bold text-sm md:text-lg">
                   {initials}
                 </AvatarFallback>
               </Avatar>
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-status-active rounded-full border-2 border-background animate-pulse" />
+              <div className="absolute -bottom-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-status-active rounded-full border-2 border-background animate-pulse" />
             </div>
-            <div className="text-left">
+            <div className="text-left hidden sm:block min-w-0">
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                <h1 className="text-lg md:text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent truncate max-w-[150px] md:max-w-none">
                   {displayName}
                 </h1>
-                <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+                <Sparkles className="w-4 h-4 text-primary animate-pulse flex-shrink-0" />
               </div>
               {userEmail && (
-                <p className="text-sm text-muted-foreground">{userEmail}</p>
+                <p className="text-xs md:text-sm text-muted-foreground truncate max-w-[150px] md:max-w-none">{userEmail}</p>
               )}
             </div>
           </button>
-          <SubscriptionCountdown />
+          <div className="hidden lg:block">
+            <SubscriptionCountdown />
+          </div>
         </div>
         
-        <div className="flex items-center gap-2">
-          <WhatsAppSupport variant="inline" className="hidden md:flex" />
+        {/* Right: Actions - Hidden on mobile (handled by BottomNav) */}
+        <div className="hidden md:flex items-center gap-2">
+          <WhatsAppSupport variant="inline" />
+          
           <Button 
             variant="outline" 
             onClick={() => navigate('/plans')}
-            className="hidden md:flex border-primary/20 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
+            className="border-primary/20 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
           >
             <CreditCard className="w-4 h-4 mr-2" />
             Ver Planos
@@ -101,7 +106,7 @@ export function Header({
             <Button 
               variant="outline" 
               onClick={() => navigate('/admin')}
-              className="hidden md:flex border-stat-purple/20 hover:border-stat-purple/50 hover:bg-stat-purple/5 transition-all duration-300"
+              className="border-stat-purple/20 hover:border-stat-purple/50 hover:bg-stat-purple/5 transition-all duration-300"
             >
               <Shield className="w-4 h-4 mr-2 text-stat-purple" />
               Admin
@@ -138,7 +143,7 @@ export function Header({
             className="btn-premium bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 border-0"
           >
             <UserPlus className="w-4 h-4 mr-2" />
-            <span className="hidden sm:inline">Novo Cliente</span>
+            Novo Cliente
           </Button>
           
           <Button 

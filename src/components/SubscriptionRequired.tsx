@@ -1,8 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Lock, CreditCard, Clock, ShieldCheck, Database } from 'lucide-react';
+import { Lock, CreditCard, Clock, ShieldCheck, Database, LogOut } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { Loader2 } from 'lucide-react';
+import { WhatsAppSupport } from './WhatsAppSupport';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface SubscriptionRequiredProps {
   children: React.ReactNode;
@@ -11,6 +14,20 @@ interface SubscriptionRequiredProps {
 export function SubscriptionRequired({ children }: SubscriptionRequiredProps) {
   const navigate = useNavigate();
   const { hasActiveSubscription, loading, subscription } = useSubscription();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate('/auth');
+    } catch (error) {
+      toast({
+        title: 'Erro ao sair',
+        description: 'Não foi possível encerrar a sessão.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -90,18 +107,32 @@ export function SubscriptionRequired({ children }: SubscriptionRequiredProps) {
           </div>
         </div>
 
-        <Button 
-          onClick={() => navigate('/plans')} 
-          size="lg" 
-          className="w-full"
-        >
-          Ver Planos Disponíveis
-        </Button>
+        <div className="space-y-3">
+          <Button 
+            onClick={() => navigate('/plans')} 
+            size="lg" 
+            className="w-full"
+          >
+            Ver Planos Disponíveis
+          </Button>
+          
+          <Button 
+            variant="outline"
+            onClick={handleLogout}
+            className="w-full gap-2"
+          >
+            <LogOut className="w-4 h-4" />
+            Sair da conta
+          </Button>
+        </div>
 
         <p className="text-sm text-muted-foreground">
           Já realizou o pagamento? Aguarde alguns minutos para a confirmação.
         </p>
       </div>
+      
+      {/* WhatsApp Support Button */}
+      <WhatsAppSupport variant="fixed" />
     </div>
   );
 }

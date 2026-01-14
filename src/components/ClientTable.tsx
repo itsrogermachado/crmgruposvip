@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/tooltip';
 import { StatusBadge } from './StatusBadge';
 import { WhatsAppMessageDialog } from './WhatsAppMessageDialog';
+import { MobileClientCard } from './MobileClientCard';
 import { Client } from '@/types/client';
 
 interface ClientTableProps {
@@ -44,19 +45,37 @@ export function ClientTable({ clients, onEdit, onDelete }: ClientTableProps) {
 
   if (clients.length === 0) {
     return (
-      <div className="data-table mx-6 mb-6 p-12 text-center animate-fade-in">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-          <Users className="w-8 h-8 text-primary" />
+      <div className="mx-4 md:mx-6 mb-6 p-8 md:p-12 text-center animate-fade-in glass-card rounded-xl">
+        <div className="inline-flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full bg-primary/10 mb-4">
+          <Users className="w-7 h-7 md:w-8 md:h-8 text-primary" />
         </div>
-        <h3 className="text-lg font-semibold text-foreground mb-2">Nenhum cliente encontrado</h3>
-        <p className="text-muted-foreground">Adicione seu primeiro cliente clicando em "Novo Cliente"</p>
+        <h3 className="text-base md:text-lg font-semibold text-foreground mb-2">Nenhum cliente encontrado</h3>
+        <p className="text-sm text-muted-foreground">Adicione seu primeiro cliente clicando em "Novo Cliente"</p>
       </div>
     );
   }
 
   return (
     <>
-      <div className="data-table mx-6 mb-6 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+      {/* Mobile: Card List */}
+      <div className="md:hidden mx-4 mb-20 space-y-3">
+        {clients.map((client, index) => (
+          <div
+            key={client.id}
+            style={{ animationDelay: `${0.1 + index * 0.05}s` }}
+          >
+            <MobileClientCard
+              client={client}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onWhatsApp={openWhatsAppDialog}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop: Table */}
+      <div className="hidden md:block data-table mx-6 mb-6 animate-fade-in" style={{ animationDelay: '0.4s' }}>
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">

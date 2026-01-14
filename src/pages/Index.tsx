@@ -8,6 +8,7 @@ import { FilterSection } from '@/components/FilterSection';
 import { ClientTable } from '@/components/ClientTable';
 import { ClientDialog } from '@/components/ClientDialog';
 import { SubscriptionRequired } from '@/components/SubscriptionRequired';
+import { BottomNav } from '@/components/BottomNav';
 import { StatusFilter, PlanoFilter } from '@/types/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -271,7 +272,7 @@ const Index = () => {
 
   return (
     <SubscriptionRequired>
-      <div className="min-h-screen animated-bg dark:animated-bg animated-bg-light">
+      <div className="min-h-screen animated-bg dark:animated-bg animated-bg-light pb-20 md:pb-0">
         <Header
           onImport={handleImport}
           onExport={handleExport}
@@ -283,7 +284,7 @@ const Index = () => {
           avatarUrl={profile?.avatar_url}
         />
 
-        <main className="pb-8">
+        <main className="pb-4 md:pb-8">
           <StatsGrid clients={statsClients} />
 
           <ChartsSection clients={statsClients} />
@@ -297,7 +298,7 @@ const Index = () => {
             onPlanoChange={setPlanoFilter}
           />
 
-          <div className="mt-6">
+          <div className="mt-4 md:mt-6">
             <ClientTable
               clients={tableClients}
               onEdit={handleEditClient}
@@ -305,6 +306,15 @@ const Index = () => {
             />
           </div>
         </main>
+
+        {/* Bottom Navigation - Mobile Only */}
+        <BottomNav
+          onNewClient={handleNewClient}
+          onImport={handleImport}
+          onExport={handleExport}
+          onRefresh={handleRefresh}
+          onLogout={handleLogout}
+        />
 
         <ClientDialog
           open={dialogOpen}
