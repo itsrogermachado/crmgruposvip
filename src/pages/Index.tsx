@@ -61,6 +61,8 @@ const Index = () => {
       dataEntrada: c.data_entrada,
       dataVencimento: c.data_vencimento,
       status: c.status,
+      comprovanteUrl: c.comprovante_url,
+      observacoes: c.observacoes,
     }));
   }, [filteredClients]);
 
@@ -84,7 +86,7 @@ const Index = () => {
     setDialogOpen(true);
   };
 
-  const handleEditClient = (client: { id: string; nome: string; telefone: string; discord?: string; telegram?: string; plano: string; preco: number; dataEntrada: string; dataVencimento: string; status: string }) => {
+  const handleEditClient = (client: { id: string; nome: string; telefone: string; discord?: string; telegram?: string; plano: string; preco: number; dataEntrada: string; dataVencimento: string; status: string; comprovanteUrl?: string; observacoes?: string }) => {
     const clientToEdit: Client = {
       id: client.id,
       nome: client.nome,
@@ -96,6 +98,8 @@ const Index = () => {
       data_entrada: client.dataEntrada,
       data_vencimento: client.dataVencimento,
       status: client.status as Client['status'],
+      comprovante_url: client.comprovanteUrl,
+      observacoes: client.observacoes,
     };
     setEditingClient(clientToEdit);
     setDialogOpen(true);
