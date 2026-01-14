@@ -1,5 +1,13 @@
-import { MessageCircle, Pencil, Trash2, FileText, Calendar, DollarSign } from 'lucide-react';
+import { useState } from 'react';
+import { MessageCircle, Pencil, Trash2, FileText, Calendar, DollarSign, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { StatusBadge } from './StatusBadge';
 import { Client } from '@/types/client';
 
@@ -11,11 +19,36 @@ interface MobileClientCardProps {
 }
 
 export function MobileClientCard({ client, onEdit, onDelete, onWhatsApp }: MobileClientCardProps) {
+  const [comprovanteOpen, setComprovanteOpen] = useState(false);
+  
   const formatCurrency = (value: number) => {
     return `R$ ${value.toFixed(2).replace('.', ',')}`;
   };
 
   return (
+    <>
+    <Dialog open={comprovanteOpen} onOpenChange={setComprovanteOpen}>
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Receipt className="w-5 h-5 text-stat-green" />
+            Comprovante - {client.nome}
+          </DialogTitle>
+          <DialogDescription>
+            Visualização do comprovante de pagamento do cliente.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex items-center justify-center p-4">
+          {client.comprovanteUrl && (
+            <img
+              src={client.comprovanteUrl}
+              alt={`Comprovante de ${client.nome}`}
+              className="max-w-full max-h-[60vh] object-contain rounded-lg border border-border"
+            />
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
     <div className="glass-card rounded-xl animate-fade-in" style={{ padding: 'clamp(0.75rem, 3vw, 1rem)' }}>
       {/* Header: Name + Status */}
       <div className="flex items-start justify-between" style={{ gap: 'clamp(0.5rem, 2vw, 0.75rem)', marginBottom: 'clamp(0.5rem, 2vw, 0.75rem)' }}>
@@ -58,6 +91,17 @@ export function MobileClientCard({ client, onEdit, onDelete, onWhatsApp }: Mobil
           <MessageCircle style={{ width: 'clamp(0.875rem, 3.5vw, 1rem)', height: 'clamp(0.875rem, 3.5vw, 1rem)' }} />
           WhatsApp
         </Button>
+        {client.comprovanteUrl && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setComprovanteOpen(true)}
+            className="text-stat-green hover:text-stat-green hover:bg-stat-green/10"
+            style={{ width: 'clamp(2rem, 8vw, 2.25rem)', height: 'clamp(2rem, 8vw, 2.25rem)' }}
+          >
+            <Receipt style={{ width: 'clamp(0.875rem, 3.5vw, 1rem)', height: 'clamp(0.875rem, 3.5vw, 1rem)' }} />
+          </Button>
+        )}
         <Button
           variant="ghost"
           size="icon"
@@ -78,5 +122,6 @@ export function MobileClientCard({ client, onEdit, onDelete, onWhatsApp }: Mobil
         </Button>
       </div>
     </div>
+    </>
   );
 }
