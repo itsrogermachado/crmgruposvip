@@ -1,6 +1,8 @@
-import { RefreshCw, Upload, Download, UserPlus, Moon, Sun, LogOut } from 'lucide-react';
+import { RefreshCw, Upload, Download, UserPlus, Moon, Sun, LogOut, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAdmin } from '@/hooks/useAdmin';
 
 interface HeaderProps {
   onImport: () => void;
@@ -13,6 +15,8 @@ interface HeaderProps {
 
 export function Header({ onImport, onExport, onNewClient, onRefresh, onLogout, userEmail }: HeaderProps) {
   const [isDark, setIsDark] = useState(false);
+  const navigate = useNavigate();
+  const { isAdmin } = useAdmin();
 
   useEffect(() => {
     const isDarkMode = document.documentElement.classList.contains('dark');
@@ -35,6 +39,13 @@ export function Header({ onImport, onExport, onNewClient, onRefresh, onLogout, u
       </div>
       
       <div className="flex items-center gap-3">
+        {isAdmin && (
+          <Button variant="outline" onClick={() => navigate('/admin')}>
+            <Shield className="w-4 h-4 mr-2" />
+            Painel Admin
+          </Button>
+        )}
+        
         <Button variant="ghost" size="icon" onClick={onRefresh}>
           <RefreshCw className="w-5 h-5" />
         </Button>
