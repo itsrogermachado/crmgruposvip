@@ -95,20 +95,31 @@ Deno.serve(async (req) => {
     
     const webhookSecret = Deno.env.get('PUSHINPAY_WEBHOOK_SECRET')
     
-    // Webhook secret is REQUIRED - reject if not configured
-    if (!webhookSecret) {
-      console.error('PUSHINPAY_WEBHOOK_SECRET not configured - webhook rejected for security')
-      return new Response(JSON.stringify({ error: 'Webhook não configurado' }), { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      })
+    // Check for token in URL as fallback authentication
+    const url = new URL(req.url)
+    const urlToken = url.searchParams.get('token')
+    
+    // Verify either signature OR URL token
+    let isAuthenticated = false
+    
+    if (webhookSecret) {
+      // Try signature verification first
+      const isValidSignature = await verifySignature(rawBody, signature, webhookSecret)
+      if (isValidSignature) {
+        isAuthenticated = true
+        console.log('Webhook authenticated via signature')
+      }
+      
+      // Fallback to URL token verification
+      if (!isAuthenticated && urlToken && urlToken === webhookSecret) {
+        isAuthenticated = true
+        console.log('Webhook authenticated via URL token')
+      }
     }
     
-    // Verify signature - REQUIRED
-    const isValid = await verifySignature(rawBody, signature, webhookSecret)
-    if (!isValid) {
-      console.error('Invalid webhook signature')
-      return new Response(JSON.stringify({ error: 'Assinatura inválida' }), { 
+    if (!isAuthenticated) {
+      console.error('Webhook authentication failed - no valid signature or token')
+      return new Response(JSON.stringify({ error: 'Autenticação inválida' }), { 
         status: 401, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       })

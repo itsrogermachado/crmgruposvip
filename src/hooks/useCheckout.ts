@@ -13,6 +13,12 @@ interface PixResponse {
   status: string;
 }
 
+interface PaymentStatusResponse {
+  status: 'pending' | 'paid';
+  paid_at?: string;
+  error?: string;
+}
+
 export function useCheckout() {
   const { toast } = useToast();
   const [pixData, setPixData] = useState<PixResponse | null>(null);
@@ -52,24 +58,27 @@ export function useCheckout() {
   });
 
   const usePaymentStatus = (paymentId: string | null) => {
-    return useQuery({
+    return useQuery<PaymentStatusResponse | null>({
       queryKey: ['payment-status', paymentId],
-      queryFn: async () => {
+      queryFn: async (): Promise<PaymentStatusResponse | null> => {
         if (!paymentId) return null;
 
-        const { data, error } = await supabase
-          .from('payments')
-          .select('status, paid_at')
-          .eq('id', paymentId)
-          .single();
+        // Call edge function to check status directly on PushinPay
+        const response = await supabase.functions.invoke('check-payment-status', {
+          body: { paymentId },
+        });
 
-        if (error) throw error;
-        return data;
+        if (response.error) {
+          console.error('Error checking payment status:', response.error);
+          throw new Error(response.error.message);
+        }
+
+        return response.data as PaymentStatusResponse;
       },
       enabled: !!paymentId,
-      refetchInterval: (data) => {
+      refetchInterval: (query) => {
         // Stop polling when payment is confirmed
-        if (data?.state?.data?.status === 'paid') {
+        if (query.state.data?.status === 'paid') {
           return false;
         }
         return 3000; // Poll every 3 seconds
