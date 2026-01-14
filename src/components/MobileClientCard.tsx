@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { MessageCircle, Pencil, Trash2, FileText, Calendar, DollarSign, Receipt } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { MessageCircle, Pencil, Trash2, FileText, Calendar, DollarSign, Receipt, Upload, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -7,22 +7,98 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import { StatusBadge } from './StatusBadge';
 import { Client } from '@/types/client';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface MobileClientCardProps {
   client: Client;
   onEdit: (client: Client) => void;
   onDelete: (clientId: string) => void;
   onWhatsApp: (client: Client) => void;
+  onClientUpdate?: () => void;
 }
 
-export function MobileClientCard({ client, onEdit, onDelete, onWhatsApp }: MobileClientCardProps) {
+export function MobileClientCard({ client, onEdit, onDelete, onWhatsApp, onClientUpdate }: MobileClientCardProps) {
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [comprovanteOpen, setComprovanteOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [currentUrl, setCurrentUrl] = useState(client.comprovanteUrl);
   
   const formatCurrency = (value: number) => {
     return `R$ ${value.toFixed(2).replace('.', ',')}`;
+  };
+
+  const handleUpdateComprovante = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Erro",
+        description: "Por favor, selecione apenas imagens.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Erro",
+        description: "A imagem deve ter no máximo 5MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${client.id}-${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('comprovantes')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('comprovantes')
+        .getPublicUrl(fileName);
+
+      const { error: updateError } = await supabase
+        .from('clients')
+        .update({ comprovante_url: publicUrl })
+        .eq('id', client.id);
+
+      if (updateError) throw updateError;
+
+      setCurrentUrl(publicUrl);
+
+      toast({
+        title: "Sucesso",
+        description: "Comprovante atualizado com sucesso!",
+      });
+
+      onClientUpdate?.();
+    } catch (error) {
+      console.error('Error updating comprovante:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao atualizar comprovante. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   return (
@@ -39,14 +115,41 @@ export function MobileClientCard({ client, onEdit, onDelete, onWhatsApp }: Mobil
           </DialogDescription>
         </DialogHeader>
         <div className="flex items-center justify-center p-4">
-          {client.comprovanteUrl && (
+          {(currentUrl || client.comprovanteUrl) && (
             <img
-              src={client.comprovanteUrl}
+              src={currentUrl || client.comprovanteUrl}
               alt={`Comprovante de ${client.nome}`}
               className="max-w-full max-h-[60vh] object-contain rounded-lg border border-border"
             />
           )}
         </div>
+        <DialogFooter>
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept="image/*"
+            onChange={handleUpdateComprovante}
+            className="hidden"
+          />
+          <Button
+            variant="outline"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="gap-2"
+          >
+            {uploading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Enviando...
+              </>
+            ) : (
+              <>
+                <Upload className="w-4 h-4" />
+                Atualizar Comprovante
+              </>
+            )}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
     <div className="glass-card rounded-xl animate-fade-in" style={{ padding: 'clamp(0.75rem, 3vw, 1rem)' }}>

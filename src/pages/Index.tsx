@@ -309,6 +309,7 @@ const Index = () => {
               clients={tableClients}
               onEdit={handleEditClient}
               onDelete={handleDeleteClient}
+              onClientUpdate={handleRefresh}
             />
           </div>
         </main>
