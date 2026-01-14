@@ -23,10 +23,48 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Search, MoreHorizontal, Check, X, Clock, Ban } from 'lucide-react';
+import { Search, MoreHorizontal, Check, X, Clock, Ban, AlertTriangle } from 'lucide-react';
 import { Subscription, useUpdateSubscriptionStatus } from '@/hooks/useAdminData';
-import { format, addDays } from 'date-fns';
+import { format, addDays, differenceInDays, isPast } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+
+function getExpirationInfo(expiresAt: string | null, status: string) {
+  if (!expiresAt || status !== 'active') return null;
+  
+  const expDate = new Date(expiresAt);
+  const now = new Date();
+  const daysLeft = differenceInDays(expDate, now);
+  
+  if (isPast(expDate)) {
+    return { 
+      text: 'Expirado',
+      variant: 'destructive' as const,
+      urgent: true
+    };
+  }
+  
+  if (daysLeft <= 3) {
+    return { 
+      text: `${daysLeft} dia${daysLeft !== 1 ? 's' : ''}`,
+      variant: 'outline' as const,
+      urgent: true
+    };
+  }
+  
+  if (daysLeft <= 7) {
+    return { 
+      text: `${daysLeft} dias`,
+      variant: 'secondary' as const,
+      urgent: false
+    };
+  }
+  
+  return { 
+    text: `${daysLeft} dias`,
+    variant: 'secondary' as const,
+    urgent: false
+  };
+}
 
 interface SubscriptionsTableProps {
   subscriptions: Subscription[];
@@ -94,19 +132,21 @@ export function SubscriptionsTable({ subscriptions }: SubscriptionsTableProps) {
               <TableHead>Status</TableHead>
               <TableHead>Início</TableHead>
               <TableHead>Vencimento</TableHead>
+              <TableHead>Tempo Restante</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredSubscriptions.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground">
+                <TableCell colSpan={7} className="text-center text-muted-foreground">
                   Nenhuma assinatura encontrada
                 </TableCell>
               </TableRow>
             ) : (
               filteredSubscriptions.map((sub) => {
                 const config = statusConfig[sub.status];
+                const expirationInfo = getExpirationInfo(sub.expires_at, sub.status);
                 return (
                   <TableRow key={sub.id}>
                     <TableCell className="font-medium">
@@ -125,6 +165,19 @@ export function SubscriptionsTable({ subscriptions }: SubscriptionsTableProps) {
                       {sub.expires_at 
                         ? format(new Date(sub.expires_at), 'dd/MM/yyyy', { locale: ptBR })
                         : '-'}
+                    </TableCell>
+                    <TableCell>
+                      {expirationInfo ? (
+                        <Badge 
+                          variant={expirationInfo.variant}
+                          className={expirationInfo.urgent ? 'animate-pulse' : ''}
+                        >
+                          {expirationInfo.urgent && <AlertTriangle className="h-3 w-3 mr-1" />}
+                          {expirationInfo.text}
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
