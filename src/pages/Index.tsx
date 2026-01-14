@@ -7,6 +7,7 @@ import { ChartsSection } from '@/components/ChartsSection';
 import { FilterSection } from '@/components/FilterSection';
 import { ClientTable } from '@/components/ClientTable';
 import { ClientDialog } from '@/components/ClientDialog';
+import { SubscriptionRequired } from '@/components/SubscriptionRequired';
 import { StatusFilter, PlanoFilter } from '@/types/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -223,66 +224,68 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header
-        onImport={handleImport}
-        onExport={handleExport}
-        onNewClient={handleNewClient}
-        onRefresh={handleRefresh}
-        onLogout={handleLogout}
-        userEmail={user?.email}
-      />
+    <SubscriptionRequired>
+      <div className="min-h-screen bg-background">
+        <Header
+          onImport={handleImport}
+          onExport={handleExport}
+          onNewClient={handleNewClient}
+          onRefresh={handleRefresh}
+          onLogout={handleLogout}
+          userEmail={user?.email}
+        />
 
-      <StatsGrid clients={statsClients} />
+        <StatsGrid clients={statsClients} />
 
-      <ChartsSection clients={statsClients} />
+        <ChartsSection clients={statsClients} />
 
 
-      <FilterSection
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        statusFilter={statusFilter}
-        onStatusChange={setStatusFilter}
-        planoFilter={planoFilter}
-        onPlanoChange={setPlanoFilter}
-      />
+        <FilterSection
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          statusFilter={statusFilter}
+          onStatusChange={setStatusFilter}
+          planoFilter={planoFilter}
+          onPlanoChange={setPlanoFilter}
+        />
 
-      <div className="mt-6">
-        <ClientTable
-          clients={tableClients}
-          onEdit={handleEditClient}
-          onDelete={handleDeleteClient}
+        <div className="mt-6">
+          <ClientTable
+            clients={tableClients}
+            onEdit={handleEditClient}
+            onDelete={handleDeleteClient}
+          />
+        </div>
+
+        <ClientDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          client={editingClient ? {
+            id: editingClient.id,
+            nome: editingClient.nome,
+            telefone: editingClient.telefone,
+            discord: editingClient.discord,
+            telegram: editingClient.telegram,
+            plano: editingClient.plano,
+            preco: editingClient.preco,
+            dataEntrada: editingClient.data_entrada,
+            dataVencimento: editingClient.data_vencimento,
+            status: editingClient.status,
+            comprovanteUrl: editingClient.comprovante_url,
+          } : null}
+          onSave={handleSaveClient}
+        />
+
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".xlsx,.xls"
+          className="hidden"
+          onChange={handleFileChange}
         />
       </div>
-
-      <ClientDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        client={editingClient ? {
-          id: editingClient.id,
-          nome: editingClient.nome,
-          telefone: editingClient.telefone,
-          discord: editingClient.discord,
-          telegram: editingClient.telegram,
-          plano: editingClient.plano,
-          preco: editingClient.preco,
-          dataEntrada: editingClient.data_entrada,
-          dataVencimento: editingClient.data_vencimento,
-          status: editingClient.status,
-          comprovanteUrl: editingClient.comprovante_url,
-        } : null}
-        onSave={handleSaveClient}
-      />
-
-
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".xlsx,.xls"
-        className="hidden"
-        onChange={handleFileChange}
-      />
-    </div>
+    </SubscriptionRequired>
   );
 };
 
