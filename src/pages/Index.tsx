@@ -109,7 +109,7 @@ const Index = () => {
     await deleteClient(clientId);
   };
 
-  const handleSaveClient = async (clientData: { id?: string; nome: string; telefone: string; discord?: string; telegram?: string; plano: string; preco: number; dataEntrada: string; dataVencimento: string; status: string; comprovanteUrl?: string }) => {
+  const handleSaveClient = async (clientData: { id?: string; nome: string; telefone: string; discord?: string; telegram?: string; plano: string; preco: number; dataEntrada: string; dataVencimento: string; status: string; comprovanteUrl?: string; observacoes?: string }) => {
     if (clientData.id) {
       await updateClient(clientData.id, {
         nome: clientData.nome,
@@ -122,6 +122,7 @@ const Index = () => {
         data_vencimento: clientData.dataVencimento,
         status: clientData.status as Client['status'],
         comprovante_url: clientData.comprovanteUrl,
+        observacoes: clientData.observacoes,
       });
     } else {
       await addClient({
@@ -135,6 +136,7 @@ const Index = () => {
         data_vencimento: clientData.dataVencimento,
         status: clientData.status as Client['status'],
         comprovante_url: clientData.comprovanteUrl,
+        observacoes: clientData.observacoes,
       });
     }
   };
