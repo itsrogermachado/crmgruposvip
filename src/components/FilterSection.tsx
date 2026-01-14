@@ -1,4 +1,4 @@
-import { Filter, Search } from 'lucide-react';
+import { Filter, Search, SlidersHorizontal } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -27,55 +27,72 @@ export function FilterSection({
   onPlanoChange,
 }: FilterSectionProps) {
   return (
-    <div className="filter-section mx-6">
-      <div className="flex items-center gap-2 mb-4">
-        <Filter className="w-5 h-5 text-muted-foreground" />
-        <h2 className="font-semibold text-foreground">Filtros</h2>
+    <div className="filter-section mx-6 animate-slide-in-left" style={{ animationDelay: '0.3s' }}>
+      <div className="flex items-center gap-3 mb-5">
+        <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5">
+          <SlidersHorizontal className="w-5 h-5 text-primary" />
+        </div>
+        <h2 className="font-semibold text-foreground text-lg">Filtros</h2>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <label className="text-sm font-medium text-muted-foreground mb-2 block">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-muted-foreground block">
             Buscar
           </label>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <div className="relative group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
             <Input
               placeholder="Nome, número ou Discord..."
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10"
+              className="pl-10 input-glow transition-all duration-300 border-border/50 focus:border-primary/50 bg-background/50"
             />
           </div>
         </div>
         
-        <div>
-          <label className="text-sm font-medium text-muted-foreground mb-2 block">
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-muted-foreground block">
             Status
           </label>
           <Select value={statusFilter} onValueChange={(v) => onStatusChange(v as StatusFilter)}>
-            <SelectTrigger>
+            <SelectTrigger className="transition-all duration-300 border-border/50 focus:border-primary/50 bg-background/50">
               <SelectValue placeholder="Todos" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Todos">Todos</SelectItem>
-              <SelectItem value="Ativo">Ativo</SelectItem>
-              <SelectItem value="Próximo">Próximo</SelectItem>
-              <SelectItem value="Vencido">Vencido</SelectItem>
+              <SelectItem value="Todos">Todos os Status</SelectItem>
+              <SelectItem value="Ativo">
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-status-active" />
+                  Ativo
+                </span>
+              </SelectItem>
+              <SelectItem value="Próximo">
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-status-warning" />
+                  Próximo
+                </span>
+              </SelectItem>
+              <SelectItem value="Vencido">
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-status-expired" />
+                  Vencido
+                </span>
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
         
-        <div>
-          <label className="text-sm font-medium text-muted-foreground mb-2 block">
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-muted-foreground block">
             Plano
           </label>
           <Select value={planoFilter} onValueChange={(v) => onPlanoChange(v as PlanoFilter)}>
-            <SelectTrigger>
+            <SelectTrigger className="transition-all duration-300 border-border/50 focus:border-primary/50 bg-background/50">
               <SelectValue placeholder="Todos" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Todos">Todos</SelectItem>
+              <SelectItem value="Todos">Todos os Planos</SelectItem>
               <SelectItem value="VIP Completo">VIP Completo</SelectItem>
               <SelectItem value="Delay">Delay</SelectItem>
               <SelectItem value="Básico">Básico</SelectItem>
