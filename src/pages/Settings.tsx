@@ -11,6 +11,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { SubscriptionRequired } from '@/components/SubscriptionRequired';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -175,138 +176,140 @@ export default function Settings() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-xl font-bold">Configurações</h1>
-        </div>
-      </header>
+    <SubscriptionRequired>
+      <div className="min-h-screen bg-background">
+        <header className="border-b bg-card">
+          <div className="container mx-auto px-4 py-4 flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-xl font-bold">Configurações</h1>
+          </div>
+        </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-2xl space-y-6">
-        {/* Profile Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Perfil do Grupo
-            </CardTitle>
-            <CardDescription>
-              Personalize as informações do seu grupo VIP
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Avatar */}
-            <div className="flex flex-col items-center gap-4">
-              <div className="relative">
-                <Avatar className="h-24 w-24">
-                  <AvatarImage src={avatarPreview || undefined} alt={displayName} />
-                  <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-semibold">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-                <label
-                  htmlFor="avatar-upload"
-                  className="absolute bottom-0 right-0 p-2 bg-primary text-primary-foreground rounded-full cursor-pointer hover:bg-primary/90 transition-colors"
-                >
-                  <Camera className="h-4 w-4" />
-                  <input
-                    id="avatar-upload"
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    onChange={handleAvatarChange}
-                    className="hidden"
-                  />
-                </label>
+        <main className="container mx-auto px-4 py-8 max-w-2xl space-y-6">
+          {/* Profile Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                Perfil do Grupo
+              </CardTitle>
+              <CardDescription>
+                Personalize as informações do seu grupo VIP
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Avatar */}
+              <div className="flex flex-col items-center gap-4">
+                <div className="relative">
+                  <Avatar className="h-24 w-24">
+                    <AvatarImage src={avatarPreview || undefined} alt={displayName} />
+                    <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-semibold">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <label
+                    htmlFor="avatar-upload"
+                    className="absolute bottom-0 right-0 p-2 bg-primary text-primary-foreground rounded-full cursor-pointer hover:bg-primary/90 transition-colors"
+                  >
+                    <Camera className="h-4 w-4" />
+                    <input
+                      id="avatar-upload"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleAvatarChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Clique no ícone para alterar a foto (máx. 2MB)
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Clique no ícone para alterar a foto (máx. 2MB)
-              </p>
-            </div>
 
-            {/* Group Name */}
-            <div className="space-y-2">
-              <Label htmlFor="group-name">Nome do Grupo VIP</Label>
-              <Input
-                id="group-name"
-                value={groupName}
-                onChange={(e) => setGroupName(e.target.value)}
-                placeholder="Ex: Elite Traders VIP"
-                maxLength={100}
-              />
-            </div>
+              {/* Group Name */}
+              <div className="space-y-2">
+                <Label htmlFor="group-name">Nome do Grupo VIP</Label>
+                <Input
+                  id="group-name"
+                  value={groupName}
+                  onChange={(e) => setGroupName(e.target.value)}
+                  placeholder="Ex: Elite Traders VIP"
+                  maxLength={100}
+                />
+              </div>
 
-            {/* Email (read-only) */}
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                value={user?.email || ''}
-                disabled
-                className="bg-muted"
-              />
-              <p className="text-xs text-muted-foreground">
-                O email não pode ser alterado
-              </p>
-            </div>
+              {/* Email (read-only) */}
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  value={user?.email || ''}
+                  disabled
+                  className="bg-muted"
+                />
+                <p className="text-xs text-muted-foreground">
+                  O email não pode ser alterado
+                </p>
+              </div>
 
-            <Button onClick={handleSaveProfile} disabled={saving} className="w-full">
-              <Save className="h-4 w-4 mr-2" />
-              {saving ? 'Salvando...' : 'Salvar Alterações'}
-            </Button>
-          </CardContent>
-        </Card>
+              <Button onClick={handleSaveProfile} disabled={saving} className="w-full">
+                <Save className="h-4 w-4 mr-2" />
+                {saving ? 'Salvando...' : 'Salvar Alterações'}
+              </Button>
+            </CardContent>
+          </Card>
 
-        <Separator />
+          <Separator />
 
-        {/* Password Change */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Lock className="h-5 w-5" />
-              Alterar Senha
-            </CardTitle>
-            <CardDescription>
-              Atualize sua senha de acesso
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="new-password">Nova Senha</Label>
-              <Input
-                id="new-password"
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Mínimo 6 caracteres"
-              />
-            </div>
+          {/* Password Change */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Lock className="h-5 w-5" />
+                Alterar Senha
+              </CardTitle>
+              <CardDescription>
+                Atualize sua senha de acesso
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-password">Nova Senha</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Mínimo 6 caracteres"
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirmar Nova Senha</Label>
-              <Input
-                id="confirm-password"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Repita a nova senha"
-              />
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">Confirmar Nova Senha</Label>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Repita a nova senha"
+                />
+              </div>
 
-            <Button
-              onClick={handleChangePassword}
-              disabled={changingPassword}
-              variant="outline"
-              className="w-full"
-            >
-              <Lock className="h-4 w-4 mr-2" />
-              {changingPassword ? 'Alterando...' : 'Alterar Senha'}
-            </Button>
-          </CardContent>
-        </Card>
-      </main>
-    </div>
+              <Button
+                onClick={handleChangePassword}
+                disabled={changingPassword}
+                variant="outline"
+                className="w-full"
+              >
+                <Lock className="h-4 w-4 mr-2" />
+                {changingPassword ? 'Alterando...' : 'Alterar Senha'}
+              </Button>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    </SubscriptionRequired>
   );
 }
