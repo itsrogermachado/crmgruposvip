@@ -3,14 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import { Header } from '@/components/Header';
 import { StatsGrid } from '@/components/StatsGrid';
+import { ChartsSection } from '@/components/ChartsSection';
 import { FilterSection } from '@/components/FilterSection';
 import { ClientTable } from '@/components/ClientTable';
 import { ClientDialog } from '@/components/ClientDialog';
+import { NotifyClientsDialog } from '@/components/NotifyClientsDialog';
 import { StatusFilter, PlanoFilter } from '@/types/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useClients, Client } from '@/hooks/useClients';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Bell } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -21,9 +24,23 @@ const Index = () => {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('Todos');
   const [planoFilter, setPlanoFilter] = useState<PlanoFilter>('Todos');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [notifyDialogOpen, setNotifyDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // Clients near expiration for notifications
+  const clientsNearExpiration = useMemo(() => {
+    return clients
+      .filter(c => c.status === 'Próximo')
+      .map(c => ({
+        id: c.id,
+        nome: c.nome,
+        telefone: c.telefone,
+        dataVencimento: c.data_vencimento,
+        status: c.status,
+      }));
+  }, [clients]);
 
   // Redirect to auth if not logged in
   if (!authLoading && !user) {
@@ -103,7 +120,7 @@ const Index = () => {
     await deleteClient(clientId);
   };
 
-  const handleSaveClient = async (clientData: { id?: string; nome: string; telefone: string; discord?: string; telegram?: string; plano: string; preco: number; dataEntrada: string; dataVencimento: string; status: string }) => {
+  const handleSaveClient = async (clientData: { id?: string; nome: string; telefone: string; discord?: string; telegram?: string; plano: string; preco: number; dataEntrada: string; dataVencimento: string; status: string; comprovanteUrl?: string }) => {
     if (clientData.id) {
       await updateClient(clientData.id, {
         nome: clientData.nome,
@@ -115,6 +132,7 @@ const Index = () => {
         data_entrada: clientData.dataEntrada,
         data_vencimento: clientData.dataVencimento,
         status: clientData.status as Client['status'],
+        comprovante_url: clientData.comprovanteUrl,
       });
     } else {
       await addClient({
@@ -127,6 +145,7 @@ const Index = () => {
         data_entrada: clientData.dataEntrada,
         data_vencimento: clientData.dataVencimento,
         status: clientData.status as Client['status'],
+        comprovante_url: clientData.comprovanteUrl,
       });
     }
   };
@@ -231,6 +250,21 @@ const Index = () => {
 
       <StatsGrid clients={statsClients} />
 
+      <ChartsSection clients={statsClients} />
+
+      {/* Notification Button */}
+      {clientsNearExpiration.length > 0 && (
+        <div className="px-6 mb-4">
+          <Button
+            onClick={() => setNotifyDialogOpen(true)}
+            className="bg-yellow-600 hover:bg-yellow-700 text-white"
+          >
+            <Bell className="h-4 w-4 mr-2" />
+            Notificar {clientsNearExpiration.length} cliente{clientsNearExpiration.length !== 1 ? 's' : ''} próximo{clientsNearExpiration.length !== 1 ? 's' : ''} do vencimento
+          </Button>
+        </div>
+      )}
+
       <FilterSection
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -262,8 +296,15 @@ const Index = () => {
           dataEntrada: editingClient.data_entrada,
           dataVencimento: editingClient.data_vencimento,
           status: editingClient.status,
+          comprovanteUrl: editingClient.comprovante_url,
         } : null}
         onSave={handleSaveClient}
+      />
+
+      <NotifyClientsDialog
+        open={notifyDialogOpen}
+        onOpenChange={setNotifyDialogOpen}
+        clients={clientsNearExpiration}
       />
 
       <input
