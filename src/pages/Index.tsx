@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { Header } from '@/components/Header';
 import { StatsGrid } from '@/components/StatsGrid';
 import { ChartsSection } from '@/components/ChartsSection';
@@ -148,61 +148,106 @@ const Index = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      try {
-        const data = new Uint8Array(event.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet) as Record<string, unknown>[];
-
-        const importedClients: Omit<Client, 'id'>[] = jsonData.map((row) => ({
-          nome: String(row['Nome'] || row['nome'] || ''),
-          telefone: String(row['Telefone'] || row['telefone'] || ''),
-          discord: row['Discord'] || row['discord'] ? String(row['Discord'] || row['discord']) : undefined,
-          telegram: row['Telegram'] || row['telegram'] ? String(row['Telegram'] || row['telegram']) : undefined,
-          plano: (row['Plano'] || row['plano'] || 'VIP Completo') as Client['plano'],
-          preco: Number(row['Preço'] || row['preco'] || row['Preco'] || 0),
-          data_entrada: String(row['Data Entrada'] || row['dataEntrada'] || row['data_entrada'] || ''),
-          data_vencimento: String(row['Data Vencimento'] || row['dataVencimento'] || row['data_vencimento'] || ''),
-          status: (row['Status'] || row['status'] || 'Ativo') as Client['status'],
-        }));
-
-        await importClients(importedClients);
-      } catch (error) {
-        toast({
-          title: 'Erro na importação',
-          description: 'Não foi possível importar o arquivo.',
-          variant: 'destructive',
-        });
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(arrayBuffer);
+      
+      const worksheet = workbook.worksheets[0];
+      if (!worksheet) {
+        throw new Error('Planilha vazia');
       }
-    };
-    reader.readAsArrayBuffer(file);
+
+      const jsonData: Record<string, unknown>[] = [];
+      const headerRow = worksheet.getRow(1);
+      const headers: string[] = [];
+      
+      headerRow.eachCell((cell, colNumber) => {
+        headers[colNumber] = String(cell.value || '');
+      });
+
+      worksheet.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) return; // Skip header
+        const rowData: Record<string, unknown> = {};
+        row.eachCell((cell, colNumber) => {
+          const header = headers[colNumber];
+          if (header) {
+            rowData[header] = cell.value;
+          }
+        });
+        if (Object.keys(rowData).length > 0) {
+          jsonData.push(rowData);
+        }
+      });
+
+      const importedClients: Omit<Client, 'id'>[] = jsonData.map((row) => ({
+        nome: String(row['Nome'] || row['nome'] || ''),
+        telefone: String(row['Telefone'] || row['telefone'] || ''),
+        discord: row['Discord'] || row['discord'] ? String(row['Discord'] || row['discord']) : undefined,
+        telegram: row['Telegram'] || row['telegram'] ? String(row['Telegram'] || row['telegram']) : undefined,
+        plano: (row['Plano'] || row['plano'] || 'VIP Completo') as Client['plano'],
+        preco: Number(row['Preço'] || row['preco'] || row['Preco'] || 0),
+        data_entrada: String(row['Data Entrada'] || row['dataEntrada'] || row['data_entrada'] || ''),
+        data_vencimento: String(row['Data Vencimento'] || row['dataVencimento'] || row['data_vencimento'] || ''),
+        status: (row['Status'] || row['status'] || 'Ativo') as Client['status'],
+      }));
+
+      await importClients(importedClients);
+    } catch (error) {
+      toast({
+        title: 'Erro na importação',
+        description: 'Não foi possível importar o arquivo.',
+        variant: 'destructive',
+      });
+    }
     e.target.value = '';
   };
 
-  const handleExport = () => {
-    const exportData = clients.map((c) => ({
-      Nome: c.nome,
-      Telefone: c.telefone,
-      Discord: c.discord || '',
-      Telegram: c.telegram || '',
-      Plano: c.plano,
-      Preço: c.preco,
-      'Data Entrada': c.data_entrada,
-      'Data Vencimento': c.data_vencimento,
-      Status: c.status,
-    }));
+  const handleExport = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Clientes');
 
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Clientes');
-    XLSX.writeFile(workbook, 'clientes_vip.xlsx');
+    worksheet.columns = [
+      { header: 'Nome', key: 'nome', width: 25 },
+      { header: 'Telefone', key: 'telefone', width: 15 },
+      { header: 'Discord', key: 'discord', width: 20 },
+      { header: 'Telegram', key: 'telegram', width: 20 },
+      { header: 'Plano', key: 'plano', width: 15 },
+      { header: 'Preço', key: 'preco', width: 10 },
+      { header: 'Data Entrada', key: 'data_entrada', width: 15 },
+      { header: 'Data Vencimento', key: 'data_vencimento', width: 15 },
+      { header: 'Status', key: 'status', width: 12 },
+    ];
+
+    clients.forEach((c) => {
+      worksheet.addRow({
+        nome: c.nome,
+        telefone: c.telefone,
+        discord: c.discord || '',
+        telegram: c.telegram || '',
+        plano: c.plano,
+        preco: c.preco,
+        data_entrada: c.data_entrada,
+        data_vencimento: c.data_vencimento,
+        status: c.status,
+      });
+    });
+
+    // Style header row
+    worksheet.getRow(1).font = { bold: true };
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'clientes_vip.xlsx';
+    link.click();
+    URL.revokeObjectURL(url);
 
     toast({
       title: 'Exportação concluída',
