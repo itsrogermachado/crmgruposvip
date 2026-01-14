@@ -76,7 +76,7 @@ export function PixPayment({ qrCode, qrCodeBase64, value, paymentStatus, isCheck
         <div className="flex justify-center">
           <div className="bg-white p-4 rounded-lg">
             <img 
-              src={`data:image/png;base64,${qrCodeBase64}`} 
+              src={qrCodeBase64.startsWith('data:') ? qrCodeBase64 : `data:image/png;base64,${qrCodeBase64}`} 
               alt="QR Code PIX" 
               className="w-48 h-48"
             />
