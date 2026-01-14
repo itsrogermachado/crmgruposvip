@@ -5,6 +5,7 @@ import { CalendarIcon, Upload, X, Image as ImageIcon, Plus } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
@@ -220,234 +221,241 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{client ? 'Editar Cliente' : 'Novo Cliente'}</DialogTitle>
-        </DialogHeader>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="nome">Nome</Label>
-              <Input
-                id="nome"
-                value={formData.nome}
-                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="telefone">Telefone</Label>
-              <Input
-                id="telefone"
-                value={formData.telefone}
-                onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
-                placeholder="+55 00 00000-0000"
-                required
-              />
-            </div>
-          </div>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{client ? 'Editar Cliente' : 'Novo Cliente'}</DialogTitle>
+            <DialogDescription>
+              Preencha as informações do cliente abaixo.
+            </DialogDescription>
+          </DialogHeader>
           
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="discord">Discord (opcional)</Label>
-              <Input
-                id="discord"
-                value={formData.discord}
-                onChange={(e) => setFormData({ ...formData, discord: e.target.value })}
-                placeholder="username"
-              />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="nome">Nome</Label>
+                <Input
+                  id="nome"
+                  value={formData.nome}
+                  onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="telefone">Telefone</Label>
+                <Input
+                  id="telefone"
+                  value={formData.telefone}
+                  onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
+                  placeholder="+55 00 00000-0000"
+                  required
+                />
+              </div>
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="telegram">Telegram (opcional)</Label>
-              <Input
-                id="telegram"
-                value={formData.telegram}
-                onChange={(e) => setFormData({ ...formData, telegram: e.target.value })}
-                placeholder="@username"
-              />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="plano">Plano</Label>
-              <Select
-                value={formData.plano}
-                onValueChange={(v) => {
-                  if (v === '__new__') {
-                    setNewPlanDialogOpen(true);
-                  } else {
-                    setFormData({ ...formData, plano: v });
-                  }
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {plans.map((plan) => (
-                    <SelectItem key={plan} value={plan}>{plan}</SelectItem>
-                  ))}
-                  <Separator className="my-1" />
-                  <SelectItem value="__new__">
-                    <span className="flex items-center gap-2 text-primary">
-                      <Plus className="w-3 h-3" />
-                      Novo Plano
-                    </span>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="discord">Discord (opcional)</Label>
+                <Input
+                  id="discord"
+                  value={formData.discord}
+                  onChange={(e) => setFormData({ ...formData, discord: e.target.value })}
+                  placeholder="username"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="telegram">Telegram (opcional)</Label>
+                <Input
+                  id="telegram"
+                  value={formData.telegram}
+                  onChange={(e) => setFormData({ ...formData, telegram: e.target.value })}
+                  placeholder="@username"
+                />
+              </div>
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="preco">Preço (R$)</Label>
-              <Input
-                id="preco"
-                type="number"
-                step="0.01"
-                value={formData.preco}
-                onChange={(e) => setFormData({ ...formData, preco: parseFloat(e.target.value) || 0 })}
-                required
-              />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Data de Entrada</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !dataEntradaDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {dataEntradaDate ? format(dataEntradaDate, "dd/MM/yyyy", { locale: ptBR }) : "Selecione"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={dataEntradaDate}
-                    onSelect={handleDataEntradaSelect}
-                    initialFocus
-                    className="pointer-events-auto"
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Data de Vencimento</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !dataVencimentoDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {dataVencimentoDate ? format(dataVencimentoDate, "dd/MM/yyyy", { locale: ptBR }) : "Selecione"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={dataVencimentoDate}
-                    onSelect={handleDataVencimentoSelect}
-                    initialFocus
-                    className="pointer-events-auto"
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="observacoes">Observações (opcional)</Label>
-            <Textarea
-              id="observacoes"
-              value={formData.observacoes}
-              onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
-              placeholder="Anotações sobre o cliente..."
-              rows={3}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Comprovante (opcional)</Label>
-            <div className="flex flex-col gap-2">
-              {previewUrl ? (
-                <div className="relative group">
-                  <img 
-                    src={previewUrl} 
-                    alt="Comprovante" 
-                    className="w-full h-32 object-cover rounded-md border"
-                  />
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={removeComprovante}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ) : (
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-md cursor-pointer hover:bg-muted/50 transition-colors"
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="plano">Plano</Label>
+                <Select
+                  value={formData.plano}
+                  onValueChange={(v) => {
+                    if (v === '__new__') {
+                      setNewPlanDialogOpen(true);
+                    } else {
+                      setFormData({ ...formData, plano: v });
+                    }
+                  }}
                 >
-                  {uploading ? (
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full" />
-                      <span>Enviando...</span>
-                    </div>
-                  ) : (
-                    <>
-                      <ImageIcon className="h-8 w-8 text-muted-foreground mb-2" />
-                      <span className="text-sm text-muted-foreground">Clique para adicionar comprovante</span>
-                    </>
-                  )}
-                </div>
-              )}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="hidden"
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {plans.map((plan) => (
+                      <SelectItem key={plan} value={plan}>{plan}</SelectItem>
+                    ))}
+                    <Separator className="my-1" />
+                    <SelectItem value="__new__">
+                      <span className="flex items-center gap-2 text-primary">
+                        <Plus className="w-3 h-3" />
+                        Novo Plano
+                      </span>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="preco">Preço (R$)</Label>
+                <Input
+                  id="preco"
+                  type="number"
+                  step="0.01"
+                  value={formData.preco}
+                  onChange={(e) => setFormData({ ...formData, preco: parseFloat(e.target.value) || 0 })}
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Data de Entrada</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !dataEntradaDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {dataEntradaDate ? format(dataEntradaDate, "dd/MM/yyyy", { locale: ptBR }) : "Selecione"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={dataEntradaDate}
+                      onSelect={handleDataEntradaSelect}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Data de Vencimento</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !dataVencimentoDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {dataVencimentoDate ? format(dataVencimentoDate, "dd/MM/yyyy", { locale: ptBR }) : "Selecione"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={dataVencimentoDate}
+                      onSelect={handleDataVencimentoSelect}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="observacoes">Observações (opcional)</Label>
+              <Textarea
+                id="observacoes"
+                value={formData.observacoes}
+                onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
+                placeholder="Anotações sobre o cliente..."
+                rows={3}
               />
             </div>
-          </div>
 
-          
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancelar
-            </Button>
-            <Button type="submit">
-              {client ? 'Salvar' : 'Criar Cliente'}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
+            <div className="space-y-2">
+              <Label>Comprovante (opcional)</Label>
+              <div className="flex flex-col gap-2">
+                {previewUrl ? (
+                  <div className="relative group">
+                    <img 
+                      src={previewUrl} 
+                      alt="Comprovante" 
+                      className="w-full h-32 object-cover rounded-md border"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={removeComprovante}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-md cursor-pointer hover:bg-muted/50 transition-colors"
+                  >
+                    {uploading ? (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full" />
+                        <span>Enviando...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <ImageIcon className="h-8 w-8 text-muted-foreground mb-2" />
+                        <span className="text-sm text-muted-foreground">Clique para adicionar comprovante</span>
+                      </>
+                    )}
+                  </div>
+                )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+              </div>
+            </div>
 
-      {/* Dialog para criar novo plano */}
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                Cancelar
+              </Button>
+              <Button type="submit">
+                {client ? 'Salvar' : 'Criar Cliente'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog separado para criar novo plano */}
       <Dialog open={newPlanDialogOpen} onOpenChange={setNewPlanDialogOpen}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
             <DialogTitle>Novo Plano</DialogTitle>
+            <DialogDescription>
+              Crie um novo plano para categorizar seus clientes.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
@@ -471,6 +479,6 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </Dialog>
+    </>
   );
 }
