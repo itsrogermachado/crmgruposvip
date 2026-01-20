@@ -4,7 +4,6 @@ import ExcelJS from 'exceljs';
 import { Header } from '@/components/Header';
 import { StatsGrid } from '@/components/StatsGrid';
 import { ChartsSection } from '@/components/ChartsSection';
-import { RevenueHistory } from '@/components/RevenueHistory';
 import { FilterSection } from '@/components/FilterSection';
 import { ClientTable } from '@/components/ClientTable';
 import { ClientDialog } from '@/components/ClientDialog';
@@ -295,8 +294,6 @@ const Index = () => {
           <StatsGrid clients={statsClients} />
 
           <ChartsSection clients={statsClients} />
-
-          <RevenueHistory />
 
           <FilterSection
             searchTerm={searchTerm}

@@ -128,16 +128,6 @@ export function useClients(groupId?: string | null) {
         group_id: data.group_id || undefined,
       };
 
-      // Registrar pagamento inicial automaticamente
-      await supabase.from('client_payments').insert({
-        client_id: newClient.id,
-        user_id: user.id,
-        amount: clientData.preco,
-        payment_date: clientData.data_entrada,
-        payment_method: 'pix',
-        notes: `Primeiro pagamento - ${clientData.plano}`,
-      });
-
       setClients((prev) => [newClient, ...prev]);
       
       toast({
@@ -158,16 +148,7 @@ export function useClients(groupId?: string | null) {
   };
 
   const updateClient = async (id: string, clientData: Partial<Omit<Client, 'id'>>) => {
-    if (!user) return false;
-
     try {
-      // Buscar dados atuais do cliente para verificar se é uma renovação
-      const currentClient = clients.find(c => c.id === id);
-      const isRenewal = currentClient && 
-        clientData.data_vencimento && 
-        clientData.data_vencimento !== currentClient.data_vencimento &&
-        (currentClient.status === 'Vencido' || currentClient.status === 'Próximo');
-
       const { error } = await supabase
         .from('clients')
         .update({
@@ -188,24 +169,6 @@ export function useClients(groupId?: string | null) {
 
       if (error) throw error;
 
-      // Registrar pagamento se for uma renovação
-      if (isRenewal && clientData.preco) {
-        const today = new Date();
-        const day = String(today.getDate()).padStart(2, '0');
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const year = today.getFullYear();
-        const paymentDate = `${day}/${month}/${year}`;
-
-        await supabase.from('client_payments').insert({
-          client_id: id,
-          user_id: user.id,
-          amount: clientData.preco,
-          payment_date: paymentDate,
-          payment_method: 'pix',
-          notes: `Renovação - ${clientData.plano || currentClient?.plano}`,
-        });
-      }
-
       setClients((prev) =>
         prev.map((c) => {
           if (c.id === id) {
@@ -219,9 +182,7 @@ export function useClients(groupId?: string | null) {
 
       toast({
         title: 'Cliente atualizado',
-        description: isRenewal 
-          ? 'Cliente renovado e pagamento registrado no histórico.' 
-          : 'As informações do cliente foram atualizadas.',
+        description: 'As informações do cliente foram atualizadas.',
       });
 
       return true;
