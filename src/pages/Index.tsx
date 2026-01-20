@@ -296,7 +296,7 @@ const Index = () => {
 
           <ChartsSection clients={statsClients} />
 
-          <RevenueHistory clients={statsClients} />
+          <RevenueHistory />
 
           <FilterSection
             searchTerm={searchTerm}
