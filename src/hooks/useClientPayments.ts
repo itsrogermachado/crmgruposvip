@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
-import { useToast } from './use-toast';
 import { parseBRDate } from '@/lib/dateUtils';
 
 export interface ClientPayment {
@@ -28,34 +27,53 @@ export interface MonthlyPaymentData {
   faturamento: number;
   lucroEsperado: number;
   paymentCount: number;
+  isPast: boolean;
+}
+
+interface ClientForProjection {
+  id: string;
+  nome: string;
+  plano: string;
+  preco: number;
+  data_vencimento: string;
+  status: string;
 }
 
 export function useClientPayments() {
   const [payments, setPayments] = useState<ClientPayment[]>([]);
+  const [clients, setClients] = useState<ClientForProjection[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
-  const { toast } = useToast();
 
   const fetchPayments = useCallback(async () => {
     if (!user) {
       setPayments([]);
+      setClients([]);
       setLoading(false);
       return;
     }
 
     try {
-      const { data, error } = await supabase
-        .from('client_payments')
-        .select(`
-          *,
-          client:clients(nome, plano, status)
-        `)
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+      // Fetch payments and clients in parallel
+      const [paymentsResult, clientsResult] = await Promise.all([
+        supabase
+          .from('client_payments')
+          .select(`
+            *,
+            client:clients(nome, plano, status)
+          `)
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('clients')
+          .select('id, nome, plano, preco, data_vencimento, status')
+          .eq('user_id', user.id)
+      ]);
 
-      if (error) throw error;
+      if (paymentsResult.error) throw paymentsResult.error;
+      if (clientsResult.error) throw clientsResult.error;
 
-      const mappedPayments: ClientPayment[] = (data || []).map((p) => ({
+      const mappedPayments: ClientPayment[] = (paymentsResult.data || []).map((p) => ({
         id: p.id,
         client_id: p.client_id,
         user_id: p.user_id,
@@ -72,7 +90,17 @@ export function useClientPayments() {
         } : undefined,
       }));
 
+      const mappedClients: ClientForProjection[] = (clientsResult.data || []).map((c) => ({
+        id: c.id,
+        nome: c.nome,
+        plano: c.plano,
+        preco: Number(c.preco),
+        data_vencimento: c.data_vencimento,
+        status: c.status,
+      }));
+
       setPayments(mappedPayments);
+      setClients(mappedClients);
     } catch (error) {
       console.error('Erro ao buscar pagamentos:', error);
     } finally {
@@ -123,7 +151,11 @@ export function useClientPayments() {
 
   const getPaymentsByMonth = useCallback((): MonthlyPaymentData[] => {
     const dataByMonth: Record<string, MonthlyPaymentData> = {};
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
 
+    // Process real payments
     payments.forEach((payment) => {
       const paymentDate = parseBRDate(payment.payment_date);
       if (!paymentDate) return;
@@ -131,6 +163,7 @@ export function useClientPayments() {
       const month = paymentDate.getMonth();
       const year = paymentDate.getFullYear();
       const key = `${year}-${month}`;
+      const isPast = year < currentYear || (year === currentYear && month < currentMonth);
 
       if (!dataByMonth[key]) {
         const monthName = paymentDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
@@ -141,6 +174,7 @@ export function useClientPayments() {
           faturamento: 0,
           lucroEsperado: 0,
           paymentCount: 0,
+          isPast,
         };
       }
 
@@ -153,12 +187,45 @@ export function useClientPayments() {
       }
     });
 
-    // Sort by date (most recent first)
-    return Object.values(dataByMonth).sort((a, b) => {
-      if (a.year !== b.year) return b.year - a.year;
-      return b.month - a.month;
+    // Process future projections based on data_vencimento
+    clients.forEach((client) => {
+      const dueDate = parseBRDate(client.data_vencimento);
+      if (!dueDate) return;
+
+      const month = dueDate.getMonth();
+      const year = dueDate.getFullYear();
+      const key = `${year}-${month}`;
+      
+      // Only add projection if it's current month or future
+      const isFutureOrCurrent = year > currentYear || (year === currentYear && month >= currentMonth);
+      
+      if (isFutureOrCurrent) {
+        if (!dataByMonth[key]) {
+          const monthName = dueDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+          dataByMonth[key] = {
+            month,
+            year,
+            monthName: monthName.charAt(0).toUpperCase() + monthName.slice(1),
+            faturamento: 0,
+            lucroEsperado: 0,
+            paymentCount: 0,
+            isPast: false,
+          };
+        }
+
+        // Add to lucro esperado (expected revenue based on active clients due dates)
+        if (client.status === 'Ativo' || client.status === 'Próximo') {
+          dataByMonth[key].lucroEsperado += client.preco;
+        }
+      }
     });
-  }, [payments]);
+
+    // Sort by date (oldest first for chronological order)
+    return Object.values(dataByMonth).sort((a, b) => {
+      if (a.year !== b.year) return a.year - b.year;
+      return a.month - b.month;
+    });
+  }, [payments, clients]);
 
   return {
     payments,

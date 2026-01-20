@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TrendingUp, DollarSign, Calendar, Receipt } from 'lucide-react';
+import { TrendingUp, DollarSign, Calendar, Receipt, Clock } from 'lucide-react';
 import { useClientPayments } from '@/hooks/useClientPayments';
 
 export function RevenueHistory() {
@@ -112,27 +112,37 @@ export function RevenueHistory() {
               <TableBody>
                 {monthlyData.map((data) => {
                   const isCurrentMonth = data.month === currentMonth && data.year === currentYear;
+                  const isFuture = data.year > currentYear || (data.year === currentYear && data.month > currentMonth);
+                  
                   return (
                     <TableRow
                       key={`${data.year}-${data.month}`}
-                      className={`border-border/30 ${isCurrentMonth ? 'bg-primary/5 border-l-2 border-l-primary' : ''}`}
+                      className={`border-border/30 ${isCurrentMonth ? 'bg-primary/5 border-l-2 border-l-primary' : ''} ${isFuture ? 'bg-muted/20' : ''}`}
                     >
                       <TableCell className="font-medium">
-                        {data.monthName}
-                        {isCurrentMonth && (
-                          <span className="ml-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">
-                            Atual
-                          </span>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {data.monthName}
+                          {isCurrentMonth && (
+                            <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">
+                              Atual
+                            </span>
+                          )}
+                          {isFuture && (
+                            <span className="text-xs bg-blue-500/20 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              Previsão
+                            </span>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="text-right font-semibold text-cyan-600 dark:text-cyan-400">
-                        {formatCurrency(data.faturamento)}
+                        {data.faturamento > 0 ? formatCurrency(data.faturamento) : '-'}
                       </TableCell>
                       <TableCell className="text-right font-semibold text-green-600 dark:text-green-400">
                         {formatCurrency(data.lucroEsperado)}
                       </TableCell>
                       <TableCell className="text-right text-muted-foreground hidden sm:table-cell">
-                        {data.paymentCount}
+                        {data.paymentCount > 0 ? data.paymentCount : '-'}
                       </TableCell>
                     </TableRow>
                   );
