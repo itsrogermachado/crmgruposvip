@@ -36,23 +36,26 @@ export function useSubscription() {
       }
 
       try {
+        // Get all active subscriptions and find the one with the latest expiry
         const { data, error } = await supabase
           .from('subscriptions')
           .select('id, status, starts_at, expires_at, plan_id')
           .eq('user_id', user.id)
           .eq('status', 'active')
-          .maybeSingle();
+          .order('expires_at', { ascending: false, nullsFirst: false })
+          .limit(1);
 
         if (error) {
           console.error('Error checking subscription:', error);
           setSubscription(null);
-        } else if (data) {
+        } else if (data && data.length > 0) {
+          const activeSubscription = data[0];
           // Check if subscription is not expired
           const now = new Date();
-          const expiresAt = data.expires_at ? new Date(data.expires_at) : null;
+          const expiresAt = activeSubscription.expires_at ? new Date(activeSubscription.expires_at) : null;
           
           if (!expiresAt || expiresAt > now) {
-            setSubscription(data);
+            setSubscription(activeSubscription);
           } else {
             setSubscription(null);
           }
