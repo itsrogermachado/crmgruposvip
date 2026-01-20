@@ -1,73 +1,26 @@
-import { useMemo } from 'react';
+import { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TrendingUp, DollarSign, Calendar } from 'lucide-react';
-import { parseBRDate } from '@/lib/dateUtils';
-import { Client } from '@/types/client';
+import { TrendingUp, DollarSign, Calendar, Receipt } from 'lucide-react';
+import { useClientPayments } from '@/hooks/useClientPayments';
 
-interface RevenueHistoryProps {
-  clients: Client[];
-}
+export function RevenueHistory() {
+  const { payments, loading, fetchPayments, getPaymentsByMonth } = useClientPayments();
 
-interface MonthlyData {
-  month: number;
-  year: number;
-  monthName: string;
-  faturamento: number;
-  lucroEsperado: number;
-  clientCount: number;
-}
+  useEffect(() => {
+    fetchPayments();
+  }, [fetchPayments]);
 
-export function RevenueHistory({ clients }: RevenueHistoryProps) {
-  const monthlyData = useMemo(() => {
-    const dataByMonth: Record<string, MonthlyData> = {};
+  const monthlyData = getPaymentsByMonth();
 
-    clients.forEach((client) => {
-      const dataVenc = parseBRDate(client.dataVencimento);
-      if (!dataVenc) return;
-
-      const month = dataVenc.getMonth();
-      const year = dataVenc.getFullYear();
-      const key = `${year}-${month}`;
-
-      if (!dataByMonth[key]) {
-        const monthName = dataVenc.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-        dataByMonth[key] = {
-          month,
-          year,
-          monthName: monthName.charAt(0).toUpperCase() + monthName.slice(1),
-          faturamento: 0,
-          lucroEsperado: 0,
-          clientCount: 0,
-        };
-      }
-
-      dataByMonth[key].faturamento += client.preco;
-      dataByMonth[key].clientCount += 1;
-
-      // Lucro esperado: apenas clientes Ativos ou Próximos
-      if (client.status === 'Ativo' || client.status === 'Próximo') {
-        dataByMonth[key].lucroEsperado += client.preco;
-      }
-    });
-
-    // Ordenar por data (mais recente primeiro)
-    return Object.values(dataByMonth).sort((a, b) => {
-      if (a.year !== b.year) return b.year - a.year;
-      return b.month - a.month;
-    });
-  }, [clients]);
-
-  const totals = useMemo(() => {
-    return monthlyData.reduce(
-      (acc, data) => ({
-        faturamento: acc.faturamento + data.faturamento,
-        lucroEsperado: acc.lucroEsperado + data.lucroEsperado,
-        clientCount: acc.clientCount + data.clientCount,
-      }),
-      { faturamento: 0, lucroEsperado: 0, clientCount: 0 }
-    );
-  }, [monthlyData]);
+  const totals = monthlyData.reduce(
+    (acc, data) => ({
+      faturamento: acc.faturamento + data.faturamento,
+      lucroEsperado: acc.lucroEsperado + data.lucroEsperado,
+      paymentCount: acc.paymentCount + data.paymentCount,
+    }),
+    { faturamento: 0, lucroEsperado: 0, paymentCount: 0 }
+  );
 
   const formatCurrency = (value: number) => {
     return `R$ ${value.toFixed(2).replace('.', ',')}`;
@@ -78,6 +31,26 @@ export function RevenueHistory({ clients }: RevenueHistoryProps) {
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
 
+  if (loading) {
+    return (
+      <div className="px-4 md:px-6 lg:px-8 mt-6">
+        <Card className="glass-card border-border/50">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Calendar className="w-5 h-5 text-primary" />
+              Histórico de Pagamentos
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground text-center py-8">
+              Carregando...
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (monthlyData.length === 0) {
     return (
       <div className="px-4 md:px-6 lg:px-8 mt-6">
@@ -85,13 +58,19 @@ export function RevenueHistory({ clients }: RevenueHistoryProps) {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-lg">
               <Calendar className="w-5 h-5 text-primary" />
-              Histórico Financeiro
+              Histórico de Pagamentos
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground text-center py-8">
-              Nenhum dado disponível ainda.
-            </p>
+            <div className="text-center py-8 space-y-2">
+              <Receipt className="w-12 h-12 mx-auto text-muted-foreground/50" />
+              <p className="text-muted-foreground">
+                Nenhum pagamento registrado ainda.
+              </p>
+              <p className="text-sm text-muted-foreground/70">
+                Os pagamentos serão registrados automaticamente ao criar ou renovar clientes.
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -104,7 +83,7 @@ export function RevenueHistory({ clients }: RevenueHistoryProps) {
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Calendar className="w-5 h-5 text-primary" />
-            Histórico Financeiro
+            Histórico de Pagamentos
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -126,7 +105,7 @@ export function RevenueHistory({ clients }: RevenueHistoryProps) {
                     </span>
                   </TableHead>
                   <TableHead className="text-right text-muted-foreground hidden sm:table-cell">
-                    Clientes
+                    Pagamentos
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -153,7 +132,7 @@ export function RevenueHistory({ clients }: RevenueHistoryProps) {
                         {formatCurrency(data.lucroEsperado)}
                       </TableCell>
                       <TableCell className="text-right text-muted-foreground hidden sm:table-cell">
-                        {data.clientCount}
+                        {data.paymentCount}
                       </TableCell>
                     </TableRow>
                   );
@@ -170,7 +149,7 @@ export function RevenueHistory({ clients }: RevenueHistoryProps) {
                     {formatCurrency(totals.lucroEsperado)}
                   </TableCell>
                   <TableCell className="text-right font-bold text-muted-foreground hidden sm:table-cell">
-                    {totals.clientCount}
+                    {totals.paymentCount}
                   </TableCell>
                 </TableRow>
               </TableBody>
