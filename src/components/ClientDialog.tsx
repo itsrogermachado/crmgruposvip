@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+
 import { Client } from '@/types/client';
 import { cn } from '@/lib/utils';
 import { parseBRDate, formatToBRDate, calculateStatus } from '@/lib/dateUtils';
@@ -40,7 +40,7 @@ import { useClientPlans } from '@/hooks/useClientPlans';
 
 export interface PaymentOptions {
   registrar: boolean;
-  tipo: 'adesao' | 'renovacao';
+  tipo: 'adesao';
   valor: number;
   valorRenovacao?: number;
 }
@@ -81,7 +81,6 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
   
   // Payment options state
   const [registrarPagamento, setRegistrarPagamento] = useState(true);
-  const [tipoPagamento, setTipoPagamento] = useState<'adesao' | 'renovacao'>('adesao');
   const [valorAdesao, setValorAdesao] = useState(150);
   const [valorRenovacao, setValorRenovacao] = useState(150);
 
@@ -115,9 +114,8 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
       setDataVencimentoDate(vencimentoParsed || undefined);
       setPreviewUrl(client.comprovanteUrl || null);
       
-      // Edit mode: payment off by default, renewal pre-selected
+      // Edit mode: payment off by default
       setRegistrarPagamento(false);
-      setTipoPagamento('renovacao');
       // Use saved renewal price if available, otherwise use plan price
       const savedRenovacao = client.precoRenovacao ?? client.preco;
       setValorAdesao(client.preco);
@@ -143,9 +141,8 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
       setDataVencimentoDate(nextMonth);
       setPreviewUrl(null);
       
-      // New client: payment on by default, adesao pre-selected
+      // New client: payment on by default
       setRegistrarPagamento(true);
-      setTipoPagamento('adesao');
       setValorAdesao(150);
       setValorRenovacao(150);
     }
@@ -248,8 +245,8 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
     
     const paymentOptions: PaymentOptions = {
       registrar: registrarPagamento,
-      tipo: tipoPagamento,
-      valor: tipoPagamento === 'adesao' ? valorAdesao : valorRenovacao,
+      tipo: 'adesao',
+      valor: valorAdesao,
       valorRenovacao: valorRenovacao,
     };
     
@@ -453,25 +450,6 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
               
               {registrarPagamento && (
                 <div className="space-y-4 pt-2">
-                  <RadioGroup
-                    value={tipoPagamento}
-                    onValueChange={(v) => setTipoPagamento(v as 'adesao' | 'renovacao')}
-                    className="flex gap-4"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="adesao" id="adesao" />
-                      <Label htmlFor="adesao" className="font-normal cursor-pointer">
-                        Adesão
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="renovacao" id="renovacao" />
-                      <Label htmlFor="renovacao" className="font-normal cursor-pointer">
-                        Renovação
-                      </Label>
-                    </div>
-                  </RadioGroup>
-                  
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="valor-adesao">Valor Adesão (R$)</Label>
@@ -481,7 +459,6 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
                         step="0.01"
                         value={valorAdesao}
                         onChange={(e) => setValorAdesao(parseFloat(e.target.value) || 0)}
-                        className={tipoPagamento === 'adesao' ? 'ring-2 ring-primary' : ''}
                       />
                     </div>
                     <div className="space-y-2">
@@ -492,13 +469,12 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
                         step="0.01"
                         value={valorRenovacao}
                         onChange={(e) => setValorRenovacao(parseFloat(e.target.value) || 0)}
-                        className={tipoPagamento === 'renovacao' ? 'ring-2 ring-primary' : ''}
                       />
                     </div>
                   </div>
                   
                   <p className="text-xs text-muted-foreground">
-                    💡 O valor de renovação será salvo para uso em futuros pagamentos deste cliente.
+                    💡 O valor de adesão será registrado como pagamento. O valor de renovação será usado nas próximas cobranças.
                   </p>
                 </div>
               )}
