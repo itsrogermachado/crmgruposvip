@@ -21,7 +21,8 @@ Deno.serve(async (req) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!
-    const pushinPayKey = Deno.env.get('PUSHINPAY_API_KEY')!
+    const misticClientId = Deno.env.get('MISTIC_CLIENT_ID')!
+    const misticClientSecret = Deno.env.get('MISTIC_CLIENT_SECRET')!
 
     const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers: { Authorization: authHeader } }
@@ -64,43 +65,13 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Create PIX charge on PushinPay
-    // Include webhook secret token in URL for authentication
-    const webhookSecret = Deno.env.get('PUSHINPAY_WEBHOOK_SECRET') || ''
-    const webhookUrl = `${supabaseUrl}/functions/v1/pushinpay-webhook?token=${encodeURIComponent(webhookSecret)}`
-    
-    const pushinPayResponse = await fetch('https://api.pushinpay.com.br/api/pix/cashIn', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${pushinPayKey}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify({
-        value: plan.price_cents,
-        webhook_url: webhookUrl,
-      }),
-    })
-
-    if (!pushinPayResponse.ok) {
-      const errorText = await pushinPayResponse.text()
-      console.error('PushinPay error:', errorText)
-      return new Response(JSON.stringify({ error: 'Erro ao criar cobrança PIX' }), { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      })
-    }
-
-    const pixData = await pushinPayResponse.json()
-    console.log('PushinPay response:', pixData)
-
     // Use service role to create records (bypass RLS)
     const supabaseServiceRole = createClient(
       supabaseUrl,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     )
 
-    // Create subscription with pending status
+    // Create subscription with pending status first to get the ID
     const { data: subscription, error: subError } = await supabaseServiceRole
       .from('subscriptions')
       .insert({
@@ -119,7 +90,7 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Create payment with pending status
+    // Create payment with pending status first to get the ID for transactionId
     const { data: payment, error: paymentError } = await supabaseServiceRole
       .from('payments')
       .insert({
@@ -127,7 +98,6 @@ Deno.serve(async (req) => {
         subscription_id: subscription.id,
         amount_cents: plan.price_cents,
         status: 'pending',
-        external_payment_id: pixData.id,
         payment_method: 'pix',
       })
       .select()
@@ -135,20 +105,69 @@ Deno.serve(async (req) => {
 
     if (paymentError) {
       console.error('Payment error:', paymentError)
+      // Rollback subscription
+      await supabaseServiceRole.from('subscriptions').delete().eq('id', subscription.id)
       return new Response(JSON.stringify({ error: 'Erro ao criar pagamento' }), { 
         status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       })
     }
 
+    // Create PIX charge on Mistic Pay
+    const webhookSecret = Deno.env.get('MISTIC_WEBHOOK_SECRET') || ''
+    const webhookUrl = `${supabaseUrl}/functions/v1/mistic-webhook?token=${encodeURIComponent(webhookSecret)}`
+    
+    // Convert cents to decimal (Mistic uses decimal format)
+    const amountDecimal = plan.price_cents / 100
+
+    const misticResponse = await fetch('https://api.misticpay.com/api/transactions/create', {
+      method: 'POST',
+      headers: {
+        'ci': misticClientId,
+        'cs': misticClientSecret,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: amountDecimal,
+        payerName: 'Cliente',
+        payerDocument: '00000000000',
+        transactionId: payment.id,
+        description: `Assinatura ${plan.name}`,
+        projectWebhook: webhookUrl,
+      }),
+    })
+
+    if (!misticResponse.ok) {
+      const errorText = await misticResponse.text()
+      console.error('Mistic Pay error:', errorText)
+      // Rollback payment and subscription
+      await supabaseServiceRole.from('payments').delete().eq('id', payment.id)
+      await supabaseServiceRole.from('subscriptions').delete().eq('id', subscription.id)
+      return new Response(JSON.stringify({ error: 'Erro ao criar cobrança PIX' }), { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      })
+    }
+
+    const misticData = await misticResponse.json()
+    console.log('Mistic Pay response:', misticData)
+
+    // Update payment with external ID from Mistic
+    const externalId = misticData.data?.transactionId || misticData.transactionId || payment.id
+    await supabaseServiceRole
+      .from('payments')
+      .update({ external_payment_id: externalId })
+      .eq('id', payment.id)
+
     return new Response(JSON.stringify({
       paymentId: payment.id,
       subscriptionId: subscription.id,
-      qrCode: pixData.qr_code,
-      qrCodeBase64: pixData.qr_code_base64,
-      externalId: pixData.id,
-      value: pixData.value,
-      status: pixData.status,
+      qrCode: misticData.data?.copyPaste || misticData.copyPaste,
+      qrCodeBase64: misticData.data?.qrCodeBase64 || misticData.qrCodeBase64,
+      externalId: externalId,
+      value: plan.price_cents,
+      status: 'pending',
     }), { 
       status: 200, 
       headers: { ...corsHeaders, 'Content-Type': 'application/json' } 

@@ -22,7 +22,8 @@ Deno.serve(async (req) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const pushinpayApiKey = Deno.env.get('PUSHINPAY_API_KEY')!
+    const misticClientId = Deno.env.get('MISTIC_CLIENT_ID')!
+    const misticClientSecret = Deno.env.get('MISTIC_CLIENT_SECRET')!
 
     const supabase = createClient(supabaseUrl, supabaseServiceRoleKey)
 
@@ -49,41 +50,37 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Check status on PushinPay API
-    const externalId = payment.external_payment_id
-    if (!externalId) {
-      return new Response(
-        JSON.stringify({ status: 'pending', error: 'ID externo não encontrado' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
+    // Check status on Mistic Pay API
+    // Use payment.id as transactionId since that's what we send to Mistic
+    const transactionId = payment.external_payment_id || payment.id
 
-    // Use correct PushinPay endpoint: /api/transactions/{id}
-    const pushinpayResponse = await fetch(
-      `https://api.pushinpay.com.br/api/transactions/${externalId}`,
-      {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${pushinpayApiKey}`,
-          'Accept': 'application/json',
-        },
-      }
-    )
+    const misticResponse = await fetch('https://api.misticpay.com/api/transactions/check', {
+      method: 'POST',
+      headers: {
+        'ci': misticClientId,
+        'cs': misticClientSecret,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ transactionId }),
+    })
 
-    if (!pushinpayResponse.ok) {
-      const errorBody = await pushinpayResponse.text()
-      console.error('PushinPay API error:', pushinpayResponse.status, errorBody)
+    if (!misticResponse.ok) {
+      const errorBody = await misticResponse.text()
+      console.error('Mistic Pay API error:', misticResponse.status, errorBody)
       return new Response(
         JSON.stringify({ status: 'pending', error: 'Erro ao consultar status' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    const pushinpayData = await pushinpayResponse.json()
-    console.log('PushinPay status response:', JSON.stringify(pushinpayData))
+    const misticData = await misticResponse.json()
+    console.log('Mistic Pay status response:', JSON.stringify(misticData))
 
-    const pushinpayStatus = pushinpayData.status?.toLowerCase()
-    const isPaid = pushinpayStatus === 'paid' || pushinpayStatus === 'completed' || pushinpayStatus === 'approved'
+    // Map Mistic status to our status
+    // Mistic statuses: COMPLETO, PENDENTE, FALHA, EXPIRADO
+    const misticStatus = (misticData.data?.status || misticData.status || '').toUpperCase()
+    const isPaid = misticStatus === 'COMPLETO' || misticStatus === 'COMPLETED' || misticStatus === 'PAID' || misticStatus === 'APPROVED'
 
     if (isPaid && payment.status !== 'paid') {
       const now = new Date()
@@ -96,8 +93,8 @@ Deno.serve(async (req) => {
         .update({
           status: 'paid',
           paid_at: now.toISOString(),
-          payer_name: pushinpayData.payer_name || null,
-          payer_document: pushinpayData.payer_national_registration?.replace(/\D/g, '') || null,
+          payer_name: misticData.data?.payerName || misticData.payerName || null,
+          payer_document: (misticData.data?.payerDocument || misticData.payerDocument || '').replace(/\D/g, '') || null,
         })
         .eq('id', payment.id)
 

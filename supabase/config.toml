@@ -3,7 +3,7 @@ project_id = "fpjzrijdruoknalrqcrt"
 [functions.create-pix]
 verify_jwt = false
 
-[functions.pushinpay-webhook]
+[functions.mistic-webhook]
 verify_jwt = false
 
 [functions.backfill-payments]
