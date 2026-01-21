@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useClients } from './useClients';
-import { format, parse, startOfMonth, endOfMonth, subMonths, isWithinInterval, isBefore, isAfter, startOfDay } from 'date-fns';
+import { format, startOfMonth, endOfMonth, addMonths, isWithinInterval, isAfter } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export interface ClientPayment {
@@ -99,15 +99,25 @@ export function useClientPayments() {
     const currentMonth = startOfMonth(today);
     const months: MonthlyRevenue[] = [];
 
-    // Generate last 12 months
-    for (let i = 0; i < 12; i++) {
-      const monthDate = subMonths(currentMonth, i);
+    // Mês mínimo: Janeiro 2026
+    const minMonth = new Date(2026, 0, 1);
+
+    // Encontrar o mês mais distante com clientes a vencer
+    let maxMonth = currentMonth;
+    clients.forEach((c) => {
+      const dueDate = parseDate(c.data_vencimento);
+      if (dueDate && isAfter(startOfMonth(dueDate), maxMonth)) {
+        maxMonth = startOfMonth(dueDate);
+      }
+    });
+
+    // Gerar meses de Janeiro 2026 até o mês máximo
+    let monthDate = minMonth;
+    while (!isAfter(monthDate, maxMonth)) {
       const monthStart = startOfMonth(monthDate);
       const monthEnd = endOfMonth(monthDate);
       const monthKey = format(monthDate, 'yyyy-MM');
       const monthLabel = format(monthDate, 'MMMM yyyy', { locale: ptBR });
-      const isPastMonth = isBefore(monthEnd, startOfDay(today));
-      const isCurrentMonth = isWithinInterval(today, { start: monthStart, end: monthEnd });
 
       // Calculate real revenue from payments
       const faturamento = payments
@@ -143,9 +153,12 @@ export function useClientPayments() {
         lucroEsperado,
         diferenca: faturamento - lucroEsperado,
       });
+
+      monthDate = addMonths(monthDate, 1);
     }
 
-    return months;
+    // Ordenar por mês mais recente primeiro
+    return months.sort((a, b) => b.month.localeCompare(a.month));
   }, [payments, clients]);
 
   const totals = useMemo(() => {
