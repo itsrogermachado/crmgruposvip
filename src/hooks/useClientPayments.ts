@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
-import { useClients } from './useClients';
 import { format, startOfMonth, endOfMonth, addMonths, isWithinInterval, isAfter } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -19,9 +18,7 @@ export interface ClientPayment {
 export interface MonthlyRevenue {
   month: string; // "2026-01"
   label: string; // "Janeiro 2026"
-  faturamentoReal: number; // Pagamentos reais
-  faturamentoEsperado: number; // Projeção baseada em clientes
-  diferenca: number;
+  faturamento: number; // Pagamentos reais
 }
 
 function parseDate(dateStr: string): Date | null {
@@ -54,7 +51,6 @@ export function useClientPayments() {
   const [payments, setPayments] = useState<ClientPayment[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
-  const { clients } = useClients();
 
   const fetchPayments = useCallback(async () => {
     if (!user) {
@@ -94,6 +90,26 @@ export function useClientPayments() {
     fetchPayments();
   }, [fetchPayments]);
 
+  // Realtime subscription for automatic updates
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('client_payments_changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'client_payments' },
+        () => {
+          fetchPayments();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, fetchPayments]);
+
   const monthlyRevenue = useMemo(() => {
     const today = new Date();
     const currentMonth = startOfMonth(today);
@@ -102,12 +118,12 @@ export function useClientPayments() {
     // Mês mínimo: Janeiro 2026
     const minMonth = new Date(2026, 0, 1);
 
-    // Encontrar o mês mais distante com clientes a vencer
+    // Find the maximum month with payments
     let maxMonth = currentMonth;
-    clients.forEach((c) => {
-      const dueDate = parseDate(c.data_vencimento);
-      if (dueDate && isAfter(startOfMonth(dueDate), maxMonth)) {
-        maxMonth = startOfMonth(dueDate);
+    payments.forEach((p) => {
+      const paymentDate = parseDate(p.payment_date);
+      if (paymentDate && isAfter(startOfMonth(paymentDate), maxMonth)) {
+        maxMonth = startOfMonth(paymentDate);
       }
     });
 
@@ -128,30 +144,10 @@ export function useClientPayments() {
         })
         .reduce((sum, p) => sum + p.amount, 0);
 
-      // Calculate expected profit based on client due dates
-      // Include clients with status "Ativo" or "Próximo" whose due date falls in this month
-      // Exclude clients with status "Vencido"
-      const lucroEsperado = clients
-        .filter((c) => {
-          const dueDate = parseDate(c.data_vencimento);
-          if (!dueDate) return false;
-          
-          // Check if due date is within this month
-          const isInMonth = isWithinInterval(dueDate, { start: monthStart, end: monthEnd });
-          
-          // Only include active or near-expiration clients (exclude expired)
-          const isValidStatus = c.status === 'Ativo' || c.status === 'Próximo';
-          
-          return isInMonth && isValidStatus;
-        })
-        .reduce((sum, c) => sum + c.preco, 0);
-
       months.push({
         month: monthKey,
         label: monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1),
-        faturamentoReal: faturamento,
-        faturamentoEsperado: lucroEsperado,
-        diferenca: faturamento - lucroEsperado,
+        faturamento,
       });
 
       monthDate = addMonths(monthDate, 1);
@@ -159,16 +155,14 @@ export function useClientPayments() {
 
     // Ordenar por mês mais recente primeiro
     return months.sort((a, b) => b.month.localeCompare(a.month));
-  }, [payments, clients]);
+  }, [payments]);
 
   const totals = useMemo(() => {
     return monthlyRevenue.reduce(
       (acc, m) => ({
-        faturamentoReal: acc.faturamentoReal + m.faturamentoReal,
-        faturamentoEsperado: acc.faturamentoEsperado + m.faturamentoEsperado,
-        diferenca: acc.diferenca + m.diferenca,
+        faturamento: acc.faturamento + m.faturamento,
       }),
-      { faturamentoReal: 0, faturamentoEsperado: 0, diferenca: 0 }
+      { faturamento: 0 }
     );
   }, [monthlyRevenue]);
 

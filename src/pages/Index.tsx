@@ -10,16 +10,14 @@ import { ClientDialog } from '@/components/ClientDialog';
 import { SubscriptionRequired } from '@/components/SubscriptionRequired';
 import { BottomNav } from '@/components/BottomNav';
 import { RevenueHistory } from '@/components/RevenueHistory';
-import { RevenueChart } from '@/components/RevenueChart';
 import { StatusFilter, PlanoFilter } from '@/types/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useClients, Client } from '@/hooks/useClients';
 import { useProfile } from '@/hooks/useProfile';
 import { useClientPayments } from '@/hooks/useClientPayments';
-import { Loader2, Sparkles, ChevronDown, ChevronUp, BarChart3, Table } from 'lucide-react';
+import { Loader2, Sparkles, ChevronDown, ChevronUp, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -329,25 +327,8 @@ const Index = () => {
               </Button>
             </div>
             
-            {revenueExpanded && !paymentsLoading && (
-              <Tabs defaultValue="chart" className="w-full">
-                <TabsList className="grid w-full max-w-[300px] grid-cols-2 mb-4">
-                  <TabsTrigger value="chart" className="gap-2">
-                    <BarChart3 className="w-4 h-4" />
-                    Gráfico
-                  </TabsTrigger>
-                  <TabsTrigger value="table" className="gap-2">
-                    <Table className="w-4 h-4" />
-                    Tabela
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="chart">
-                  <RevenueChart monthlyRevenue={monthlyRevenue} />
-                </TabsContent>
-                <TabsContent value="table">
-                  <RevenueHistory monthlyRevenue={monthlyRevenue} totals={totals} />
-                </TabsContent>
-              </Tabs>
+          {revenueExpanded && !paymentsLoading && (
+              <RevenueHistory monthlyRevenue={monthlyRevenue} totals={totals} />
             )}
           </div>
 

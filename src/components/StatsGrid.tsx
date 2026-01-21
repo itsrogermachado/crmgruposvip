@@ -1,4 +1,4 @@
-import { Users, TrendingUp, Clock, AlertCircle, DollarSign, Wallet } from 'lucide-react';
+import { Users, TrendingUp, Clock, AlertCircle, DollarSign } from 'lucide-react';
 import { StatCard } from './StatCard';
 import { Client } from '@/types/client';
 import { startOfMonth, endOfMonth, isWithinInterval, parseISO, format } from 'date-fns';
@@ -38,11 +38,6 @@ export function StatsGrid({ clients }: StatsGridProps) {
   // Faturamento do mês: soma de preços de clientes com vencimento no mês
   const faturamentoMensal = clientesDoMes.reduce((acc, c) => acc + c.preco, 0);
 
-  // Lucro esperado do mês: soma de preços de clientes Ativo/Próximo com vencimento no mês
-  const lucroEsperado = clientesDoMes
-    .filter(c => c.status === 'Ativo' || c.status === 'Próximo')
-    .reduce((acc, c) => acc + c.preco, 0);
-
   const formatCurrency = (value: number) => {
     return `R$ ${value.toFixed(2).replace('.', ',')}`;
   };
@@ -78,12 +73,6 @@ export function StatsGrid({ clients }: StatsGridProps) {
         value={formatCurrency(faturamentoMensal)}
         icon={DollarSign}
         variant="cyan"
-      />
-      <StatCard
-        title={`Lucro Esperado ${capitalizedMonth}`}
-        value={formatCurrency(lucroEsperado)}
-        icon={Wallet}
-        variant="green"
       />
     </div>
   );
