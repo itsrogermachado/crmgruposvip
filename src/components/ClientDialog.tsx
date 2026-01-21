@@ -148,13 +148,7 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
     }
   }, [client, open]);
   
-  // Sync payment values when price changes (only for new clients)
-  useEffect(() => {
-    if (!client) {
-      setValorAdesao(formData.preco);
-      setValorRenovacao(formData.preco);
-    }
-  }, [formData.preco, client]);
+  // No longer needed - price field removed from form
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -253,6 +247,11 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
     onSave({
       ...(client ? { id: client.id } : {}),
       ...formData,
+      // Set preco automatically based on context:
+      // - If registering payment: use valorAdesao
+      // - If editing without payment: keep existing value
+      // - If new without payment: use default (150)
+      preco: registrarPagamento ? valorAdesao : (client?.preco || 150),
       status,
       discord: formData.discord || undefined,
       telegram: formData.telegram || undefined,
@@ -319,48 +318,34 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="plano">Plano</Label>
-                <Select
-                  value={formData.plano}
-                  onValueChange={(v) => {
-                    if (v === '__new__') {
-                      setNewPlanDialogOpen(true);
-                    } else {
-                      setFormData({ ...formData, plano: v });
-                    }
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {plans.map((plan) => (
-                      <SelectItem key={plan} value={plan}>{plan}</SelectItem>
-                    ))}
-                    <Separator className="my-1" />
-                    <SelectItem value="__new__">
-                      <span className="flex items-center gap-2 text-primary">
-                        <Plus className="w-3 h-3" />
-                        Novo Plano
-                      </span>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="preco">Preço (R$)</Label>
-                <Input
-                  id="preco"
-                  type="number"
-                  step="0.01"
-                  value={formData.preco}
-                  onChange={(e) => setFormData({ ...formData, preco: parseFloat(e.target.value) || 0 })}
-                  required
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="plano">Plano</Label>
+              <Select
+                value={formData.plano}
+                onValueChange={(v) => {
+                  if (v === '__new__') {
+                    setNewPlanDialogOpen(true);
+                  } else {
+                    setFormData({ ...formData, plano: v });
+                  }
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {plans.map((plan) => (
+                    <SelectItem key={plan} value={plan}>{plan}</SelectItem>
+                  ))}
+                  <Separator className="my-1" />
+                  <SelectItem value="__new__">
+                    <span className="flex items-center gap-2 text-primary">
+                      <Plus className="w-3 h-3" />
+                      Novo Plano
+                    </span>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
