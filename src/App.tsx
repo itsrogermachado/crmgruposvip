@@ -15,6 +15,7 @@ import Plans from "./pages/Plans";
 import Checkout from "./pages/Checkout";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import Settings from "./pages/Settings";
+import ClientPaymentHistory from "./pages/ClientPaymentHistory";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/plans" element={<Plans />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/client/:clientId/payments" element={<ClientPaymentHistory />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
