@@ -9,31 +9,33 @@ import { ClientTable } from '@/components/ClientTable';
 import { ClientDialog } from '@/components/ClientDialog';
 import { SubscriptionRequired } from '@/components/SubscriptionRequired';
 import { BottomNav } from '@/components/BottomNav';
+import { RevenueHistory } from '@/components/RevenueHistory';
+import { RevenueChart } from '@/components/RevenueChart';
 import { StatusFilter, PlanoFilter } from '@/types/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useClients, Client } from '@/hooks/useClients';
 import { useProfile } from '@/hooks/useProfile';
-import { Loader2, Sparkles } from 'lucide-react';
+import { useClientPayments } from '@/hooks/useClientPayments';
+import { Loader2, Sparkles, ChevronDown, ChevronUp, BarChart3, Table } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, signOut } = useAuth();
   const { clients, loading: clientsLoading, fetchClients, addClient, updateClient, deleteClient, importClients } = useClients();
   const { profile } = useProfile();
+  const { monthlyRevenue, totals, loading: paymentsLoading } = useClientPayments();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('Todos');
   const [planoFilter, setPlanoFilter] = useState<PlanoFilter>('Todos');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [revenueExpanded, setRevenueExpanded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-
-  if (!authLoading && !user) {
-    navigate('/auth');
-    return null;
-  }
 
   const filteredClients = useMemo(() => {
     return clients.filter((client) => {
@@ -80,6 +82,11 @@ const Index = () => {
       status: c.status,
     }));
   }, [clients]);
+
+  if (!authLoading && !user) {
+    navigate('/auth');
+    return null;
+  }
 
   const handleNewClient = () => {
     setEditingClient(null);
@@ -294,6 +301,55 @@ const Index = () => {
           <StatsGrid clients={statsClients} />
 
           <ChartsSection clients={statsClients} />
+
+          {/* Revenue History Section */}
+          <div className="px-4 md:px-6 mt-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-primary" />
+                Histórico de Faturamento
+              </h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setRevenueExpanded(!revenueExpanded)}
+                className="gap-1"
+              >
+                {revenueExpanded ? (
+                  <>
+                    <ChevronUp className="w-4 h-4" />
+                    <span className="hidden sm:inline">Recolher</span>
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="w-4 h-4" />
+                    <span className="hidden sm:inline">Expandir</span>
+                  </>
+                )}
+              </Button>
+            </div>
+            
+            {revenueExpanded && !paymentsLoading && (
+              <Tabs defaultValue="chart" className="w-full">
+                <TabsList className="grid w-full max-w-[300px] grid-cols-2 mb-4">
+                  <TabsTrigger value="chart" className="gap-2">
+                    <BarChart3 className="w-4 h-4" />
+                    Gráfico
+                  </TabsTrigger>
+                  <TabsTrigger value="table" className="gap-2">
+                    <Table className="w-4 h-4" />
+                    Tabela
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="chart">
+                  <RevenueChart monthlyRevenue={monthlyRevenue} />
+                </TabsContent>
+                <TabsContent value="table">
+                  <RevenueHistory monthlyRevenue={monthlyRevenue} totals={totals} />
+                </TabsContent>
+              </Tabs>
+            )}
+          </div>
 
           <FilterSection
             searchTerm={searchTerm}
