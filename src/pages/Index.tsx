@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ExcelJS from 'exceljs';
 import { Header } from '@/components/Header';
 import { StatsGrid } from '@/components/StatsGrid';
-import { ChartsSection } from '@/components/ChartsSection';
+
 import { FilterSection } from '@/components/FilterSection';
 import { ClientTable } from '@/components/ClientTable';
 import { ClientDialog } from '@/components/ClientDialog';
@@ -298,7 +298,7 @@ const Index = () => {
         <main className="pb-4 md:pb-8">
           <StatsGrid clients={statsClients} />
 
-          <ChartsSection clients={statsClients} />
+          
 
           {/* Revenue History Section */}
           <div className="px-4 md:px-6 mt-6">
