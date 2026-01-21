@@ -29,13 +29,13 @@ export function StatsGrid({ clients }: StatsGridProps) {
   const proximosVencimento = clients.filter(c => c.status === 'Próximo').length;
   const clientesVencidos = clients.filter(c => c.status === 'Vencido').length;
 
-  // Clientes com vencimento no mês atual
+  // Clientes que entraram/pagaram no mês atual
   const clientesDoMes = clients.filter(c => {
-    const dueDate = parseDate(c.dataVencimento);
-    return dueDate && isWithinInterval(dueDate, { start: monthStart, end: monthEnd });
+    const entryDate = parseDate(c.dataEntrada);
+    return entryDate && isWithinInterval(entryDate, { start: monthStart, end: monthEnd });
   });
 
-  // Faturamento do mês: soma de preços de clientes com vencimento no mês
+  // Faturamento do mês: soma de preços de clientes que entraram no mês
   const faturamentoMensal = clientesDoMes.reduce((acc, c) => acc + c.preco, 0);
 
   const formatCurrency = (value: number) => {
