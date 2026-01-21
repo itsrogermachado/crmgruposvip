@@ -1,6 +1,8 @@
 import { useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ExcelJS from 'exceljs';
+import { startOfMonth, endOfMonth, addMonths, isWithinInterval } from 'date-fns';
+import { parseBRDate } from '@/lib/dateUtils';
 import { Header } from '@/components/Header';
 import { StatsGrid } from '@/components/StatsGrid';
 
@@ -86,6 +88,26 @@ const Index = () => {
     return clients.reduce((total, c) => {
       const preco = c.preco_renovacao ?? c.preco;
       return total + (preco || 0);
+    }, 0);
+  }, [clients]);
+
+  // Faturamento mensal: soma dos clientes cujo vencimento está no PRÓXIMO mês
+  // (se vencimento está em fevereiro, significa que pagou em janeiro)
+  const faturamentoMensal = useMemo(() => {
+    const hoje = new Date();
+    const proximoMes = addMonths(hoje, 1);
+    const inicioProximoMes = startOfMonth(proximoMes);
+    const fimProximoMes = endOfMonth(proximoMes);
+    
+    return clients.reduce((total, c) => {
+      const dataVencimento = parseBRDate(c.data_vencimento);
+      if (!dataVencimento) return total;
+      
+      if (isWithinInterval(dataVencimento, { start: inicioProximoMes, end: fimProximoMes })) {
+        const preco = c.preco_renovacao ?? c.preco;
+        return total + (preco || 0);
+      }
+      return total;
     }, 0);
   }, [clients]);
 
@@ -304,7 +326,7 @@ const Index = () => {
         />
 
         <main className="pb-4 md:pb-8">
-          <StatsGrid clients={statsClients} faturamentoTotal={faturamentoTotal} />
+          <StatsGrid clients={statsClients} faturamentoTotal={faturamentoTotal} faturamentoMensal={faturamentoMensal} />
 
           
 
