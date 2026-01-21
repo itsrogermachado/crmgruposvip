@@ -156,12 +156,18 @@ html.transitioning * {
     padding-inline: clamp(0.75rem, 3vw, 2rem);
   }
 
-  /* Stats Grid - Responsive auto-fit */
+  /* Stats Grid - Responsive */
   .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: clamp(0.5rem, 2vw, 1rem);
     padding: clamp(1rem, 3vw, 1.5rem);
+  }
+
+  @media (min-width: 640px) {
+    .stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 
   @media (min-width: 1280px) {
