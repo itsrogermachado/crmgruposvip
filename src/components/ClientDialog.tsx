@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, forwardRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { CalendarIcon, Upload, X, Image as ImageIcon, Plus, CreditCard, DollarSign, TrendingUp } from 'lucide-react';
@@ -53,8 +53,7 @@ interface ClientDialogProps {
   onSave: (client: Omit<Client, 'id'> & { id?: string }, paymentOptions: PaymentOptions) => void;
 }
 
-export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
-  function ClientDialog({ open, onOpenChange, client, onSave }, ref) {
+export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialogProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -659,6 +658,4 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
       </Dialog>
     </>
   );
-});
-
-ClientDialog.displayName = 'ClientDialog';
+}
