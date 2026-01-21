@@ -80,7 +80,7 @@ export function Header({
               )}
             </div>
           </button>
-          <div className="hidden lg:block">
+          <div className="hidden md:block">
             <SubscriptionCountdown />
           </div>
         </div>

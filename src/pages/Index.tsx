@@ -283,7 +283,7 @@ const Index = () => {
 
   return (
     <SubscriptionRequired>
-      <div className="min-h-screen animated-bg dark:animated-bg animated-bg-light safe-area-pb" style={{ paddingBottom: 'clamp(5rem, 20vw, 0rem)' }}>
+      <div className="min-h-screen animated-bg dark:animated-bg animated-bg-light safe-area-pb">
         <Header
           onImport={handleImport}
           onExport={handleExport}
@@ -316,12 +316,12 @@ const Index = () => {
                 {revenueExpanded ? (
                   <>
                     <ChevronUp className="w-4 h-4" />
-                    <span className="hidden sm:inline">Recolher</span>
+                    <span>Recolher</span>
                   </>
                 ) : (
                   <>
                     <ChevronDown className="w-4 h-4" />
-                    <span className="hidden sm:inline">Expandir</span>
+                    <span>Expandir</span>
                   </>
                 )}
               </Button>
