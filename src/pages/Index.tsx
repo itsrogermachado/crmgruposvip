@@ -10,6 +10,7 @@ import { ClientDialog } from '@/components/ClientDialog';
 import { SubscriptionRequired } from '@/components/SubscriptionRequired';
 import { BottomNav } from '@/components/BottomNav';
 import { RevenueHistory } from '@/components/RevenueHistory';
+import { RevenueChart } from '@/components/RevenueChart';
 import { StatusFilter, PlanoFilter } from '@/types/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -299,6 +300,8 @@ const Index = () => {
           <StatsGrid clients={statsClients} />
 
           <ChartsSection clients={statsClients} />
+
+          <RevenueChart monthlyRevenue={monthlyRevenue} clients={tableClients} />
 
           {/* Revenue History Section */}
           <div className="px-4 md:px-6 mt-6">
