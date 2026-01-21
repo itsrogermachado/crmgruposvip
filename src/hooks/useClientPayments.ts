@@ -49,25 +49,34 @@ function parseDate(dateStr: string): Date | null {
 
 export function useClientPayments() {
   const [payments, setPayments] = useState<ClientPayment[]>([]);
+  const [clientDueDates, setClientDueDates] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
-  const fetchPayments = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     if (!user) {
       setPayments([]);
+      setClientDueDates([]);
       setLoading(false);
       return;
     }
 
     try {
-      const { data, error } = await supabase
-        .from('client_payments')
-        .select('*')
-        .order('payment_date', { ascending: false });
+      // Fetch payments and client due dates in parallel
+      const [paymentsResult, clientsResult] = await Promise.all([
+        supabase
+          .from('client_payments')
+          .select('*')
+          .order('payment_date', { ascending: false }),
+        supabase
+          .from('clients')
+          .select('data_vencimento')
+      ]);
 
-      if (error) throw error;
+      if (paymentsResult.error) throw paymentsResult.error;
+      if (clientsResult.error) throw clientsResult.error;
 
-      const mappedPayments: ClientPayment[] = (data || []).map((p) => ({
+      const mappedPayments: ClientPayment[] = (paymentsResult.data || []).map((p) => ({
         id: p.id,
         client_id: p.client_id,
         amount: Number(p.amount),
@@ -78,37 +87,52 @@ export function useClientPayments() {
         created_at: p.created_at,
       }));
 
+      const dueDates = (clientsResult.data || []).map((c) => c.data_vencimento);
+
       setPayments(mappedPayments);
+      setClientDueDates(dueDates);
     } catch (error) {
-      console.error('Erro ao buscar pagamentos:', error);
+      console.error('Erro ao buscar dados:', error);
     } finally {
       setLoading(false);
     }
   }, [user]);
 
   useEffect(() => {
-    fetchPayments();
-  }, [fetchPayments]);
+    fetchData();
+  }, [fetchData]);
 
   // Realtime subscription for automatic updates
   useEffect(() => {
     if (!user) return;
 
-    const channel = supabase
+    const paymentsChannel = supabase
       .channel('client_payments_changes')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'client_payments' },
         () => {
-          fetchPayments();
+          fetchData();
+        }
+      )
+      .subscribe();
+
+    const clientsChannel = supabase
+      .channel('clients_changes_for_revenue')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'clients' },
+        () => {
+          fetchData();
         }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(paymentsChannel);
+      supabase.removeChannel(clientsChannel);
     };
-  }, [user, fetchPayments]);
+  }, [user, fetchData]);
 
   const monthlyRevenue = useMemo(() => {
     const today = new Date();
@@ -118,12 +142,22 @@ export function useClientPayments() {
     // Mês mínimo: Janeiro 2026
     const minMonth = new Date(2026, 0, 1);
 
-    // Find the maximum month with payments
+    // Find the maximum month considering both payments and client due dates
     let maxMonth = currentMonth;
+    
+    // Check payments
     payments.forEach((p) => {
       const paymentDate = parseDate(p.payment_date);
       if (paymentDate && isAfter(startOfMonth(paymentDate), maxMonth)) {
         maxMonth = startOfMonth(paymentDate);
+      }
+    });
+
+    // Check client due dates (to include future months)
+    clientDueDates.forEach((dateStr) => {
+      const dueDate = parseDate(dateStr);
+      if (dueDate && isAfter(startOfMonth(dueDate), maxMonth)) {
+        maxMonth = startOfMonth(dueDate);
       }
     });
 
@@ -155,7 +189,7 @@ export function useClientPayments() {
 
     // Ordenar por mês mais recente primeiro
     return months.sort((a, b) => b.month.localeCompare(a.month));
-  }, [payments]);
+  }, [payments, clientDueDates]);
 
   const totals = useMemo(() => {
     return monthlyRevenue.reduce(
@@ -171,6 +205,6 @@ export function useClientPayments() {
     loading,
     monthlyRevenue,
     totals,
-    refetch: fetchPayments,
+    refetch: fetchData,
   };
 }
