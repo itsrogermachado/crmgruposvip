@@ -1,5 +1,6 @@
-import { useState, useRef } from 'react';
-import { MessageCircle, Pencil, Trash2, Send, FileText, Users, Receipt, Upload, Loader2 } from 'lucide-react';
+import { useState, useRef, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { MessageCircle, Pencil, Trash2, Send, FileText, Users, Receipt, Upload, Loader2, ArrowUpDown, ArrowUp, ArrowDown, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -23,6 +24,14 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import { StatusBadge } from './StatusBadge';
 import { WhatsAppMessageDialog } from './WhatsAppMessageDialog';
 import { MobileClientCard } from './MobileClientCard';
@@ -37,10 +46,21 @@ interface ClientTableProps {
   onClientUpdate?: () => void;
 }
 
+type SortField = 'nome' | 'preco' | 'dataVencimento' | 'status';
+type SortDirection = 'asc' | 'desc';
+
+const ITEMS_PER_PAGE = 10;
+
+const statusOrder = { 'Vencido': 0, 'Próximo': 1, 'Ativo': 2 };
+
 export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: ClientTableProps) {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortField, setSortField] = useState<SortField | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   
   const [whatsappDialog, setWhatsappDialog] = useState<{ 
     open: boolean; 
@@ -62,6 +82,73 @@ export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: Clien
     clientId: '',
   });
 
+  // Sorting logic
+  const sortedClients = useMemo(() => {
+    if (!sortField) return clients;
+
+    return [...clients].sort((a, b) => {
+      let comparison = 0;
+
+      switch (sortField) {
+        case 'nome':
+          comparison = a.nome.localeCompare(b.nome, 'pt-BR');
+          break;
+        case 'preco':
+          comparison = a.preco - b.preco;
+          break;
+        case 'dataVencimento': {
+          const parseDate = (dateStr: string): Date => {
+            if (dateStr.includes('/')) {
+              const [day, month, year] = dateStr.split('/');
+              return new Date(Number(year), Number(month) - 1, Number(day));
+            }
+            return new Date(dateStr);
+          };
+          const dateA = parseDate(a.dataVencimento);
+          const dateB = parseDate(b.dataVencimento);
+          comparison = dateA.getTime() - dateB.getTime();
+          break;
+        }
+        case 'status':
+          comparison = (statusOrder[a.status as keyof typeof statusOrder] || 0) - 
+                      (statusOrder[b.status as keyof typeof statusOrder] || 0);
+          break;
+      }
+
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+  }, [clients, sortField, sortDirection]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(sortedClients.length / ITEMS_PER_PAGE);
+  const paginatedClients = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return sortedClients.slice(start, start + ITEMS_PER_PAGE);
+  }, [sortedClients, currentPage]);
+
+  // Reset to page 1 when clients change
+  useMemo(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1);
+    }
+  }, [clients.length, totalPages, currentPage]);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) return <ArrowUpDown className="w-4 h-4 text-muted-foreground/50" />;
+    return sortDirection === 'asc' ? 
+      <ArrowUp className="w-4 h-4 text-primary" /> : 
+      <ArrowDown className="w-4 h-4 text-primary" />;
+  };
+
   const openComprovanteModal = (url: string, clientName: string, clientId: string) => {
     setComprovanteDialog({ open: true, url, clientName, clientId });
   };
@@ -70,7 +157,6 @@ export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: Clien
     const file = event.target.files?.[0];
     if (!file || !comprovanteDialog.clientId) return;
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       toast({
         title: "Erro",
@@ -80,7 +166,6 @@ export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: Clien
       return;
     }
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast({
         title: "Erro",
@@ -107,7 +192,6 @@ export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: Clien
         .from('comprovantes')
         .getPublicUrl(filePath);
 
-      // Update client record
       const { error: updateError } = await supabase
         .from('clients')
         .update({ comprovante_url: publicUrl })
@@ -115,7 +199,6 @@ export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: Clien
 
       if (updateError) throw updateError;
 
-      // Update modal with new URL
       setComprovanteDialog(prev => ({ ...prev, url: publicUrl }));
 
       toast({
@@ -123,7 +206,6 @@ export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: Clien
         description: "Comprovante atualizado com sucesso!",
       });
 
-      // Notify parent to refresh list
       onClientUpdate?.();
     } catch (error) {
       console.error('Error updating comprovante:', error);
@@ -134,7 +216,6 @@ export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: Clien
       });
     } finally {
       setUploading(false);
-      // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -147,6 +228,10 @@ export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: Clien
 
   const openWhatsAppDialog = (client: Client) => {
     setWhatsappDialog({ open: true, client });
+  };
+
+  const handleViewPaymentHistory = (clientId: string) => {
+    navigate(`/client/${clientId}/payments`);
   };
 
   if (clients.length === 0) {
@@ -165,7 +250,7 @@ export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: Clien
     <>
       {/* Mobile: Card List */}
       <div className="lg:hidden mx-4 pb-24 space-y-2.5 sm:space-y-3">
-        {clients.map((client, index) => (
+        {paginatedClients.map((client, index) => (
           <div
             key={client.id}
             style={{ animationDelay: `${0.1 + index * 0.05}s` }}
@@ -179,6 +264,33 @@ export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: Clien
             />
           </div>
         ))}
+        
+        {/* Mobile Pagination */}
+        {totalPages > 1 && (
+          <div className="pt-4">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+                <PaginationItem>
+                  <span className="text-sm text-muted-foreground px-4">
+                    {currentPage} de {totalPages}
+                  </span>
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
 
       {/* Desktop: Table */}
@@ -186,8 +298,14 @@ export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: Clien
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="font-semibold text-muted-foreground uppercase text-xs tracking-wider">
-                Cliente
+              <TableHead 
+                className="font-semibold text-muted-foreground uppercase text-xs tracking-wider cursor-pointer hover:text-foreground transition-colors"
+                onClick={() => handleSort('nome')}
+              >
+                <div className="flex items-center gap-2">
+                  Cliente
+                  {getSortIcon('nome')}
+                </div>
               </TableHead>
               <TableHead className="font-semibold text-muted-foreground uppercase text-xs tracking-wider">
                 Contato
@@ -195,14 +313,32 @@ export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: Clien
               <TableHead className="font-semibold text-muted-foreground uppercase text-xs tracking-wider">
                 Plano
               </TableHead>
-              <TableHead className="font-semibold text-muted-foreground uppercase text-xs tracking-wider">
-                Preço
+              <TableHead 
+                className="font-semibold text-muted-foreground uppercase text-xs tracking-wider cursor-pointer hover:text-foreground transition-colors"
+                onClick={() => handleSort('preco')}
+              >
+                <div className="flex items-center gap-2">
+                  Preço
+                  {getSortIcon('preco')}
+                </div>
               </TableHead>
-              <TableHead className="font-semibold text-muted-foreground uppercase text-xs tracking-wider">
-                Vencimento
+              <TableHead 
+                className="font-semibold text-muted-foreground uppercase text-xs tracking-wider cursor-pointer hover:text-foreground transition-colors"
+                onClick={() => handleSort('dataVencimento')}
+              >
+                <div className="flex items-center gap-2">
+                  Vencimento
+                  {getSortIcon('dataVencimento')}
+                </div>
               </TableHead>
-              <TableHead className="font-semibold text-muted-foreground uppercase text-xs tracking-wider">
-                Status
+              <TableHead 
+                className="font-semibold text-muted-foreground uppercase text-xs tracking-wider cursor-pointer hover:text-foreground transition-colors"
+                onClick={() => handleSort('status')}
+              >
+                <div className="flex items-center gap-2">
+                  Status
+                  {getSortIcon('status')}
+                </div>
               </TableHead>
               <TableHead className="font-semibold text-muted-foreground uppercase text-xs tracking-wider">
                 Ações
@@ -210,7 +346,7 @@ export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: Clien
             </TableRow>
           </TableHeader>
           <TableBody>
-            {clients.map((client, index) => (
+            {paginatedClients.map((client, index) => (
               <TableRow 
                 key={client.id} 
                 className="table-row-animated opacity-0 animate-fade-in-up"
@@ -281,6 +417,23 @@ export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: Clien
                           <Button
                             variant="ghost"
                             size="icon"
+                            onClick={() => handleViewPaymentHistory(client.id)}
+                            className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10 transition-all duration-300"
+                          >
+                            <History className="w-4 h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Histórico de pagamentos</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => openComprovanteModal(client.comprovanteUrl || '', client.nome, client.id)}
                             className={`h-8 w-8 transition-all duration-300 ${
                               client.comprovanteUrl 
@@ -322,6 +475,54 @@ export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: Clien
             ))}
           </TableBody>
         </Table>
+
+        {/* Desktop Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-4 border-t border-border/50">
+            <p className="text-sm text-muted-foreground">
+              Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, sortedClients.length)} de {sortedClients.length} clientes
+            </p>
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum: number;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationLink
+                        onClick={() => setCurrentPage(pageNum)}
+                        isActive={currentPage === pageNum}
+                        className="cursor-pointer"
+                      >
+                        {pageNum}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                })}
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
 
       {whatsappDialog.client && (
