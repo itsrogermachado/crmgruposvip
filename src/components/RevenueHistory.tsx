@@ -13,8 +13,8 @@ import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 interface RevenueHistoryProps {
   monthlyRevenue: MonthlyRevenue[];
   totals: {
-    faturamento: number;
-    lucroEsperado: number;
+    faturamentoReal: number;
+    faturamentoEsperado: number;
     diferenca: number;
   };
 }
@@ -53,8 +53,8 @@ export function RevenueHistory({ monthlyRevenue, totals }: RevenueHistoryProps) 
             <TableHeader>
               <TableRow>
                 <TableHead>Mês</TableHead>
-                <TableHead className="text-right">Faturamento</TableHead>
-                <TableHead className="text-right">Lucro Esperado</TableHead>
+                <TableHead className="text-right">Faturamento Real</TableHead>
+                <TableHead className="text-right">Faturamento Esperado</TableHead>
                 <TableHead className="text-right">Diferença</TableHead>
               </TableRow>
             </TableHeader>
@@ -63,10 +63,10 @@ export function RevenueHistory({ monthlyRevenue, totals }: RevenueHistoryProps) 
                 <TableRow key={month.month}>
                   <TableCell className="font-medium">{month.label}</TableCell>
                   <TableCell className="text-right font-mono">
-                    {formatCurrency(month.faturamento)}
+                    {formatCurrency(month.faturamentoReal)}
                   </TableCell>
                   <TableCell className="text-right font-mono text-muted-foreground">
-                    {formatCurrency(month.lucroEsperado)}
+                    {formatCurrency(month.faturamentoEsperado)}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className={`flex items-center justify-end gap-1 font-mono ${getDifferenceColor(month.diferenca)}`}>
@@ -78,12 +78,12 @@ export function RevenueHistory({ monthlyRevenue, totals }: RevenueHistoryProps) 
               ))}
               {/* Totals Row */}
               <TableRow className="border-t-2 bg-muted/50 font-semibold">
-                <TableCell>Total (12 meses)</TableCell>
+                <TableCell>Total</TableCell>
                 <TableCell className="text-right font-mono">
-                  {formatCurrency(totals.faturamento)}
+                  {formatCurrency(totals.faturamentoReal)}
                 </TableCell>
                 <TableCell className="text-right font-mono text-muted-foreground">
-                  {formatCurrency(totals.lucroEsperado)}
+                  {formatCurrency(totals.faturamentoEsperado)}
                 </TableCell>
                 <TableCell className="text-right">
                   <div className={`flex items-center justify-end gap-1 font-mono ${getDifferenceColor(totals.diferenca)}`}>
