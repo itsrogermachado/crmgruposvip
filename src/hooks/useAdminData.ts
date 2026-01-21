@@ -315,6 +315,130 @@ export function useDeletePlan() {
   });
 }
 
+// Subscription CRUD
+export function useCreateSubscription() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (subscription: {
+      user_id: string;
+      plan_id: string;
+      status: string;
+      starts_at: string;
+      expires_at: string | null;
+    }) => {
+      const { error } = await supabase
+        .from('subscriptions')
+        .insert(subscription);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-subscriptions'] });
+      toast({ title: 'Assinatura criada com sucesso!' });
+    },
+    onError: (error) => {
+      toast({ title: 'Erro ao criar assinatura', description: error.message, variant: 'destructive' });
+    },
+  });
+}
+
+export function useUpdateSubscription() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      ...data
+    }: {
+      id: string;
+      user_id?: string;
+      plan_id?: string;
+      status?: string;
+      starts_at?: string;
+      expires_at?: string | null;
+    }) => {
+      const { error } = await supabase
+        .from('subscriptions')
+        .update(data)
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-subscriptions'] });
+      toast({ title: 'Assinatura atualizada com sucesso!' });
+    },
+    onError: (error) => {
+      toast({ title: 'Erro ao atualizar assinatura', description: error.message, variant: 'destructive' });
+    },
+  });
+}
+
+export function useDeleteSubscription() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('subscriptions')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-subscriptions'] });
+      toast({ title: 'Assinatura excluída com sucesso!' });
+    },
+    onError: (error) => {
+      toast({ title: 'Erro ao excluir assinatura', description: error.message, variant: 'destructive' });
+    },
+  });
+}
+
+export function useExtendSubscription() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ id, additionalDays }: { id: string; additionalDays: number }) => {
+      // First, get current subscription
+      const { data: subscription, error: fetchError } = await supabase
+        .from('subscriptions')
+        .select('expires_at, status')
+        .eq('id', id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      const currentExpiry = subscription.expires_at
+        ? new Date(subscription.expires_at)
+        : new Date();
+      
+      const newExpiry = new Date(currentExpiry);
+      newExpiry.setDate(newExpiry.getDate() + additionalDays);
+
+      const { error: updateError } = await supabase
+        .from('subscriptions')
+        .update({
+          expires_at: newExpiry.toISOString(),
+          status: 'active',
+        })
+        .eq('id', id);
+
+      if (updateError) throw updateError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-subscriptions'] });
+      toast({ title: 'Assinatura estendida com sucesso!' });
+    },
+    onError: (error) => {
+      toast({ title: 'Erro ao estender assinatura', description: error.message, variant: 'destructive' });
+    },
+  });
+}
+
 // Admin Stats
 export function useAdminStats() {
   const { data: profiles } = useProfiles();
