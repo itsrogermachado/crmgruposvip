@@ -1,6 +1,7 @@
 import { Users, TrendingUp, Clock, AlertCircle, DollarSign, Calendar } from 'lucide-react';
 import { StatCard } from './StatCard';
 import { Client } from '@/types/client';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface StatsGridProps {
   clients: Client[];
@@ -9,6 +10,7 @@ interface StatsGridProps {
 }
 
 export function StatsGrid({ clients, faturamentoTotal, faturamentoMensal }: StatsGridProps) {
+  const isMobile = useIsMobile();
   const totalClientes = clients.length;
   const clientesAtivos = clients.filter(c => c.status === 'Ativo').length;
   const proximosVencimento = clients.filter(c => c.status === 'Próximo').length;
@@ -24,37 +26,37 @@ export function StatsGrid({ clients, faturamentoTotal, faturamentoMensal }: Stat
   return (
     <div className="stats-grid">
       <StatCard
-        title="Total de Clientes"
+        title={isMobile ? "Total" : "Total de Clientes"}
         value={totalClientes}
         icon={Users}
         variant="blue"
       />
       <StatCard
-        title="Clientes Ativos"
+        title={isMobile ? "Ativos" : "Clientes Ativos"}
         value={clientesAtivos}
         icon={TrendingUp}
         variant="purple"
       />
       <StatCard
-        title="Próximos do Vencimento"
+        title={isMobile ? "Próximos" : "Próximos do Vencimento"}
         value={proximosVencimento}
         icon={Clock}
         variant="yellow"
       />
       <StatCard
-        title="Clientes Vencidos"
+        title={isMobile ? "Vencidos" : "Clientes Vencidos"}
         value={clientesVencidos}
         icon={AlertCircle}
         variant="red"
       />
       <StatCard
-        title="Faturamento Mensal"
+        title={isMobile ? "Fat. Mensal" : "Faturamento Mensal"}
         value={formatCurrency(faturamentoMensal)}
         icon={Calendar}
         variant="cyan"
       />
       <StatCard
-        title="Faturamento Total"
+        title={isMobile ? "Fat. Total" : "Faturamento Total"}
         value={formatCurrency(faturamentoTotal)}
         icon={DollarSign}
         variant="green"

@@ -51,8 +51,8 @@ export function StatCard({ title, value, icon: Icon, variant }: StatCardProps) {
         `hover:shadow-xl ${styles.glow}`
       )}
       style={{ 
-        padding: 'clamp(0.75rem, 2vw, 1.5rem)',
-        minHeight: 'clamp(80px, 12vw, 120px)'
+        padding: 'clamp(0.5rem, 2vw, 1.5rem)',
+        minHeight: 'clamp(70px, 10vw, 120px)'
       }}
     >
       {/* Gradient overlay */}
@@ -62,7 +62,7 @@ export function StatCard({ title, value, icon: Icon, variant }: StatCardProps) {
       )} />
       
       {/* Content */}
-      <div className="relative z-10 pr-12 md:pr-16">
+      <div className="relative z-10 pr-10 md:pr-16">
         <p className="text-responsive-sm font-medium text-muted-foreground mb-1 truncate">{title}</p>
         <p className="text-responsive-xl font-bold text-foreground tracking-tight">{value}</p>
       </div>
@@ -74,11 +74,11 @@ export function StatCard({ title, value, icon: Icon, variant }: StatCardProps) {
           styles.icon
         )}
         style={{
-          width: 'clamp(2.25rem, 4vw, 3.5rem)',
-          height: 'clamp(2.25rem, 4vw, 3.5rem)',
+          width: 'clamp(2rem, 3.5vw, 3.5rem)',
+          height: 'clamp(2rem, 3.5vw, 3.5rem)',
         }}
       >
-        <Icon style={{ width: 'clamp(1.125rem, 2vw, 1.75rem)', height: 'clamp(1.125rem, 2vw, 1.75rem)' }} />
+        <Icon style={{ width: 'clamp(1rem, 1.8vw, 1.75rem)', height: 'clamp(1rem, 1.8vw, 1.75rem)' }} />
       </div>
     </div>
   );
