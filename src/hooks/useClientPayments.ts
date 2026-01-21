@@ -51,6 +51,7 @@ function parseDate(dateStr: string): Date | null {
 interface ClientDueData {
   data_vencimento: string;
   preco: number;
+  preco_renovacao: number | null;
 }
 
 export function useClientPayments() {
@@ -76,7 +77,7 @@ export function useClientPayments() {
           .order('payment_date', { ascending: false }),
         supabase
           .from('clients')
-          .select('data_vencimento, preco')
+          .select('data_vencimento, preco, preco_renovacao')
       ]);
 
       if (paymentsResult.error) throw paymentsResult.error;
@@ -96,6 +97,7 @@ export function useClientPayments() {
       const clientsDueData: ClientDueData[] = (clientsResult.data || []).map((c) => ({
         data_vencimento: c.data_vencimento,
         preco: Number(c.preco),
+        preco_renovacao: c.preco_renovacao ? Number(c.preco_renovacao) : null,
       }));
 
       setPayments(mappedPayments);
@@ -187,14 +189,14 @@ export function useClientPayments() {
         })
         .reduce((sum, p) => sum + p.amount, 0);
 
-      // Calculate projection from client due dates
+      // Calculate projection from client due dates using RENEWAL price
       const projecao = clientsData
         .filter((c) => {
           const dueDate = parseDate(c.data_vencimento);
           if (!dueDate) return false;
           return isWithinInterval(dueDate, { start: monthStart, end: monthEnd });
         })
-        .reduce((sum, c) => sum + c.preco, 0);
+        .reduce((sum, c) => sum + (c.preco_renovacao ?? c.preco), 0);
 
       months.push({
         month: monthKey,
