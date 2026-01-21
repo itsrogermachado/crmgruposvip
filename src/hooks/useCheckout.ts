@@ -76,10 +76,13 @@ export function useCheckout() {
         return response.data as PaymentStatusResponse;
       },
       enabled: !!paymentId,
-      // Disable aggressive polling - rely on realtime updates instead
-      // Only allow manual refresh via refetch
-      refetchInterval: false,
-      staleTime: Infinity,
+      // Poll every 10 seconds as fallback in case webhook fails
+      refetchInterval: (query) => {
+        // Stop polling once payment is confirmed
+        if (query.state.data?.status === 'paid') return false;
+        return 10000; // 10 seconds
+      },
+      staleTime: 5000, // Consider data stale after 5 seconds
     });
   };
 

@@ -80,6 +80,11 @@ async function verifySignature(body: string, signature: string | null, secret: s
 }
 
 Deno.serve(async (req) => {
+  console.log('=== WEBHOOK RECEIVED ===')
+  console.log('Method:', req.method)
+  console.log('URL:', req.url)
+  console.log('Headers:', JSON.stringify(Object.fromEntries(req.headers.entries())))
+  
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
