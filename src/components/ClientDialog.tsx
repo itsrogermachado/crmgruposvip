@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, forwardRef } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CalendarIcon, Upload, X, Image as ImageIcon, Plus, CreditCard } from 'lucide-react';
+import { CalendarIcon, Upload, X, Image as ImageIcon, Plus, CreditCard, DollarSign, TrendingUp } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 
 import { Client } from '@/types/client';
 import { cn } from '@/lib/utils';
@@ -83,6 +84,7 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
   const [registrarPagamento, setRegistrarPagamento] = useState(true);
   const [valorAdesao, setValorAdesao] = useState(150);
   const [valorRenovacao, setValorRenovacao] = useState(150);
+  const [precoUnico, setPrecoUnico] = useState(true);
 
   const handleCreatePlan = () => {
     if (newPlanName.trim()) {
@@ -141,10 +143,11 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
       setDataVencimentoDate(nextMonth);
       setPreviewUrl(null);
       
-      // New client: no payment registration (just set price)
-      setRegistrarPagamento(false);
+      // New client: payment registration on by default
+      setRegistrarPagamento(true);
       setValorAdesao(150);
       setValorRenovacao(150);
+      setPrecoUnico(true);
     }
   }, [client, open]);
   
@@ -253,8 +256,9 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
     onSave({
       ...(client ? { id: client.id } : {}),
       ...formData,
-      // Set preco: for new clients use the price field value, for existing keep current
-      preco: isRenovacao ? (client?.preco || valorRenovacao) : valorRenovacao,
+      // Set preco: for new clients use valorAdesao if registering, otherwise use valorRenovacao
+      // For existing clients, keep current preco
+      preco: isRenovacao ? (client?.preco || valorRenovacao) : (registrarPagamento ? valorAdesao : valorRenovacao),
       status,
       discord: formData.discord || undefined,
       telegram: formData.telegram || undefined,
@@ -423,26 +427,105 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
             {/* Payment/Price Section */}
             <div className="space-y-4 rounded-lg border p-4 bg-muted/30">
               {client === null ? (
-                // NEW CLIENT: Simple price field (no payment registration)
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <CreditCard className="h-4 w-4 text-muted-foreground" />
-                    <Label htmlFor="preco" className="font-medium">Preço (R$)</Label>
+                // NEW CLIENT: Payment registration with enrollment option
+                <div className="space-y-4">
+                  {/* Switch to register payment */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="h-4 w-4 text-muted-foreground" />
+                      <Label htmlFor="registrar-adesao" className="font-medium">
+                        Registrar pagamento de adesão
+                      </Label>
+                    </div>
+                    <Switch
+                      id="registrar-adesao"
+                      checked={registrarPagamento}
+                      onCheckedChange={setRegistrarPagamento}
+                    />
                   </div>
-                  <Input
-                    id="preco"
-                    type="number"
-                    step="0.01"
-                    value={valorRenovacao}
-                    onChange={(e) => {
-                      const value = parseFloat(e.target.value) || 0;
-                      setValorRenovacao(value);
-                      setValorAdesao(value);
-                    }}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    💡 Este valor será usado como preço de renovação do cliente.
-                  </p>
+
+                  {registrarPagamento ? (
+                    <>
+                      {/* Valor Adesão */}
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="h-4 w-4 text-green-500" />
+                          <Label htmlFor="valor-adesao">Valor Adesão (R$)</Label>
+                        </div>
+                        <Input
+                          id="valor-adesao"
+                          type="number"
+                          step="0.01"
+                          value={valorAdesao}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value) || 0;
+                            setValorAdesao(value);
+                            if (precoUnico) setValorRenovacao(value);
+                          }}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          💵 Será registrado como faturamento recebido.
+                        </p>
+                      </div>
+
+                      {/* Checkbox for single price */}
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          id="preco-unico"
+                          checked={precoUnico}
+                          onCheckedChange={(checked) => {
+                            setPrecoUnico(!!checked);
+                            if (checked) setValorRenovacao(valorAdesao);
+                          }}
+                        />
+                        <Label htmlFor="preco-unico" className="text-sm cursor-pointer">
+                          Preço único (renovação = adesão)
+                        </Label>
+                      </div>
+
+                      {/* Valor Renovação (only if not single price) */}
+                      {!precoUnico && (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <TrendingUp className="h-4 w-4 text-blue-500" />
+                            <Label htmlFor="valor-renovacao-new">Valor Renovação (R$)</Label>
+                          </div>
+                          <Input
+                            id="valor-renovacao-new"
+                            type="number"
+                            step="0.01"
+                            value={valorRenovacao}
+                            onChange={(e) => setValorRenovacao(parseFloat(e.target.value) || 0)}
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            📊 Será usado para projeção de faturamento futuro.
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    // No payment registration - just price field
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+                        <Label htmlFor="preco-simples">Preço (R$)</Label>
+                      </div>
+                      <Input
+                        id="preco-simples"
+                        type="number"
+                        step="0.01"
+                        value={valorRenovacao}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value) || 0;
+                          setValorRenovacao(value);
+                          setValorAdesao(value);
+                        }}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        💡 Este valor será usado como preço base do cliente.
+                      </p>
+                    </div>
+                  )}
                 </div>
               ) : (
                 // EXISTING CLIENT: Payment registration switch for renewals
@@ -451,7 +534,7 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
                     <div className="flex items-center gap-2">
                       <CreditCard className="h-4 w-4 text-muted-foreground" />
                       <Label htmlFor="registrar-pagamento" className="font-medium">
-                        Registrar pagamento
+                        Registrar pagamento de renovação
                       </Label>
                     </div>
                     <Switch
@@ -463,7 +546,10 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
                   
                   {registrarPagamento && (
                     <div className="space-y-2 pt-2">
-                      <Label htmlFor="valor-renovacao">Valor da Renovação (R$)</Label>
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-green-500" />
+                        <Label htmlFor="valor-renovacao">Valor da Renovação (R$)</Label>
+                      </div>
                       <Input
                         id="valor-renovacao"
                         type="number"
@@ -472,7 +558,7 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
                         onChange={(e) => setValorRenovacao(parseFloat(e.target.value) || 0)}
                       />
                       <p className="text-xs text-muted-foreground">
-                        💡 Este valor será registrado como renovação no faturamento.
+                        💵 Este valor será registrado como renovação no faturamento.
                       </p>
                     </div>
                   )}
