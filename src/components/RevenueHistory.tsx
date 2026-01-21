@@ -14,6 +14,7 @@ interface RevenueHistoryProps {
   monthlyRevenue: MonthlyRevenue[];
   totals: {
     faturamento: number;
+    projecao: number;
   };
 }
 
@@ -38,22 +39,29 @@ export const RevenueHistory = forwardRef<HTMLDivElement, RevenueHistoryProps>(
               <TableRow>
                 <TableHead>Mês</TableHead>
                 <TableHead className="text-right">Faturamento</TableHead>
+                <TableHead className="text-right">Projeção</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {monthlyRevenue.map((month) => (
                 <TableRow key={month.month}>
                   <TableCell className="font-medium">{month.label}</TableCell>
-                  <TableCell className="text-right font-mono">
+                  <TableCell className="text-right font-mono text-green-600 dark:text-green-400">
                     {formatCurrency(month.faturamento)}
+                  </TableCell>
+                  <TableCell className="text-right font-mono text-blue-600 dark:text-blue-400">
+                    {formatCurrency(month.projecao)}
                   </TableCell>
                 </TableRow>
               ))}
               {/* Totals Row */}
               <TableRow className="border-t-2 bg-muted/50 font-semibold">
                 <TableCell>Total</TableCell>
-                <TableCell className="text-right font-mono">
+                <TableCell className="text-right font-mono text-green-600 dark:text-green-400">
                   {formatCurrency(totals.faturamento)}
+                </TableCell>
+                <TableCell className="text-right font-mono text-blue-600 dark:text-blue-400">
+                  {formatCurrency(totals.projecao)}
                 </TableCell>
               </TableRow>
             </TableBody>
