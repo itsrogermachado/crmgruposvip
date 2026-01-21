@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { MonthlyRevenue } from '@/hooks/useClientPayments';
 import {
   Table,
@@ -23,9 +24,10 @@ function formatCurrency(value: number): string {
   }).format(value);
 }
 
-export function RevenueHistory({ monthlyRevenue, totals }: RevenueHistoryProps) {
-  return (
-    <Card className="glass-card">
+export const RevenueHistory = forwardRef<HTMLDivElement, RevenueHistoryProps>(
+  function RevenueHistory({ monthlyRevenue, totals }, ref) {
+    return (
+      <Card ref={ref} className="glass-card">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg font-semibold">Histórico Mensal</CardTitle>
       </CardHeader>
@@ -60,4 +62,6 @@ export function RevenueHistory({ monthlyRevenue, totals }: RevenueHistoryProps) 
       </CardContent>
     </Card>
   );
-}
+});
+
+RevenueHistory.displayName = 'RevenueHistory';
