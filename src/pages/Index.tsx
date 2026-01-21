@@ -296,7 +296,7 @@ const Index = () => {
         />
 
         <main className="pb-4 md:pb-8">
-          <StatsGrid clients={statsClients} />
+          <StatsGrid clients={statsClients} faturamentoTotal={totals.faturamento} />
 
           
 

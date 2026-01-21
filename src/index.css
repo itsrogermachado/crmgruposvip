@@ -166,7 +166,7 @@ html.transitioning * {
 
   @media (min-width: 1280px) {
     .stats-grid {
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
     }
   }
 
