@@ -57,7 +57,8 @@ const Index = () => {
       discord: c.discord,
       telegram: c.telegram,
       plano: c.plano,
-      preco: c.preco,
+      // Use renewal price if available, otherwise fallback to base price
+      preco: c.preco_renovacao ?? c.preco,
       dataEntrada: c.data_entrada,
       dataVencimento: c.data_vencimento,
       status: c.status,
