@@ -13,12 +13,12 @@ interface RevenueChartProps {
 }
 
 const chartConfig = {
-  faturamento: {
-    label: 'Faturamento',
+  faturamentoReal: {
+    label: 'Faturamento Real',
     color: 'hsl(var(--chart-1))',
   },
-  lucroEsperado: {
-    label: 'Lucro Esperado',
+  faturamentoEsperado: {
+    label: 'Faturamento Esperado',
     color: 'hsl(var(--chart-2))',
   },
 } satisfies ChartConfig;
@@ -76,10 +76,10 @@ export function RevenueChart({ monthlyRevenue }: RevenueChartProps) {
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  formatter={(value, name) => (
+              formatter={(value, name) => (
                     <div className="flex items-center justify-between gap-4">
                       <span className="text-muted-foreground">
-                        {name === 'faturamento' ? 'Faturamento' : 'Lucro Esperado'}
+                        {name === 'faturamentoReal' ? 'Faturamento Real' : 'Faturamento Esperado'}
                       </span>
                       <span className="font-mono font-medium">
                         {formatCurrency(Number(value))}
@@ -90,14 +90,14 @@ export function RevenueChart({ monthlyRevenue }: RevenueChartProps) {
               }
             />
             <Bar
-              dataKey="faturamento"
-              fill="var(--color-faturamento)"
+              dataKey="faturamentoReal"
+              fill="var(--color-faturamentoReal)"
               radius={[4, 4, 0, 0]}
               maxBarSize={40}
             />
             <Bar
-              dataKey="lucroEsperado"
-              fill="var(--color-lucroEsperado)"
+              dataKey="faturamentoEsperado"
+              fill="var(--color-faturamentoEsperado)"
               radius={[4, 4, 0, 0]}
               maxBarSize={40}
             />
@@ -108,11 +108,11 @@ export function RevenueChart({ monthlyRevenue }: RevenueChartProps) {
         <div className="flex items-center justify-center gap-6 mt-4">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: 'hsl(var(--chart-1))' }} />
-            <span className="text-sm text-muted-foreground">Faturamento</span>
+            <span className="text-sm text-muted-foreground">Faturamento Real</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: 'hsl(var(--chart-2))' }} />
-            <span className="text-sm text-muted-foreground">Lucro Esperado</span>
+            <span className="text-sm text-muted-foreground">Faturamento Esperado</span>
           </div>
         </div>
       </CardContent>

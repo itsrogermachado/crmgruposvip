@@ -19,8 +19,8 @@ export interface ClientPayment {
 export interface MonthlyRevenue {
   month: string; // "2026-01"
   label: string; // "Janeiro 2026"
-  faturamento: number; // Pagamentos reais
-  lucroEsperado: number; // Projeção baseada em clientes
+  faturamentoReal: number; // Pagamentos reais
+  faturamentoEsperado: number; // Projeção baseada em clientes
   diferenca: number;
 }
 
@@ -149,8 +149,8 @@ export function useClientPayments() {
       months.push({
         month: monthKey,
         label: monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1),
-        faturamento,
-        lucroEsperado,
+        faturamentoReal: faturamento,
+        faturamentoEsperado: lucroEsperado,
         diferenca: faturamento - lucroEsperado,
       });
 
@@ -164,11 +164,11 @@ export function useClientPayments() {
   const totals = useMemo(() => {
     return monthlyRevenue.reduce(
       (acc, m) => ({
-        faturamento: acc.faturamento + m.faturamento,
-        lucroEsperado: acc.lucroEsperado + m.lucroEsperado,
+        faturamentoReal: acc.faturamentoReal + m.faturamentoReal,
+        faturamentoEsperado: acc.faturamentoEsperado + m.faturamentoEsperado,
         diferenca: acc.diferenca + m.diferenca,
       }),
-      { faturamento: 0, lucroEsperado: 0, diferenca: 0 }
+      { faturamentoReal: 0, faturamentoEsperado: 0, diferenca: 0 }
     );
   }, [monthlyRevenue]);
 
