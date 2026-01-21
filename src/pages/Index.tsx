@@ -82,6 +82,13 @@ const Index = () => {
     }));
   }, [clients]);
 
+  const faturamentoTotal = useMemo(() => {
+    return clients.reduce((total, c) => {
+      const preco = c.preco_renovacao ?? c.preco;
+      return total + (preco || 0);
+    }, 0);
+  }, [clients]);
+
   if (!authLoading && !user) {
     navigate('/auth');
     return null;
@@ -297,7 +304,7 @@ const Index = () => {
         />
 
         <main className="pb-4 md:pb-8">
-          <StatsGrid clients={statsClients} faturamentoTotal={totals.faturamento + totals.projecao} />
+          <StatsGrid clients={statsClients} faturamentoTotal={faturamentoTotal} />
 
           
 
