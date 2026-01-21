@@ -27,7 +27,14 @@ export interface MonthlyRevenue {
 function parseDate(dateStr: string): Date | null {
   if (!dateStr) return null;
   
-  // Try DD/MM/YYYY format first
+  // If it's an Excel serial number (only digits)
+  if (/^\d+$/.test(dateStr)) {
+    const serialNumber = parseInt(dateStr);
+    const excelEpoch = new Date(1899, 11, 30);
+    return new Date(excelEpoch.getTime() + serialNumber * 24 * 60 * 60 * 1000);
+  }
+  
+  // Try DD/MM/YYYY format
   const parts = dateStr.split('/');
   if (parts.length === 3) {
     const [day, month, year] = parts;
@@ -111,25 +118,23 @@ export function useClientPayments() {
         })
         .reduce((sum, p) => sum + p.amount, 0);
 
-      // Calculate expected profit
-      // For past months: sum of client prices where due date was in that month (from payments)
-      // For current/future months: sum of prices from active clients with due date in that month
-      let lucroEsperado = 0;
-
-      if (isPastMonth) {
-        // For past months, use actual payments as expected (since they represent what was due)
-        lucroEsperado = faturamento;
-      } else {
-        // For current and future months, calculate based on client due dates
-        lucroEsperado = clients
-          .filter((c) => {
-            const dueDate = parseDate(c.data_vencimento);
-            if (!dueDate) return false;
-            return isWithinInterval(dueDate, { start: monthStart, end: monthEnd }) &&
-              (c.status === 'Ativo' || c.status === 'Próximo');
-          })
-          .reduce((sum, c) => sum + c.preco, 0);
-      }
+      // Calculate expected profit based on client due dates
+      // Include clients with status "Ativo" or "Próximo" whose due date falls in this month
+      // Exclude clients with status "Vencido"
+      const lucroEsperado = clients
+        .filter((c) => {
+          const dueDate = parseDate(c.data_vencimento);
+          if (!dueDate) return false;
+          
+          // Check if due date is within this month
+          const isInMonth = isWithinInterval(dueDate, { start: monthStart, end: monthEnd });
+          
+          // Only include active or near-expiration clients (exclude expired)
+          const isValidStatus = c.status === 'Ativo' || c.status === 'Próximo';
+          
+          return isInMonth && isValidStatus;
+        })
+        .reduce((sum, c) => sum + c.preco, 0);
 
       months.push({
         month: monthKey,
