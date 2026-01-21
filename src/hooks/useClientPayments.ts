@@ -19,6 +19,7 @@ export interface MonthlyRevenue {
   month: string; // "2026-01"
   label: string; // "Janeiro 2026"
   faturamento: number; // Pagamentos reais
+  projecao: number; // Receita esperada baseada nos vencimentos
 }
 
 function parseDate(dateStr: string): Date | null {
@@ -47,22 +48,27 @@ function parseDate(dateStr: string): Date | null {
   return null;
 }
 
+interface ClientDueData {
+  data_vencimento: string;
+  preco: number;
+}
+
 export function useClientPayments() {
   const [payments, setPayments] = useState<ClientPayment[]>([]);
-  const [clientDueDates, setClientDueDates] = useState<string[]>([]);
+  const [clientsData, setClientsData] = useState<ClientDueData[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
   const fetchData = useCallback(async () => {
     if (!user) {
       setPayments([]);
-      setClientDueDates([]);
+      setClientsData([]);
       setLoading(false);
       return;
     }
 
     try {
-      // Fetch payments and client due dates in parallel
+      // Fetch payments and client data in parallel
       const [paymentsResult, clientsResult] = await Promise.all([
         supabase
           .from('client_payments')
@@ -70,7 +76,7 @@ export function useClientPayments() {
           .order('payment_date', { ascending: false }),
         supabase
           .from('clients')
-          .select('data_vencimento')
+          .select('data_vencimento, preco')
       ]);
 
       if (paymentsResult.error) throw paymentsResult.error;
@@ -87,10 +93,13 @@ export function useClientPayments() {
         created_at: p.created_at,
       }));
 
-      const dueDates = (clientsResult.data || []).map((c) => c.data_vencimento);
+      const clientsDueData: ClientDueData[] = (clientsResult.data || []).map((c) => ({
+        data_vencimento: c.data_vencimento,
+        preco: Number(c.preco),
+      }));
 
       setPayments(mappedPayments);
-      setClientDueDates(dueDates);
+      setClientsData(clientsDueData);
     } catch (error) {
       console.error('Erro ao buscar dados:', error);
     } finally {
@@ -154,8 +163,8 @@ export function useClientPayments() {
     });
 
     // Check client due dates (to include future months)
-    clientDueDates.forEach((dateStr) => {
-      const dueDate = parseDate(dateStr);
+    clientsData.forEach((c) => {
+      const dueDate = parseDate(c.data_vencimento);
       if (dueDate && isAfter(startOfMonth(dueDate), maxMonth)) {
         maxMonth = startOfMonth(dueDate);
       }
@@ -178,10 +187,20 @@ export function useClientPayments() {
         })
         .reduce((sum, p) => sum + p.amount, 0);
 
+      // Calculate projection from client due dates
+      const projecao = clientsData
+        .filter((c) => {
+          const dueDate = parseDate(c.data_vencimento);
+          if (!dueDate) return false;
+          return isWithinInterval(dueDate, { start: monthStart, end: monthEnd });
+        })
+        .reduce((sum, c) => sum + c.preco, 0);
+
       months.push({
         month: monthKey,
         label: monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1),
         faturamento,
+        projecao,
       });
 
       monthDate = addMonths(monthDate, 1);
@@ -189,14 +208,15 @@ export function useClientPayments() {
 
     // Ordenar por mês mais recente primeiro
     return months.sort((a, b) => b.month.localeCompare(a.month));
-  }, [payments, clientDueDates]);
+  }, [payments, clientsData]);
 
   const totals = useMemo(() => {
     return monthlyRevenue.reduce(
       (acc, m) => ({
         faturamento: acc.faturamento + m.faturamento,
+        projecao: acc.projecao + m.projecao,
       }),
-      { faturamento: 0 }
+      { faturamento: 0, projecao: 0 }
     );
   }, [monthlyRevenue]);
 
