@@ -20,6 +20,12 @@ export interface Client {
   group_id?: string;
 }
 
+export interface PaymentOptions {
+  registrar: boolean;
+  tipo: 'adesao' | 'renovacao';
+  valor: number;
+}
+
 export function useClients(groupId?: string | null) {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
@@ -109,7 +115,7 @@ export function useClients(groupId?: string | null) {
     fetchClients();
   }, [fetchClients]);
 
-  const addClient = async (clientData: Omit<Client, 'id'>) => {
+  const addClient = async (clientData: Omit<Client, 'id'>, paymentOptions?: PaymentOptions) => {
     if (!user) return null;
 
     try {
@@ -151,13 +157,16 @@ export function useClients(groupId?: string | null) {
         group_id: data.group_id || undefined,
       };
 
-      // Automatically create initial payment record
-      await createPaymentRecord(
-        data.id,
-        Number(data.preco),
-        data.data_entrada,
-        `Primeiro pagamento - ${data.plano}`
-      );
+      // Create payment record if requested
+      if (paymentOptions?.registrar) {
+        const paymentLabel = paymentOptions.tipo === 'adesao' ? 'Adesão' : 'Renovação';
+        await createPaymentRecord(
+          data.id,
+          paymentOptions.valor,
+          data.data_entrada,
+          `${paymentLabel} - ${data.plano}`
+        );
+      }
 
       setClients((prev) => [newClient, ...prev]);
       
@@ -178,15 +187,9 @@ export function useClients(groupId?: string | null) {
     }
   };
 
-  const updateClient = async (id: string, clientData: Partial<Omit<Client, 'id'>>) => {
+  const updateClient = async (id: string, clientData: Partial<Omit<Client, 'id'>>, paymentOptions?: PaymentOptions) => {
     try {
-      // Fetch current client to detect renewal
       const currentClient = clients.find((c) => c.id === id);
-      const isRenewal =
-        currentClient &&
-        clientData.data_vencimento &&
-        clientData.data_vencimento !== currentClient.data_vencimento &&
-        (currentClient.status === 'Vencido' || currentClient.status === 'Próximo');
 
       const { error } = await supabase
         .from('clients')
@@ -208,14 +211,15 @@ export function useClients(groupId?: string | null) {
 
       if (error) throw error;
 
-      // If this is a renewal, create a payment record
-      if (isRenewal && currentClient) {
+      // Create payment record if explicitly requested
+      if (paymentOptions?.registrar && currentClient) {
         const today = new Date().toISOString().split('T')[0];
+        const paymentLabel = paymentOptions.tipo === 'adesao' ? 'Adesão' : 'Renovação';
         await createPaymentRecord(
           id,
-          clientData.preco ?? currentClient.preco,
+          paymentOptions.valor,
           today,
-          `Renovação - ${clientData.plano ?? currentClient.plano}`
+          `${paymentLabel} - ${clientData.plano ?? currentClient.plano}`
         );
       }
 

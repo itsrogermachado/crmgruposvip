@@ -13,7 +13,7 @@ import { RevenueHistory } from '@/components/RevenueHistory';
 import { StatusFilter, PlanoFilter } from '@/types/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { useClients, Client } from '@/hooks/useClients';
+import { useClients, Client, PaymentOptions } from '@/hooks/useClients';
 import { useProfile } from '@/hooks/useProfile';
 import { useClientPayments } from '@/hooks/useClientPayments';
 import { Loader2, Sparkles, ChevronDown, ChevronUp, BarChart3 } from 'lucide-react';
@@ -114,7 +114,7 @@ const Index = () => {
     await deleteClient(clientId);
   };
 
-  const handleSaveClient = async (clientData: { id?: string; nome: string; telefone: string; discord?: string; telegram?: string; plano: string; preco: number; dataEntrada: string; dataVencimento: string; status: string; comprovanteUrl?: string; observacoes?: string }) => {
+  const handleSaveClient = async (clientData: { id?: string; nome: string; telefone: string; discord?: string; telegram?: string; plano: string; preco: number; dataEntrada: string; dataVencimento: string; status: string; comprovanteUrl?: string; observacoes?: string }, paymentOptions: PaymentOptions) => {
     if (clientData.id) {
       await updateClient(clientData.id, {
         nome: clientData.nome,
@@ -128,7 +128,7 @@ const Index = () => {
         status: clientData.status as Client['status'],
         comprovante_url: clientData.comprovanteUrl,
         observacoes: clientData.observacoes,
-      });
+      }, paymentOptions);
     } else {
       await addClient({
         nome: clientData.nome,
@@ -142,7 +142,7 @@ const Index = () => {
         status: clientData.status as Client['status'],
         comprovante_url: clientData.comprovanteUrl,
         observacoes: clientData.observacoes,
-      });
+      }, paymentOptions);
     }
   };
 

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, forwardRef } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CalendarIcon, Upload, X, Image as ImageIcon, Plus } from 'lucide-react';
+import { CalendarIcon, Upload, X, Image as ImageIcon, Plus, CreditCard } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -28,6 +28,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Client } from '@/types/client';
 import { cn } from '@/lib/utils';
 import { parseBRDate, formatToBRDate, calculateStatus } from '@/lib/dateUtils';
@@ -36,11 +38,17 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useClientPlans } from '@/hooks/useClientPlans';
 
+export interface PaymentOptions {
+  registrar: boolean;
+  tipo: 'adesao' | 'renovacao';
+  valor: number;
+}
+
 interface ClientDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   client: Client | null;
-  onSave: (client: Omit<Client, 'id'> & { id?: string }) => void;
+  onSave: (client: Omit<Client, 'id'> & { id?: string }, paymentOptions: PaymentOptions) => void;
 }
 
 export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
@@ -69,6 +77,11 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [newPlanDialogOpen, setNewPlanDialogOpen] = useState(false);
   const [newPlanName, setNewPlanName] = useState('');
+  
+  // Payment options state
+  const [registrarPagamento, setRegistrarPagamento] = useState(true);
+  const [tipoPagamento, setTipoPagamento] = useState<'adesao' | 'renovacao'>('adesao');
+  const [valorPagamento, setValorPagamento] = useState(150);
 
   const handleCreatePlan = () => {
     if (newPlanName.trim()) {
@@ -99,6 +112,11 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
       setDataEntradaDate(entradaParsed || undefined);
       setDataVencimentoDate(vencimentoParsed || undefined);
       setPreviewUrl(client.comprovanteUrl || null);
+      
+      // Edit mode: payment off by default, renewal pre-selected
+      setRegistrarPagamento(false);
+      setTipoPagamento('renovacao');
+      setValorPagamento(client.preco);
     } else {
       const today = new Date();
       const nextMonth = new Date(today);
@@ -119,8 +137,18 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
       setDataEntradaDate(today);
       setDataVencimentoDate(nextMonth);
       setPreviewUrl(null);
+      
+      // New client: payment on by default, adesao pre-selected
+      setRegistrarPagamento(true);
+      setTipoPagamento('adesao');
+      setValorPagamento(150);
     }
   }, [client, open]);
+  
+  // Sync payment value when price changes
+  useEffect(() => {
+    setValorPagamento(formData.preco);
+  }, [formData.preco]);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -209,6 +237,12 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
     // Auto-calculate status based on due date
     const status = calculateStatus(formData.dataVencimento);
     
+    const paymentOptions: PaymentOptions = {
+      registrar: registrarPagamento,
+      tipo: tipoPagamento,
+      valor: valorPagamento,
+    };
+    
     onSave({
       ...(client ? { id: client.id } : {}),
       ...formData,
@@ -217,7 +251,7 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
       telegram: formData.telegram || undefined,
       observacoes: formData.observacoes || undefined,
       comprovanteUrl: formData.comprovanteUrl || undefined,
-    });
+    }, paymentOptions);
     onOpenChange(false);
   };
 
@@ -387,6 +421,59 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
                 placeholder="Anotações sobre o cliente..."
                 rows={3}
               />
+            </div>
+
+            <Separator />
+
+            {/* Payment Registration Section */}
+            <div className="space-y-4 rounded-lg border p-4 bg-muted/30">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CreditCard className="h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="registrar-pagamento" className="font-medium">
+                    Registrar pagamento
+                  </Label>
+                </div>
+                <Switch
+                  id="registrar-pagamento"
+                  checked={registrarPagamento}
+                  onCheckedChange={setRegistrarPagamento}
+                />
+              </div>
+              
+              {registrarPagamento && (
+                <div className="space-y-4 pt-2">
+                  <RadioGroup
+                    value={tipoPagamento}
+                    onValueChange={(v) => setTipoPagamento(v as 'adesao' | 'renovacao')}
+                    className="flex gap-4"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="adesao" id="adesao" />
+                      <Label htmlFor="adesao" className="font-normal cursor-pointer">
+                        Adesão
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="renovacao" id="renovacao" />
+                      <Label htmlFor="renovacao" className="font-normal cursor-pointer">
+                        Renovação
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="valor-pagamento">Valor do Pagamento (R$)</Label>
+                    <Input
+                      id="valor-pagamento"
+                      type="number"
+                      step="0.01"
+                      value={valorPagamento}
+                      onChange={(e) => setValorPagamento(parseFloat(e.target.value) || 0)}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
