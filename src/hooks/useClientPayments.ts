@@ -213,14 +213,26 @@ export function useClientPayments() {
   }, [payments, clientsData]);
 
   const totals = useMemo(() => {
-    return monthlyRevenue.reduce(
-      (acc, m) => ({
-        faturamento: acc.faturamento + m.faturamento,
-        projecao: acc.projecao + m.projecao,
-      }),
-      { faturamento: 0, projecao: 0 }
-    );
-  }, [monthlyRevenue]);
+    // Faturamento real: sum of ALL payments ever registered
+    const totalFaturamento = payments.reduce((sum, p) => sum + p.amount, 0);
+    
+    // Projeção futura: sum of renewal values for clients with future due dates
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const totalProjecao = clientsData
+      .filter((c) => {
+        const dueDate = parseDate(c.data_vencimento);
+        // Include only due dates from today onwards (future)
+        return dueDate && dueDate >= today;
+      })
+      .reduce((sum, c) => sum + (c.preco_renovacao ?? c.preco), 0);
+    
+    return { 
+      faturamento: totalFaturamento, 
+      projecao: totalProjecao 
+    };
+  }, [payments, clientsData]);
 
   return {
     payments,
