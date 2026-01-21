@@ -6,6 +6,7 @@ export interface Client {
   telegram?: string;
   plano: string;
   preco: number;
+  precoRenovacao?: number;
   dataEntrada: string;
   dataVencimento: string;
   status: 'Ativo' | 'Vencido' | 'Próximo';

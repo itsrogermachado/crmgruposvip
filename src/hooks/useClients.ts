@@ -12,6 +12,7 @@ export interface Client {
   telegram?: string;
   plano: string;
   preco: number;
+  preco_renovacao?: number;
   data_entrada: string;
   data_vencimento: string;
   status: 'Ativo' | 'Vencido' | 'Próximo';
@@ -24,6 +25,7 @@ export interface PaymentOptions {
   registrar: boolean;
   tipo: 'adesao' | 'renovacao';
   valor: number;
+  valorRenovacao?: number;
 }
 
 export function useClients(groupId?: string | null) {
@@ -89,6 +91,7 @@ export function useClients(groupId?: string | null) {
           telegram: c.telegram || undefined,
           plano: c.plano as Client['plano'],
           preco: Number(c.preco),
+          preco_renovacao: c.preco_renovacao ? Number(c.preco_renovacao) : undefined,
           data_entrada: c.data_entrada,
           data_vencimento: c.data_vencimento,
           status: autoStatus,
@@ -129,6 +132,7 @@ export function useClients(groupId?: string | null) {
           telegram: clientData.telegram || null,
           plano: clientData.plano,
           preco: clientData.preco,
+          preco_renovacao: paymentOptions?.valorRenovacao || null,
           data_entrada: clientData.data_entrada,
           data_vencimento: clientData.data_vencimento,
           status: clientData.status,
@@ -149,6 +153,7 @@ export function useClients(groupId?: string | null) {
         telegram: data.telegram || undefined,
         plano: data.plano as Client['plano'],
         preco: Number(data.preco),
+        preco_renovacao: data.preco_renovacao ? Number(data.preco_renovacao) : undefined,
         data_entrada: data.data_entrada,
         data_vencimento: data.data_vencimento,
         status: calculateStatus(data.data_vencimento),
@@ -191,22 +196,29 @@ export function useClients(groupId?: string | null) {
     try {
       const currentClient = clients.find((c) => c.id === id);
 
+      // Only update preco_renovacao if provided
+      const updateData: Record<string, unknown> = {
+        nome: clientData.nome,
+        telefone: clientData.telefone,
+        discord: clientData.discord || null,
+        telegram: clientData.telegram || null,
+        plano: clientData.plano,
+        preco: clientData.preco,
+        data_entrada: clientData.data_entrada,
+        data_vencimento: clientData.data_vencimento,
+        status: clientData.status,
+        observacoes: clientData.observacoes || null,
+        comprovante_url: clientData.comprovante_url || null,
+        group_id: clientData.group_id || null,
+      };
+
+      if (paymentOptions?.valorRenovacao !== undefined) {
+        updateData.preco_renovacao = paymentOptions.valorRenovacao;
+      }
+
       const { error } = await supabase
         .from('clients')
-        .update({
-          nome: clientData.nome,
-          telefone: clientData.telefone,
-          discord: clientData.discord || null,
-          telegram: clientData.telegram || null,
-          plano: clientData.plano,
-          preco: clientData.preco,
-          data_entrada: clientData.data_entrada,
-          data_vencimento: clientData.data_vencimento,
-          status: clientData.status,
-          observacoes: clientData.observacoes || null,
-          comprovante_url: clientData.comprovante_url || null,
-          group_id: clientData.group_id || null,
-        })
+        .update(updateData)
         .eq('id', id);
 
       if (error) throw error;

@@ -71,6 +71,7 @@ export type Database = {
           observacoes: string | null
           plano: string
           preco: number
+          preco_renovacao: number | null
           status: string
           telefone: string
           telegram: string | null
@@ -89,6 +90,7 @@ export type Database = {
           observacoes?: string | null
           plano?: string
           preco?: number
+          preco_renovacao?: number | null
           status?: string
           telefone: string
           telegram?: string | null
@@ -107,6 +109,7 @@ export type Database = {
           observacoes?: string | null
           plano?: string
           preco?: number
+          preco_renovacao?: number | null
           status?: string
           telefone?: string
           telegram?: string | null

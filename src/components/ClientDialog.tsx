@@ -42,6 +42,7 @@ export interface PaymentOptions {
   registrar: boolean;
   tipo: 'adesao' | 'renovacao';
   valor: number;
+  valorRenovacao?: number;
 }
 
 interface ClientDialogProps {
@@ -81,7 +82,8 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
   // Payment options state
   const [registrarPagamento, setRegistrarPagamento] = useState(true);
   const [tipoPagamento, setTipoPagamento] = useState<'adesao' | 'renovacao'>('adesao');
-  const [valorPagamento, setValorPagamento] = useState(150);
+  const [valorAdesao, setValorAdesao] = useState(150);
+  const [valorRenovacao, setValorRenovacao] = useState(150);
 
   const handleCreatePlan = () => {
     if (newPlanName.trim()) {
@@ -116,7 +118,10 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
       // Edit mode: payment off by default, renewal pre-selected
       setRegistrarPagamento(false);
       setTipoPagamento('renovacao');
-      setValorPagamento(client.preco);
+      // Use saved renewal price if available, otherwise use plan price
+      const savedRenovacao = client.precoRenovacao ?? client.preco;
+      setValorAdesao(client.preco);
+      setValorRenovacao(savedRenovacao);
     } else {
       const today = new Date();
       const nextMonth = new Date(today);
@@ -141,14 +146,18 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
       // New client: payment on by default, adesao pre-selected
       setRegistrarPagamento(true);
       setTipoPagamento('adesao');
-      setValorPagamento(150);
+      setValorAdesao(150);
+      setValorRenovacao(150);
     }
   }, [client, open]);
   
-  // Sync payment value when price changes
+  // Sync payment values when price changes (only for new clients)
   useEffect(() => {
-    setValorPagamento(formData.preco);
-  }, [formData.preco]);
+    if (!client) {
+      setValorAdesao(formData.preco);
+      setValorRenovacao(formData.preco);
+    }
+  }, [formData.preco, client]);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -240,7 +249,8 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
     const paymentOptions: PaymentOptions = {
       registrar: registrarPagamento,
       tipo: tipoPagamento,
-      valor: valorPagamento,
+      valor: tipoPagamento === 'adesao' ? valorAdesao : valorRenovacao,
+      valorRenovacao: valorRenovacao,
     };
     
     onSave({
@@ -462,16 +472,34 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
                     </div>
                   </RadioGroup>
                   
-                  <div className="space-y-2">
-                    <Label htmlFor="valor-pagamento">Valor do Pagamento (R$)</Label>
-                    <Input
-                      id="valor-pagamento"
-                      type="number"
-                      step="0.01"
-                      value={valorPagamento}
-                      onChange={(e) => setValorPagamento(parseFloat(e.target.value) || 0)}
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="valor-adesao">Valor Adesão (R$)</Label>
+                      <Input
+                        id="valor-adesao"
+                        type="number"
+                        step="0.01"
+                        value={valorAdesao}
+                        onChange={(e) => setValorAdesao(parseFloat(e.target.value) || 0)}
+                        className={tipoPagamento === 'adesao' ? 'ring-2 ring-primary' : ''}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="valor-renovacao">Valor Renovação (R$)</Label>
+                      <Input
+                        id="valor-renovacao"
+                        type="number"
+                        step="0.01"
+                        value={valorRenovacao}
+                        onChange={(e) => setValorRenovacao(parseFloat(e.target.value) || 0)}
+                        className={tipoPagamento === 'renovacao' ? 'ring-2 ring-primary' : ''}
+                      />
+                    </div>
                   </div>
+                  
+                  <p className="text-xs text-muted-foreground">
+                    💡 O valor de renovação será salvo para uso em futuros pagamentos deste cliente.
+                  </p>
                 </div>
               )}
             </div>
