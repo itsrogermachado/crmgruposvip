@@ -141,8 +141,8 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
       setDataVencimentoDate(nextMonth);
       setPreviewUrl(null);
       
-      // New client: payment on by default
-      setRegistrarPagamento(true);
+      // New client: no payment registration (just set price)
+      setRegistrarPagamento(false);
       setValorAdesao(150);
       setValorRenovacao(150);
     }
@@ -253,11 +253,8 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
     onSave({
       ...(client ? { id: client.id } : {}),
       ...formData,
-      // Set preco automatically based on context:
-      // - If new client with payment: use valorAdesao
-      // - If editing without payment: keep existing value
-      // - If new without payment: use default (150)
-      preco: (!isRenovacao && registrarPagamento) ? valorAdesao : (client?.preco || 150),
+      // Set preco: for new clients use the price field value, for existing keep current
+      preco: isRenovacao ? (client?.preco || valorRenovacao) : valorRenovacao,
       status,
       discord: formData.discord || undefined,
       telegram: formData.telegram || undefined,
@@ -423,51 +420,49 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
 
             <Separator />
 
-            {/* Payment Registration Section */}
+            {/* Payment/Price Section */}
             <div className="space-y-4 rounded-lg border p-4 bg-muted/30">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <CreditCard className="h-4 w-4 text-muted-foreground" />
-                  <Label htmlFor="registrar-pagamento" className="font-medium">
-                    Registrar pagamento
-                  </Label>
+              {client === null ? (
+                // NEW CLIENT: Simple price field (no payment registration)
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="h-4 w-4 text-muted-foreground" />
+                    <Label htmlFor="preco" className="font-medium">Preço (R$)</Label>
+                  </div>
+                  <Input
+                    id="preco"
+                    type="number"
+                    step="0.01"
+                    value={valorRenovacao}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value) || 0;
+                      setValorRenovacao(value);
+                      setValorAdesao(value);
+                    }}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    💡 Este valor será usado como preço de renovação do cliente.
+                  </p>
                 </div>
-                <Switch
-                  id="registrar-pagamento"
-                  checked={registrarPagamento}
-                  onCheckedChange={setRegistrarPagamento}
-                />
-              </div>
-              
-              {registrarPagamento && (
-                <div className="space-y-4 pt-2">
-                  {client === null ? (
-                    // New client: show both fields
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="valor-adesao">Valor Adesão (R$)</Label>
-                        <Input
-                          id="valor-adesao"
-                          type="number"
-                          step="0.01"
-                          value={valorAdesao}
-                          onChange={(e) => setValorAdesao(parseFloat(e.target.value) || 0)}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="valor-renovacao">Valor Renovação (R$)</Label>
-                        <Input
-                          id="valor-renovacao"
-                          type="number"
-                          step="0.01"
-                          value={valorRenovacao}
-                          onChange={(e) => setValorRenovacao(parseFloat(e.target.value) || 0)}
-                        />
-                      </div>
+              ) : (
+                // EXISTING CLIENT: Payment registration switch for renewals
+                <>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="h-4 w-4 text-muted-foreground" />
+                      <Label htmlFor="registrar-pagamento" className="font-medium">
+                        Registrar pagamento
+                      </Label>
                     </div>
-                  ) : (
-                    // Existing client: show only renewal field
-                    <div className="space-y-2">
+                    <Switch
+                      id="registrar-pagamento"
+                      checked={registrarPagamento}
+                      onCheckedChange={setRegistrarPagamento}
+                    />
+                  </div>
+                  
+                  {registrarPagamento && (
+                    <div className="space-y-2 pt-2">
                       <Label htmlFor="valor-renovacao">Valor da Renovação (R$)</Label>
                       <Input
                         id="valor-renovacao"
@@ -476,16 +471,12 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
                         value={valorRenovacao}
                         onChange={(e) => setValorRenovacao(parseFloat(e.target.value) || 0)}
                       />
+                      <p className="text-xs text-muted-foreground">
+                        💡 Este valor será registrado como renovação no faturamento.
+                      </p>
                     </div>
                   )}
-                  
-                  <p className="text-xs text-muted-foreground">
-                    {client === null 
-                      ? '💡 O valor de adesão será registrado como pagamento. O valor de renovação será usado nas próximas cobranças.'
-                      : '💡 Este valor será registrado como renovação no faturamento deste mês.'
-                    }
-                  </p>
-                </div>
+                </>
               )}
             </div>
 
