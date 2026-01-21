@@ -26,6 +26,29 @@ export function useClients(groupId?: string | null) {
   const { user } = useAuth();
   const { toast } = useToast();
 
+  // Helper function to create payment records
+  const createPaymentRecord = async (
+    clientId: string,
+    amount: number,
+    paymentDate: string,
+    notes: string
+  ) => {
+    if (!user) return;
+
+    try {
+      await supabase.from('client_payments').insert({
+        client_id: clientId,
+        user_id: user.id,
+        amount: amount,
+        payment_date: paymentDate,
+        payment_method: 'pix',
+        notes: notes,
+      });
+    } catch (error) {
+      console.error('Erro ao registrar pagamento:', error);
+    }
+  };
+
   const fetchClients = useCallback(async () => {
     if (!user) {
       setClients([]);
@@ -128,6 +151,14 @@ export function useClients(groupId?: string | null) {
         group_id: data.group_id || undefined,
       };
 
+      // Automatically create initial payment record
+      await createPaymentRecord(
+        data.id,
+        Number(data.preco),
+        data.data_entrada,
+        `Primeiro pagamento - ${data.plano}`
+      );
+
       setClients((prev) => [newClient, ...prev]);
       
       toast({
@@ -149,6 +180,14 @@ export function useClients(groupId?: string | null) {
 
   const updateClient = async (id: string, clientData: Partial<Omit<Client, 'id'>>) => {
     try {
+      // Fetch current client to detect renewal
+      const currentClient = clients.find((c) => c.id === id);
+      const isRenewal =
+        currentClient &&
+        clientData.data_vencimento &&
+        clientData.data_vencimento !== currentClient.data_vencimento &&
+        (currentClient.status === 'Vencido' || currentClient.status === 'Próximo');
+
       const { error } = await supabase
         .from('clients')
         .update({
@@ -168,6 +207,17 @@ export function useClients(groupId?: string | null) {
         .eq('id', id);
 
       if (error) throw error;
+
+      // If this is a renewal, create a payment record
+      if (isRenewal && currentClient) {
+        const today = new Date().toISOString().split('T')[0];
+        await createPaymentRecord(
+          id,
+          clientData.preco ?? currentClient.preco,
+          today,
+          `Renovação - ${clientData.plano ?? currentClient.plano}`
+        );
+      }
 
       setClients((prev) =>
         prev.map((c) => {
