@@ -381,6 +381,13 @@ export function useDeleteSubscription() {
 
   return useMutation({
     mutationFn: async (id: string) => {
+      // First, unlink any payments associated with this subscription
+      await supabase
+        .from('payments')
+        .update({ subscription_id: null })
+        .eq('subscription_id', id);
+
+      // Now delete the subscription
       const { error } = await supabase
         .from('subscriptions')
         .delete()
