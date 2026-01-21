@@ -40,7 +40,7 @@ import { useClientPlans } from '@/hooks/useClientPlans';
 
 export interface PaymentOptions {
   registrar: boolean;
-  tipo: 'adesao';
+  tipo: 'adesao' | 'renovacao';
   valor: number;
   valorRenovacao?: number;
 }
@@ -237,10 +237,16 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
     // Auto-calculate status based on due date
     const status = calculateStatus(formData.dataVencimento);
     
+    // Determine payment type based on context:
+    // - New client (client === null) = 'adesao' (enrollment)
+    // - Existing client (editing) = 'renovacao' (renewal)
+    const isRenovacao = client !== null;
+    
     const paymentOptions: PaymentOptions = {
       registrar: registrarPagamento,
-      tipo: 'adesao',
-      valor: valorAdesao,
+      tipo: isRenovacao ? 'renovacao' : 'adesao',
+      // Use appropriate value based on type
+      valor: isRenovacao ? valorRenovacao : valorAdesao,
       valorRenovacao: valorRenovacao,
     };
     
@@ -248,10 +254,10 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
       ...(client ? { id: client.id } : {}),
       ...formData,
       // Set preco automatically based on context:
-      // - If registering payment: use valorAdesao
+      // - If new client with payment: use valorAdesao
       // - If editing without payment: keep existing value
       // - If new without payment: use default (150)
-      preco: registrarPagamento ? valorAdesao : (client?.preco || 150),
+      preco: (!isRenovacao && registrarPagamento) ? valorAdesao : (client?.preco || 150),
       status,
       discord: formData.discord || undefined,
       telegram: formData.telegram || undefined,
@@ -435,19 +441,34 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
               
               {registrarPagamento && (
                 <div className="space-y-4 pt-2">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="valor-adesao">Valor Adesão (R$)</Label>
-                      <Input
-                        id="valor-adesao"
-                        type="number"
-                        step="0.01"
-                        value={valorAdesao}
-                        onChange={(e) => setValorAdesao(parseFloat(e.target.value) || 0)}
-                      />
+                  {client === null ? (
+                    // New client: show both fields
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="valor-adesao">Valor Adesão (R$)</Label>
+                        <Input
+                          id="valor-adesao"
+                          type="number"
+                          step="0.01"
+                          value={valorAdesao}
+                          onChange={(e) => setValorAdesao(parseFloat(e.target.value) || 0)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="valor-renovacao">Valor Renovação (R$)</Label>
+                        <Input
+                          id="valor-renovacao"
+                          type="number"
+                          step="0.01"
+                          value={valorRenovacao}
+                          onChange={(e) => setValorRenovacao(parseFloat(e.target.value) || 0)}
+                        />
+                      </div>
                     </div>
+                  ) : (
+                    // Existing client: show only renewal field
                     <div className="space-y-2">
-                      <Label htmlFor="valor-renovacao">Valor Renovação (R$)</Label>
+                      <Label htmlFor="valor-renovacao">Valor da Renovação (R$)</Label>
                       <Input
                         id="valor-renovacao"
                         type="number"
@@ -456,10 +477,13 @@ export const ClientDialog = forwardRef<HTMLDivElement, ClientDialogProps>(
                         onChange={(e) => setValorRenovacao(parseFloat(e.target.value) || 0)}
                       />
                     </div>
-                  </div>
+                  )}
                   
                   <p className="text-xs text-muted-foreground">
-                    💡 O valor de adesão será registrado como pagamento. O valor de renovação será usado nas próximas cobranças.
+                    {client === null 
+                      ? '💡 O valor de adesão será registrado como pagamento. O valor de renovação será usado nas próximas cobranças.'
+                      : '💡 Este valor será registrado como renovação no faturamento deste mês.'
+                    }
                   </p>
                 </div>
               )}
