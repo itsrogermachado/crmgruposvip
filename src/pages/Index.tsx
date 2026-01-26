@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ExcelJS from 'exceljs';
 import { startOfMonth, endOfMonth, addMonths, isWithinInterval } from 'date-fns';
@@ -111,9 +111,24 @@ const Index = () => {
     }, 0);
   }, [clients]);
 
-  if (!authLoading && !user) {
-    navigate('/auth');
-    return null;
+  // Navegação segura dentro de useEffect (após renderização)
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/auth');
+    }
+  }, [authLoading, user, navigate]);
+
+  // Mostrar loading enquanto verifica autenticação
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4 animated-bg dark:animated-bg animated-bg-light">
+        <div className="relative">
+          <Loader2 className="w-12 h-12 animate-spin text-primary" />
+          <Sparkles className="w-5 h-5 text-primary absolute -top-1 -right-1 animate-pulse" />
+        </div>
+        <p className="text-muted-foreground animate-pulse">Carregando seu CRM...</p>
+      </div>
+    );
   }
 
   const handleNewClient = () => {
