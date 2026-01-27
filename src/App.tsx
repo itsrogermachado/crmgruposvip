@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import Landing from "./pages/Landing";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminUsers from "./pages/admin/Users";
 import AdminSubscriptions from "./pages/admin/Subscriptions";
@@ -27,6 +28,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/landing" element={<Landing />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/plans" element={<Plans />} />

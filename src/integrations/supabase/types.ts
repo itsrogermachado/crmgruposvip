@@ -159,6 +159,30 @@ export type Database = {
         }
         Relationships: []
       }
+      leads: {
+        Row: {
+          contact: string
+          contact_type: string
+          created_at: string | null
+          id: string
+          source: string | null
+        }
+        Insert: {
+          contact: string
+          contact_type: string
+          created_at?: string | null
+          id?: string
+          source?: string | null
+        }
+        Update: {
+          contact?: string
+          contact_type?: string
+          created_at?: string | null
+          id?: string
+          source?: string | null
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount_cents: number
