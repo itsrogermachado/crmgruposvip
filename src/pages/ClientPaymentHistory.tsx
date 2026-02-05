@@ -121,7 +121,7 @@ export default function ClientPaymentHistory() {
             <p className="text-center text-muted-foreground mb-4">
               Cliente não encontrado.
             </p>
-            <Button onClick={() => navigate('/')} className="w-full">
+            <Button onClick={() => navigate('/dashboard')} className="w-full">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar ao Dashboard
             </Button>
@@ -137,7 +137,7 @@ export default function ClientPaymentHistory() {
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+            <Button variant="ghost" size="icon" onClick={() => navigate('/dashboard')}>
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div>

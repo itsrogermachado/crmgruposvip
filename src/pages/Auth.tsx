@@ -102,7 +102,7 @@ const Auth = () => {
           title: 'Login realizado!',
           description: 'Bem-vindo de volta ao seu CRM.',
         });
-        navigate('/');
+        navigate('/dashboard');
       } else {
         if (!groupName.trim()) {
           toast({
@@ -148,7 +148,7 @@ const Auth = () => {
           title: 'Conta criada!',
           description: 'Você tem 1 semana de teste grátis para experimentar o CRM.',
         });
-        navigate('/');
+        navigate('/dashboard');
       }
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Ocorreu um erro';

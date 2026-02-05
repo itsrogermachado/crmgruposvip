@@ -28,7 +28,7 @@ export default function PaymentSuccess() {
           </p>
           
           <div className="flex flex-col gap-3">
-            <Button onClick={() => navigate('/')} className="w-full">
+            <Button onClick={() => navigate('/dashboard')} className="w-full">
               Ir para o Dashboard
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>

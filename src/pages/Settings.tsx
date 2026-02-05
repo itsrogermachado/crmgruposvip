@@ -180,7 +180,7 @@ export default function Settings() {
       <div className="min-h-screen bg-background">
         <header className="border-b bg-card">
           <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+            <Button variant="ghost" size="icon" onClick={() => navigate('/dashboard')}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <h1 className="text-xl font-bold">Configurações</h1>
