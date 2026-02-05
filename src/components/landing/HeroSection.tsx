@@ -1,12 +1,8 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, Play } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-interface HeroSectionProps {
-  onOpenLeadCapture: () => void;
-}
-
-export function HeroSection({ onOpenLeadCapture }: HeroSectionProps) {
+export function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-20 pb-16 overflow-hidden">
       {/* Background Effects */}
@@ -41,7 +37,7 @@ export function HeroSection({ onOpenLeadCapture }: HeroSectionProps) {
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12 animate-fade-in">
+          <div className="flex items-center justify-center mb-12 animate-fade-in">
             <Link to="/auth">
               <Button 
                 size="lg" 
@@ -51,15 +47,6 @@ export function HeroSection({ onOpenLeadCapture }: HeroSectionProps) {
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
-            <Button 
-              size="lg" 
-              variant="outline"
-              onClick={onOpenLeadCapture}
-              className="w-full sm:w-auto text-lg px-8 py-6 font-semibold hover:bg-primary/5 transition-all"
-            >
-              <Play className="w-5 h-5 mr-2" />
-              Receber Guia Grátis
-            </Button>
           </div>
 
           {/* Trust badges */}
