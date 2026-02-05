@@ -12,6 +12,7 @@ export function useLeadCapture() {
 
   return useMutation({
     mutationFn: async ({ contact, contactType }: LeadData) => {
+      // Save lead to database
       const { error } = await supabase
         .from('leads')
         .insert({ 
@@ -21,12 +22,33 @@ export function useLeadCapture() {
         });
       
       if (error) throw error;
+      
+      // If it's an email, send the ebook automatically
+      if (contactType === 'email') {
+        const { error: emailError } = await supabase.functions.invoke('send-lead-email', {
+          body: { email: contact }
+        });
+        
+        if (emailError) {
+          console.error('Error sending email:', emailError);
+          // Don't throw - lead was saved, email sending is secondary
+        }
+      }
+      
+      return { contactType };
     },
-    onSuccess: () => {
-      toast({
-        title: "🎉 Pronto!",
-        description: "Enviaremos o conteúdo para você em breve!",
-      });
+    onSuccess: (data) => {
+      if (data?.contactType === 'email') {
+        toast({
+          title: "🎉 E-book enviado!",
+          description: "Verifique sua caixa de entrada (e o spam também)!",
+        });
+      } else {
+        toast({
+          title: "🎉 Pronto!",
+          description: "Entraremos em contato pelo seu WhatsApp em breve!",
+        });
+      }
     },
     onError: () => {
       toast({
