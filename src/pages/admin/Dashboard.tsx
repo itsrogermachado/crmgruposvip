@@ -23,7 +23,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (!adminLoading && !isAdmin) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [isAdmin, adminLoading, navigate]);
 

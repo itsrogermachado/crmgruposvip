@@ -72,7 +72,7 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
           <Button
             variant="outline"
             className="w-full justify-start"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/dashboard')}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Voltar ao CRM

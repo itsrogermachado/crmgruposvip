@@ -13,7 +13,7 @@ const AdminPayments = () => {
 
   useEffect(() => {
     if (!adminLoading && !isAdmin) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [isAdmin, adminLoading, navigate]);
 
