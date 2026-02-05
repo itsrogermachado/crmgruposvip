@@ -14,7 +14,6 @@ const navLinks = [
   { label: 'Benefícios', href: '#beneficios' },
   { label: 'Planos', href: '#planos' },
   { label: 'FAQ', href: '#faq' },
-  { label: 'Contato', href: '#contato' },
 ];
 
 export function LandingHeader() {
