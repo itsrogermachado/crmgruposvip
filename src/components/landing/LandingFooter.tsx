@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Crown, MessageCircle } from 'lucide-react';
 
-const SUPPORT_NUMBER = '5511966572738';
+const SUPPORT_NUMBER = '5521964488285';
 
 export function LandingFooter() {
   const openWhatsApp = () => {
@@ -79,7 +79,7 @@ export function LandingFooter() {
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
             >
               <MessageCircle className="w-4 h-4" />
-              <span>(11) 96657-2738</span>
+              <span>(21) 96448-8285</span>
             </button>
           </div>
         </div>

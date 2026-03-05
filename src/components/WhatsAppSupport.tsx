@@ -6,7 +6,7 @@ interface WhatsAppSupportProps {
   className?: string;
 }
 
-const WHATSAPP_NUMBER = '5511966572738';
+const WHATSAPP_NUMBER = '5521964488285';
 const DEFAULT_MESSAGE = 'Olá! Preciso de ajuda com o CRM Grupos VIP.';
 
 export function WhatsAppSupport({ variant = 'fixed', className = '' }: WhatsAppSupportProps) {
