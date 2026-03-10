@@ -160,6 +160,16 @@ const Index = () => {
     setDialogOpen(true);
   };
 
+  const handleEditClientFromSearch = (client: Client) => {
+    setEditingClient(client);
+    setDialogOpen(true);
+  };
+
+  const handleWhatsAppFromSearch = (client: Client) => {
+    setWhatsappSearchClient(client);
+    setWhatsappSearchOpen(true);
+  };
+
   const handleDeleteClient = async (clientId: string) => {
     await deleteClient(clientId);
   };
