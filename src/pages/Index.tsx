@@ -5,7 +5,8 @@ import { startOfMonth, endOfMonth, addMonths, isWithinInterval } from 'date-fns'
 import { parseBRDate } from '@/lib/dateUtils';
 import { Header } from '@/components/Header';
 import { StatsGrid } from '@/components/StatsGrid';
-
+import { DashboardCharts } from '@/components/DashboardCharts';
+import { ExpiringClientsAlert } from '@/components/ExpiringClientsAlert';
 import { FilterSection } from '@/components/FilterSection';
 import { ClientTable } from '@/components/ClientTable';
 import { ClientDialog } from '@/components/ClientDialog';
