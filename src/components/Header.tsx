@@ -7,6 +7,8 @@ import { useTheme } from '@/hooks/useTheme';
 import { SubscriptionCountdown } from './SubscriptionCountdown';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { WhatsAppSupport } from './WhatsAppSupport';
+import { GlobalSearch } from './GlobalSearch';
+import { Client } from '@/hooks/useClients';
 
 interface HeaderProps {
   onImport: () => void;
@@ -17,6 +19,8 @@ interface HeaderProps {
   userEmail?: string;
   groupName?: string | null;
   avatarUrl?: string | null;
+  onEditClient?: (client: Client) => void;
+  onWhatsAppClient?: (client: Client) => void;
 }
 
 export function Header({ 
@@ -27,7 +31,9 @@ export function Header({
   onLogout, 
   userEmail,
   groupName,
-  avatarUrl
+  avatarUrl,
+  onEditClient,
+  onWhatsAppClient,
 }: HeaderProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const navigate = useNavigate();
@@ -87,6 +93,7 @@ export function Header({
         
         {/* Right: Actions - Hidden on mobile (handled by BottomNav) */}
         <div className="hidden md:flex items-center gap-2">
+          <GlobalSearch onEdit={onEditClient} onWhatsApp={onWhatsAppClient} />
           <WhatsAppSupport variant="inline" />
           
           <Button 

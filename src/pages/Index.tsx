@@ -5,7 +5,8 @@ import { startOfMonth, endOfMonth, addMonths, isWithinInterval } from 'date-fns'
 import { parseBRDate } from '@/lib/dateUtils';
 import { Header } from '@/components/Header';
 import { StatsGrid } from '@/components/StatsGrid';
-
+import { DashboardCharts } from '@/components/DashboardCharts';
+import { ExpiringClientsAlert } from '@/components/ExpiringClientsAlert';
 import { FilterSection } from '@/components/FilterSection';
 import { ClientTable } from '@/components/ClientTable';
 import { ClientDialog } from '@/components/ClientDialog';
@@ -18,8 +19,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { useClients, Client, PaymentOptions } from '@/hooks/useClients';
 import { useProfile } from '@/hooks/useProfile';
 import { useClientPayments } from '@/hooks/useClientPayments';
-import { Loader2, Sparkles, ChevronDown, ChevronUp, BarChart3 } from 'lucide-react';
+import { Loader2, Sparkles, ChevronDown, ChevronUp, BarChart3, PieChart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { WhatsAppMessageDialog } from '@/components/WhatsAppMessageDialog';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -34,6 +36,9 @@ const Index = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [revenueExpanded, setRevenueExpanded] = useState(false);
+  const [chartsExpanded, setChartsExpanded] = useState(true);
+  const [whatsappSearchClient, setWhatsappSearchClient] = useState<Client | null>(null);
+  const [whatsappSearchOpen, setWhatsappSearchOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -153,6 +158,16 @@ const Index = () => {
     };
     setEditingClient(clientToEdit);
     setDialogOpen(true);
+  };
+
+  const handleEditClientFromSearch = (client: Client) => {
+    setEditingClient(client);
+    setDialogOpen(true);
+  };
+
+  const handleWhatsAppFromSearch = (client: Client) => {
+    setWhatsappSearchClient(client);
+    setWhatsappSearchOpen(true);
   };
 
   const handleDeleteClient = async (clientId: string) => {
@@ -338,12 +353,45 @@ const Index = () => {
           userEmail={user?.email}
           groupName={profile?.group_name}
           avatarUrl={profile?.avatar_url}
+          onEditClient={handleEditClientFromSearch}
+          onWhatsAppClient={handleWhatsAppFromSearch}
         />
 
         <main className="pb-4 md:pb-8">
           <StatsGrid clients={statsClients} faturamentoTotal={faturamentoTotal} faturamentoMensal={faturamentoMensal} />
 
-          
+          {/* Expiring Clients Alert */}
+          <ExpiringClientsAlert clients={clients} onWhatsApp={handleWhatsAppFromSearch} />
+
+          {/* Charts Section */}
+          <div className="px-4 md:px-6 mt-4">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+                <PieChart className="w-4 h-4 text-primary" />
+                Visão Geral
+              </h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setChartsExpanded(!chartsExpanded)}
+                className="gap-1 h-8 text-xs"
+              >
+                {chartsExpanded ? (
+                  <>
+                    <ChevronUp className="w-3.5 h-3.5" />
+                    <span>Recolher</span>
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="w-3.5 h-3.5" />
+                    <span>Expandir</span>
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+          {chartsExpanded && <DashboardCharts clients={clients} />}
+
 
           {/* Revenue History Section */}
           <div className="px-4 md:px-6 mt-6">
@@ -424,6 +472,18 @@ const Index = () => {
           } : null}
           onSave={handleSaveClient}
         />
+
+        {/* WhatsApp dialog from global search */}
+        {whatsappSearchClient && (
+          <WhatsAppMessageDialog
+            open={whatsappSearchOpen}
+            onOpenChange={setWhatsappSearchOpen}
+            clientName={whatsappSearchClient.nome}
+            phone={whatsappSearchClient.telefone}
+            status={whatsappSearchClient.status}
+            dataVencimento={whatsappSearchClient.data_vencimento}
+          />
+        )}
 
         <input
           ref={fileInputRef}
