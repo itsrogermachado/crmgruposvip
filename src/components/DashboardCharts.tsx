@@ -87,6 +87,8 @@ export function DashboardCharts({ clients }: DashboardChartsProps) {
                   fontSize: '12px',
                   color: 'hsl(var(--foreground))',
                 }}
+                itemStyle={{ color: 'hsl(var(--foreground))' }}
+                labelStyle={{ color: 'hsl(var(--foreground))' }}
               />
               <Legend
                 iconType="circle"
