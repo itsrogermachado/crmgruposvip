@@ -19,6 +19,8 @@ interface HeaderProps {
   userEmail?: string;
   groupName?: string | null;
   avatarUrl?: string | null;
+  onEditClient?: (client: Client) => void;
+  onWhatsAppClient?: (client: Client) => void;
 }
 
 export function Header({ 
