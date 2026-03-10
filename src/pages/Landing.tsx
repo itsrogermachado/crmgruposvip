@@ -7,10 +7,13 @@ import { PricingSection } from '@/components/landing/PricingSection';
 import { FAQSection } from '@/components/landing/FAQSection';
 import { FinalCTASection } from '@/components/landing/FinalCTASection';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function Landing() {
+  useTheme();
+
   return (
-    <div className="min-h-screen bg-[#04030C] text-white scroll-smooth overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground scroll-smooth overflow-x-hidden">
       <LandingHeader />
       <main>
         <HeroSection />
