@@ -7,6 +7,8 @@ import { useTheme } from '@/hooks/useTheme';
 import { SubscriptionCountdown } from './SubscriptionCountdown';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { WhatsAppSupport } from './WhatsAppSupport';
+import { GlobalSearch } from './GlobalSearch';
+import { Client } from '@/hooks/useClients';
 
 interface HeaderProps {
   onImport: () => void;
