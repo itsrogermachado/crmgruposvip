@@ -360,8 +360,6 @@ const Index = () => {
         <main className="pb-4 md:pb-8">
           <StatsGrid clients={statsClients} faturamentoTotal={faturamentoTotal} faturamentoMensal={faturamentoMensal} />
 
-          {/* Expiring Clients Alert */}
-          <ExpiringClientsAlert clients={clients} onWhatsApp={handleWhatsAppFromSearch} />
 
           {/* Charts Section */}
           <div className="px-4 md:px-6 mt-4">
