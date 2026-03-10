@@ -19,8 +19,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { useClients, Client, PaymentOptions } from '@/hooks/useClients';
 import { useProfile } from '@/hooks/useProfile';
 import { useClientPayments } from '@/hooks/useClientPayments';
-import { Loader2, Sparkles, ChevronDown, ChevronUp, BarChart3 } from 'lucide-react';
+import { Loader2, Sparkles, ChevronDown, ChevronUp, BarChart3, PieChart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { WhatsAppMessageDialog } from '@/components/WhatsAppMessageDialog';
 
 const Index = () => {
   const navigate = useNavigate();
