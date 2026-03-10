@@ -31,7 +31,9 @@ export function Header({
   onLogout, 
   userEmail,
   groupName,
-  avatarUrl
+  avatarUrl,
+  onEditClient,
+  onWhatsAppClient,
 }: HeaderProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const navigate = useNavigate();
