@@ -36,6 +36,9 @@ const Index = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [revenueExpanded, setRevenueExpanded] = useState(false);
+  const [chartsExpanded, setChartsExpanded] = useState(true);
+  const [whatsappSearchClient, setWhatsappSearchClient] = useState<Client | null>(null);
+  const [whatsappSearchOpen, setWhatsappSearchOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
