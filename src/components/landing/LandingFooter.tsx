@@ -15,18 +15,18 @@ export function LandingFooter() {
   };
 
   return (
-    <footer className="py-12 border-t border-border/50 bg-muted/30">
+    <footer className="py-12 border-t border-white/5 bg-[#04030C]">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
-                <Crown className="w-5 h-5 text-primary-foreground" />
+              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#7C3AED] to-[#4630B1] flex items-center justify-center">
+                <Crown className="w-4.5 h-4.5 text-white" />
               </div>
-              <span className="font-bold text-lg">CRM Grupos VIP</span>
+              <span className="font-bold text-lg text-white">CRM Grupos VIP</span>
             </div>
-            <p className="text-muted-foreground max-w-sm">
+            <p className="text-white/40 max-w-sm text-sm leading-relaxed">
               A ferramenta completa para gestores de grupos VIP gerenciarem 
               membros, pagamentos e crescerem seu negócio.
             </p>
@@ -34,12 +34,12 @@ export function LandingFooter() {
 
           {/* Links */}
           <div>
-            <h4 className="font-semibold mb-4">Links</h4>
-            <ul className="space-y-2">
+            <h4 className="font-semibold mb-4 text-white">Links</h4>
+            <ul className="space-y-2.5">
               <li>
                 <button 
                   onClick={() => scrollToSection('beneficios')}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-white/40 hover:text-white/70 transition-colors text-sm"
                 >
                   Benefícios
                 </button>
@@ -47,7 +47,7 @@ export function LandingFooter() {
               <li>
                 <button 
                   onClick={() => scrollToSection('planos')}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-white/40 hover:text-white/70 transition-colors text-sm"
                 >
                   Planos
                 </button>
@@ -55,7 +55,7 @@ export function LandingFooter() {
               <li>
                 <button 
                   onClick={() => scrollToSection('faq')}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-white/40 hover:text-white/70 transition-colors text-sm"
                 >
                   FAQ
                 </button>
@@ -63,7 +63,7 @@ export function LandingFooter() {
               <li>
                 <Link 
                   to="/auth"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-white/40 hover:text-white/70 transition-colors text-sm"
                 >
                   Entrar
                 </Link>
@@ -73,10 +73,10 @@ export function LandingFooter() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-semibold mb-4">Contato</h4>
+            <h4 className="font-semibold mb-4 text-white">Contato</h4>
             <button
               onClick={openWhatsApp}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-2 text-white/40 hover:text-white/70 transition-colors text-sm"
             >
               <MessageCircle className="w-4 h-4" />
               <span>(21) 96448-8285</span>
@@ -85,7 +85,7 @@ export function LandingFooter() {
         </div>
 
         {/* Copyright */}
-        <div className="mt-12 pt-6 border-t border-border/50 text-center text-sm text-muted-foreground">
+        <div className="mt-12 pt-6 border-t border-white/5 text-center text-sm text-white/30">
           © {new Date().getFullYear()} CRM Grupos VIP. Todos os direitos reservados.
         </div>
       </div>

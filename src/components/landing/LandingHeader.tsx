@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, Crown, X } from 'lucide-react';
+import { Menu, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -26,15 +26,15 @@ export function LandingHeader() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#04030C]/80 backdrop-blur-xl border-b border-white/5">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-              <Crown className="w-5 h-5 text-primary-foreground" />
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#7C3AED] to-[#4630B1] flex items-center justify-center shadow-lg shadow-[#7C3AED]/20 group-hover:shadow-[#7C3AED]/40 transition-shadow">
+              <Crown className="w-4.5 h-4.5 text-white" />
             </div>
-            <span className="font-bold text-lg md:text-xl bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            <span className="font-bold text-lg text-white">
               CRM Grupos VIP
             </span>
           </Link>
@@ -45,7 +45,7 @@ export function LandingHeader() {
               <button
                 key={link.href}
                 onClick={() => scrollToSection(link.href)}
-                className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+                className="text-white/60 hover:text-white transition-colors text-sm font-medium"
               >
                 {link.label}
               </button>
@@ -53,14 +53,14 @@ export function LandingHeader() {
           </nav>
 
           {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3">
             <Link to="/auth">
-              <Button variant="outline" className="font-semibold">
+              <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-white/5 font-medium">
                 Entrar
               </Button>
             </Link>
             <Link to="/auth">
-              <Button className="font-semibold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
+              <Button className="font-semibold bg-gradient-to-r from-[#7C3AED] to-[#4630B1] hover:from-[#6D28D9] hover:to-[#3B27A0] border-0 shadow-lg shadow-[#7C3AED]/25 hover:shadow-[#7C3AED]/40 transition-all">
                 Começar Grátis
               </Button>
             </Link>
@@ -69,14 +69,14 @@ export function LandingHeader() {
           {/* Mobile Menu */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="text-white hover:bg-white/5">
                 <Menu className="w-6 h-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px]">
+            <SheetContent side="right" className="w-[300px] bg-[#0A0818] border-white/10">
               <SheetHeader>
-                <SheetTitle className="flex items-center gap-2">
-                  <Crown className="w-5 h-5 text-primary" />
+                <SheetTitle className="flex items-center gap-2 text-white">
+                  <Crown className="w-5 h-5 text-[#7C3AED]" />
                   CRM Grupos VIP
                 </SheetTitle>
               </SheetHeader>
@@ -85,19 +85,19 @@ export function LandingHeader() {
                   <button
                     key={link.href}
                     onClick={() => scrollToSection(link.href)}
-                    className="text-left text-lg font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
+                    className="text-left text-lg font-medium text-white/60 hover:text-white transition-colors py-2"
                   >
                     {link.label}
                   </button>
                 ))}
-                <hr className="my-4" />
+                <hr className="my-4 border-white/10" />
                 <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="outline" className="w-full font-semibold">
+                  <Button variant="outline" className="w-full font-semibold border-white/20 text-white hover:bg-white/5">
                     Entrar
                   </Button>
                 </Link>
                 <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full font-semibold bg-gradient-to-r from-primary to-primary/80">
+                  <Button className="w-full font-semibold bg-gradient-to-r from-[#7C3AED] to-[#4630B1]">
                     Começar Grátis
                   </Button>
                 </Link>
