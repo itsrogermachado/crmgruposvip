@@ -7,8 +7,12 @@ import { PricingSection } from '@/components/landing/PricingSection';
 import { FAQSection } from '@/components/landing/FAQSection';
 import { FinalCTASection } from '@/components/landing/FinalCTASection';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function Landing() {
+  // Initialize theme based on system preference
+  useTheme();
+
   return (
     <div className="min-h-screen bg-background scroll-smooth">
       <LandingHeader />
