@@ -93,6 +93,7 @@ export function Header({
         
         {/* Right: Actions - Hidden on mobile (handled by BottomNav) */}
         <div className="hidden md:flex items-center gap-2">
+          <GlobalSearch onEdit={onEditClient} onWhatsApp={onWhatsAppClient} />
           <WhatsAppSupport variant="inline" />
           
           <Button 
