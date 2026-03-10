@@ -473,6 +473,18 @@ const Index = () => {
           onSave={handleSaveClient}
         />
 
+        {/* WhatsApp dialog from global search */}
+        {whatsappSearchClient && (
+          <WhatsAppMessageDialog
+            open={whatsappSearchOpen}
+            onOpenChange={setWhatsappSearchOpen}
+            clientName={whatsappSearchClient.nome}
+            phone={whatsappSearchClient.telefone}
+            status={whatsappSearchClient.status}
+            dataVencimento={whatsappSearchClient.data_vencimento}
+          />
+        )}
+
         <input
           ref={fileInputRef}
           type="file"
