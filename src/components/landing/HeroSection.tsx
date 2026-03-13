@@ -39,18 +39,18 @@ export function HeroSection() {
 
           {/* Headline */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-6 animate-fade-in tracking-tight">
-            <span className="text-foreground">Gerencie Seu Grupo VIP</span>
+            <span className="text-foreground">Chega de Perder Dinheiro</span>
             <br />
-            <span className="text-foreground">com </span>
+            <span className="text-foreground">no Seu </span>
             <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
-              Simplicidade
+              Grupo VIP
             </span>
           </h1>
 
           {/* Subtitle */}
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-10 animate-fade-in leading-relaxed">
-            Controle financeiro, lembretes automáticos e gestão completa de membros 
-            em um único lugar. A ferramenta que você precisa para escalar seu negócio.
+            Membros esquecendo de pagar? Perdendo o controle de quem está ativo? 
+            O CRM Grupos VIP automatiza cobranças e aumenta sua taxa de renovação em até 40%.
           </p>
 
           {/* CTAs */}
