@@ -58,10 +58,9 @@ export function HeroSection() {
             <Link to="/auth">
               <Button 
                 size="lg" 
-                className="text-base px-8 py-6 font-bold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/40 transition-all hover:scale-105 border-0"
+                className="text-base px-8 py-7 font-bold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/40 transition-all hover:scale-105 border-0"
               >
-                Começar Grátis - 7 Dias
-                <ArrowRight className="w-5 h-5 ml-2" />
+                Testar Grátis por 7 Dias →
               </Button>
             </Link>
             <Button 
