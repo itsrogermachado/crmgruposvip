@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function HeroSection() {
@@ -33,24 +33,24 @@ export function HeroSection() {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8 animate-fade-in">
             <Sparkles className="w-4 h-4 text-primary" />
             <span className="text-sm font-medium text-primary">
-              ✨ 7 dias grátis • Sem cartão de crédito
+              🔥 Oferta de Lançamento • 7 dias grátis
             </span>
           </div>
 
           {/* Headline */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-6 animate-fade-in tracking-tight">
-            <span className="text-foreground">Gerencie Seu Grupo VIP</span>
+            <span className="text-foreground">Chega de Perder Dinheiro</span>
             <br />
-            <span className="text-foreground">com </span>
+            <span className="text-foreground">no Seu </span>
             <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
-              Simplicidade
+              Grupo VIP
             </span>
           </h1>
 
           {/* Subtitle */}
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-10 animate-fade-in leading-relaxed">
-            Controle financeiro, lembretes automáticos e gestão completa de membros 
-            em um único lugar. A ferramenta que você precisa para escalar seu negócio.
+            Membros esquecendo de pagar? Perdendo o controle de quem está ativo? 
+            O CRM Grupos VIP automatiza cobranças e aumenta sua taxa de renovação em até 40%.
           </p>
 
           {/* CTAs */}
@@ -58,10 +58,9 @@ export function HeroSection() {
             <Link to="/auth">
               <Button 
                 size="lg" 
-                className="text-base px-8 py-6 font-bold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/40 transition-all hover:scale-105 border-0"
+                className="text-base px-8 py-7 font-bold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/40 transition-all hover:scale-105 border-0"
               >
-                Começar Grátis - 7 Dias
-                <ArrowRight className="w-5 h-5 ml-2" />
+                Testar Grátis por 7 Dias →
               </Button>
             </Link>
             <Button 
