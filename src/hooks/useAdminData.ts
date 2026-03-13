@@ -299,6 +299,20 @@ export function useDeletePlan() {
 
   return useMutation({
     mutationFn: async (id: string) => {
+      // Check if there are subscriptions using this plan
+      const { data: subs, error: checkError } = await supabase
+        .from('subscriptions')
+        .select('id')
+        .eq('plan_id', id);
+
+      if (checkError) throw checkError;
+
+      if (subs && subs.length > 0) {
+        throw new Error(
+          `Não é possível excluir este plano porque existem ${subs.length} assinatura(s) vinculada(s). Desative o plano em vez de excluí-lo.`
+        );
+      }
+
       const { error } = await supabase
         .from('subscription_plans')
         .delete()
