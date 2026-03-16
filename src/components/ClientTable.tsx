@@ -249,7 +249,7 @@ export function ClientTable({ clients, onEdit, onDelete, onClientUpdate }: Clien
   return (
     <>
       {/* Mobile: Card List */}
-      <div className="lg:hidden mx-4 pb-24 space-y-2.5 sm:space-y-3">
+      <div id="clients-section" className="lg:hidden mx-4 pb-24 space-y-2.5 sm:space-y-3 scroll-mt-20">
         {paginatedClients.map((client, index) => (
           <div
             key={client.id}

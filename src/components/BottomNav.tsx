@@ -47,8 +47,11 @@ export function BottomNav({ onNewClient, onImport, onExport, onRefresh, onLogout
   };
 
   const scrollToClients = () => {
-    const table = document.querySelector('.data-table');
-    table?.scrollIntoView({ behavior: 'smooth' });
+    const clientsSection = document.getElementById('clients-section');
+    const fallbackTable = document.querySelector('.data-table');
+    const target = clientsSection ?? fallbackTable;
+
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const navItems = [
