@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ExcelJS from 'exceljs';
 import { startOfMonth, endOfMonth, addMonths, isWithinInterval } from 'date-fns';
@@ -22,6 +22,7 @@ import { useClientPayments } from '@/hooks/useClientPayments';
 import { Loader2, Sparkles, ChevronDown, ChevronUp, BarChart3, PieChart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { WhatsAppMessageDialog } from '@/components/WhatsAppMessageDialog';
+import { OnboardingTutorial } from '@/components/OnboardingTutorial';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -41,6 +42,16 @@ const Index = () => {
   const [whatsappSearchOpen, setWhatsappSearchOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // Onboarding tutorial
+  const [showTutorial, setShowTutorial] = useState(() => {
+    return !localStorage.getItem('crm_onboarding_done');
+  });
+
+  const handleTutorialComplete = useCallback(() => {
+    localStorage.setItem('crm_onboarding_done', 'true');
+    setShowTutorial(false);
+  }, []);
 
   const filteredClients = useMemo(() => {
     return clients.filter((client) => {
@@ -343,6 +354,7 @@ const Index = () => {
 
   return (
     <SubscriptionRequired>
+      {showTutorial && <OnboardingTutorial onComplete={handleTutorialComplete} />}
       <div className="min-h-screen animated-bg dark:animated-bg animated-bg-light safe-area-pb">
         <Header
           onImport={handleImport}
