@@ -15,32 +15,35 @@ export function LandingFooter() {
   };
 
   return (
-    <footer className="py-12 border-t border-border/50 bg-muted/30">
+    <footer className="py-12 border-t border-border/40 bg-muted/10">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+          {/* Brand */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
                 <Crown className="w-4 h-4 text-primary-foreground" />
               </div>
               <span className="font-bold text-lg text-foreground">CRM Grupos VIP</span>
             </div>
             <p className="text-muted-foreground max-w-sm text-sm leading-relaxed">
-              A ferramenta completa para gestores de grupos VIP gerenciarem 
-              membros, pagamentos e crescerem seu negócio.
+              A plataforma completa para gestores de grupos VIP gerenciarem membros, pagamentos e escalarem seu negócio.
             </p>
           </div>
 
+          {/* Links */}
           <div>
-            <h4 className="font-semibold mb-4 text-foreground">Links</h4>
+            <h4 className="font-semibold mb-4 text-sm text-foreground">Navegação</h4>
             <ul className="space-y-2.5">
               {[
-                { label: 'Benefícios', id: 'beneficios' },
+                { label: 'Recursos', id: 'beneficios' },
+                { label: 'Como Funciona', id: 'como-funciona' },
+                { label: 'Depoimentos', id: 'depoimentos' },
                 { label: 'Planos', id: 'planos' },
                 { label: 'FAQ', id: 'faq' },
-              ].map(item => (
+              ].map((item) => (
                 <li key={item.id}>
-                  <button 
+                  <button
                     onClick={() => scrollToSection(item.id)}
                     className="text-muted-foreground hover:text-foreground transition-colors text-sm"
                   >
@@ -49,15 +52,19 @@ export function LandingFooter() {
                 </li>
               ))}
               <li>
-                <Link to="/auth" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                <Link
+                  to="/auth"
+                  className="text-muted-foreground hover:text-foreground transition-colors text-sm"
+                >
                   Entrar
                 </Link>
               </li>
             </ul>
           </div>
 
+          {/* Contact */}
           <div>
-            <h4 className="font-semibold mb-4 text-foreground">Contato</h4>
+            <h4 className="font-semibold mb-4 text-sm text-foreground">Contato</h4>
             <button
               onClick={openWhatsApp}
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm"
@@ -68,7 +75,7 @@ export function LandingFooter() {
           </div>
         </div>
 
-        <div className="mt-12 pt-6 border-t border-border/50 text-center text-sm text-muted-foreground">
+        <div className="pt-6 border-t border-border/40 text-center text-xs text-muted-foreground">
           © {new Date().getFullYear()} CRM Grupos VIP. Todos os direitos reservados.
         </div>
       </div>
