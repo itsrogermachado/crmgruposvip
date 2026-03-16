@@ -30,7 +30,7 @@ export default function Landing() {
         <TestimonialsSection />
         <PricingSection />
         <FAQSection />
-        <LeadCaptureSection />
+        
         <FinalCTASection />
       </main>
       <LandingFooter />
