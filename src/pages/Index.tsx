@@ -22,6 +22,7 @@ import { useClientPayments } from '@/hooks/useClientPayments';
 import { Loader2, Sparkles, ChevronDown, ChevronUp, BarChart3, PieChart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { WhatsAppMessageDialog } from '@/components/WhatsAppMessageDialog';
+import { OnboardingTutorial } from '@/components/OnboardingTutorial';
 
 const Index = () => {
   const navigate = useNavigate();
