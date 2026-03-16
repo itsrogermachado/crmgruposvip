@@ -8,7 +8,7 @@ import { IntegrationsSection } from '@/components/landing/IntegrationsSection';
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
 import { PricingSection } from '@/components/landing/PricingSection';
 import { FAQSection } from '@/components/landing/FAQSection';
-import { LeadCaptureSection } from '@/components/landing/LeadCaptureSection';
+
 import { FinalCTASection } from '@/components/landing/FinalCTASection';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { FloatingWhatsApp } from '@/components/landing/FloatingWhatsApp';
@@ -30,7 +30,7 @@ export default function Landing() {
         <TestimonialsSection />
         <PricingSection />
         <FAQSection />
-        <LeadCaptureSection />
+        
         <FinalCTASection />
       </main>
       <LandingFooter />
