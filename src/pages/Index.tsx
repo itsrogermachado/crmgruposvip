@@ -43,6 +43,16 @@ const Index = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
+  // Onboarding tutorial
+  const [showTutorial, setShowTutorial] = useState(() => {
+    return !localStorage.getItem('crm_onboarding_done');
+  });
+
+  const handleTutorialComplete = useCallback(() => {
+    localStorage.setItem('crm_onboarding_done', 'true');
+    setShowTutorial(false);
+  }, []);
+
   const filteredClients = useMemo(() => {
     return clients.filter((client) => {
       const matchesSearch =
