@@ -119,16 +119,18 @@ const Index = () => {
     const inicioProximoMes = startOfMonth(proximoMes);
     const fimProximoMes = endOfMonth(proximoMes);
     
-    return clients.reduce((total, c) => {
-      const dataVencimento = parseBRDate(c.data_vencimento);
-      if (!dataVencimento) return total;
-      
-      if (isWithinInterval(dataVencimento, { start: inicioProximoMes, end: fimProximoMes })) {
-        const preco = c.preco_renovacao ?? c.preco;
-        return total + (preco || 0);
-      }
-      return total;
-    }, 0);
+    return clients
+      .filter((c) => c.status !== 'Não renovou')
+      .reduce((total, c) => {
+        const dataVencimento = parseBRDate(c.data_vencimento);
+        if (!dataVencimento) return total;
+        
+        if (isWithinInterval(dataVencimento, { start: inicioProximoMes, end: fimProximoMes })) {
+          const preco = c.preco_renovacao ?? c.preco;
+          return total + (preco || 0);
+        }
+        return total;
+      }, 0);
   }, [clients]);
 
   // Navegação segura dentro de useEffect (após renderização)

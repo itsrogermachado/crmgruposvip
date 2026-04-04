@@ -1,4 +1,4 @@
-import { Users, TrendingUp, Clock, AlertCircle, DollarSign, Calendar } from 'lucide-react';
+import { Users, TrendingUp, Clock, AlertCircle, DollarSign, Calendar, UserX } from 'lucide-react';
 import { StatCard } from './StatCard';
 import { Client } from '@/types/client';
 import { useIsMobile } from '@/hooks/use-mobile';

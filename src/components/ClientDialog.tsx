@@ -233,21 +233,30 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
     }
   };
 
+  // Manual status override state
+  const [manualStatus, setManualStatus] = useState<string>('auto');
+
+  useEffect(() => {
+    if (client && client.status === 'Não renovou') {
+      setManualStatus('Não renovou');
+    } else {
+      setManualStatus('auto');
+    }
+  }, [client, open]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Auto-calculate status based on due date
-    const status = calculateStatus(formData.dataVencimento);
+    // Determine status: manual override or auto-calculate
+    const status = manualStatus === 'Não renovou' 
+      ? 'Não renovou' 
+      : calculateStatus(formData.dataVencimento);
     
-    // Determine payment type based on context:
-    // - New client (client === null) = 'adesao' (enrollment)
-    // - Existing client (editing) = 'renovacao' (renewal)
     const isRenovacao = client !== null;
     
     const paymentOptions: PaymentOptions = {
       registrar: registrarPagamento,
       tipo: isRenovacao ? 'renovacao' : 'adesao',
-      // Use appropriate value based on type
       valor: isRenovacao ? valorRenovacao : valorAdesao,
       valorRenovacao: valorRenovacao,
     };
@@ -255,10 +264,13 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
     onSave({
       ...(client ? { id: client.id } : {}),
       ...formData,
-      // Set preco: for new clients use valorAdesao if registering, otherwise use valorRenovacao
-      // For existing clients, keep current preco
       preco: isRenovacao ? (client?.preco || valorRenovacao) : (registrarPagamento ? valorAdesao : valorRenovacao),
       status,
+      discord: formData.discord || undefined,
+      telegram: formData.telegram || undefined,
+      observacoes: formData.observacoes || undefined,
+      comprovanteUrl: formData.comprovanteUrl || undefined,
+    }, paymentOptions);
       discord: formData.discord || undefined,
       telegram: formData.telegram || undefined,
       observacoes: formData.observacoes || undefined,
