@@ -103,10 +103,12 @@ const Index = () => {
   }, [clients]);
 
   const faturamentoTotal = useMemo(() => {
-    return clients.reduce((total, c) => {
-      const preco = c.preco_renovacao ?? c.preco;
-      return total + (preco || 0);
-    }, 0);
+    return clients
+      .filter((c) => c.status !== 'Não renovou')
+      .reduce((total, c) => {
+        const preco = c.preco_renovacao ?? c.preco;
+        return total + (preco || 0);
+      }, 0);
   }, [clients]);
 
   // Faturamento mensal: soma dos clientes cujo vencimento está no PRÓXIMO mês
