@@ -117,8 +117,12 @@ export function FilterSection({
                       Vencido
                     </span>
                   </SelectItem>
-                </SelectContent>
-              </Select>
+                  <SelectItem value="Não renovou">
+                    <span className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-status-inactive" />
+                      Não renovou
+                    </span>
+                  </SelectItem>
             </div>
             
             <div className="space-y-1">
