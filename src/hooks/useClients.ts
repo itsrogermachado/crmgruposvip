@@ -81,7 +81,7 @@ export function useClients(groupId?: string | null) {
 
       const mappedClients: Client[] = (data || []).map((c) => {
         // Auto-calculate status based on due date
-        const autoStatus = calculateStatus(c.data_vencimento);
+        const autoStatus = calculateStatus(c.data_vencimento, c.status);
         
         return {
           id: c.id,
