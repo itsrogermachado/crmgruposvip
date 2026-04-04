@@ -271,11 +271,6 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
       observacoes: formData.observacoes || undefined,
       comprovanteUrl: formData.comprovanteUrl || undefined,
     }, paymentOptions);
-      discord: formData.discord || undefined,
-      telegram: formData.telegram || undefined,
-      observacoes: formData.observacoes || undefined,
-      comprovanteUrl: formData.comprovanteUrl || undefined,
-    }, paymentOptions);
     onOpenChange(false);
   };
 

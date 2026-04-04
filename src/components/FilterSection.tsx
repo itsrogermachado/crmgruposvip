@@ -216,6 +216,8 @@ export function FilterSection({
                       Não renovou
                     </span>
                   </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             
             <div className="space-y-2">
