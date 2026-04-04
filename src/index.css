@@ -122,6 +122,8 @@ html.transitioning * {
     --status-warning-bg: 45 50% 12%;
     --status-expired: 0 84% 55%;
     --status-expired-bg: 0 50% 12%;
+    --status-inactive: 220 9% 55%;
+    --status-inactive-bg: 220 14% 15%;
 
     --sidebar-background: 222 47% 8%;
     --sidebar-foreground: 240 4.8% 95.9%;
