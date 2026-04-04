@@ -86,18 +86,20 @@ const Index = () => {
   }, [filteredClients]);
 
   const statsClients = useMemo(() => {
-    return clients.map((c) => ({
-      id: c.id,
-      nome: c.nome,
-      telefone: c.telefone,
-      discord: c.discord,
-      telegram: c.telegram,
-      plano: c.plano,
-      preco: c.preco,
-      dataEntrada: c.data_entrada,
-      dataVencimento: c.data_vencimento,
-      status: c.status,
-    }));
+    return clients
+      .filter((c) => c.status !== 'Não renovou')
+      .map((c) => ({
+        id: c.id,
+        nome: c.nome,
+        telefone: c.telefone,
+        discord: c.discord,
+        telegram: c.telegram,
+        plano: c.plano,
+        preco: c.preco,
+        dataEntrada: c.data_entrada,
+        dataVencimento: c.data_vencimento,
+        status: c.status,
+      }));
   }, [clients]);
 
   const faturamentoTotal = useMemo(() => {
