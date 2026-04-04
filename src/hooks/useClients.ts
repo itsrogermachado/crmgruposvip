@@ -239,7 +239,7 @@ export function useClients(groupId?: string | null) {
         prev.map((c) => {
           if (c.id === id) {
             const updated = { ...c, ...clientData };
-            updated.status = calculateStatus(updated.data_vencimento);
+            updated.status = calculateStatus(updated.data_vencimento, updated.status);
             return updated;
           }
           return c;

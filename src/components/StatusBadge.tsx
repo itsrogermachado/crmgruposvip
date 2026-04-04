@@ -46,7 +46,8 @@ export function StatusBadge({ status }: StatusBadgeProps) {
         'w-1.5 h-1.5 rounded-full',
         status === 'Ativo' && 'bg-status-active',
         status === 'Vencido' && 'bg-status-expired',
-        status === 'Próximo' && 'bg-status-warning animate-pulse'
+        status === 'Próximo' && 'bg-status-warning animate-pulse',
+        status === 'Não renovou' && 'bg-status-inactive'
       )} />
       {status}
     </span>

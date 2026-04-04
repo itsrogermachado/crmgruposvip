@@ -355,6 +355,11 @@ html.transitioning * {
     box-shadow: 0 0 20px hsl(var(--status-expired) / 0.3);
   }
 
+  .status-badge-inactive {
+    @apply relative opacity-75;
+    box-shadow: 0 0 10px hsl(var(--status-inactive) / 0.2);
+  }
+
   /* Table row animation */
   .table-row-animated {
     @apply transition-all duration-300;

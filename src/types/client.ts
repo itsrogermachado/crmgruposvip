@@ -9,10 +9,10 @@ export interface Client {
   precoRenovacao?: number;
   dataEntrada: string;
   dataVencimento: string;
-  status: 'Ativo' | 'Vencido' | 'Próximo';
+  status: 'Ativo' | 'Vencido' | 'Próximo' | 'Não renovou';
   observacoes?: string;
   comprovanteUrl?: string;
 }
 
-export type StatusFilter = 'Todos' | 'Ativo' | 'Vencido' | 'Próximo';
+export type StatusFilter = 'Todos' | 'Ativo' | 'Vencido' | 'Próximo' | 'Não renovou';
 export type PlanoFilter = string;
