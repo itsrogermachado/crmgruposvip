@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 
 interface StatusBadgeProps {
-  status: 'Ativo' | 'Vencido' | 'Próximo';
+  status: 'Ativo' | 'Vencido' | 'Próximo' | 'Não renovou';
 }
 
 const statusConfig = {
@@ -22,6 +22,12 @@ const statusConfig = {
     text: 'text-status-warning',
     border: 'border-status-warning/30',
     glow: 'status-badge-warning',
+  },
+  'Não renovou': {
+    bg: 'bg-gradient-to-r from-status-inactive-bg to-status-inactive-bg/50',
+    text: 'text-status-inactive',
+    border: 'border-status-inactive/30',
+    glow: 'status-badge-inactive',
   },
 };
 
