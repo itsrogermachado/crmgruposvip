@@ -428,6 +428,34 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
               />
             </div>
 
+            {/* Manual status override - only show when editing */}
+            {client && (
+              <div className="space-y-2">
+                <Label>Status do Cliente</Label>
+                <Select value={manualStatus} onValueChange={setManualStatus}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="auto">
+                      <span className="flex items-center gap-2">
+                        Automático (baseado na data)
+                      </span>
+                    </SelectItem>
+                    <SelectItem value="Não renovou">
+                      <span className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-status-inactive" />
+                        Não renovou
+                      </span>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Marque "Não renovou" para manter o cliente como backup sem afetar o faturamento.
+                </p>
+              </div>
+            )}
+
             <Separator />
 
             {/* Payment/Price Section */}
