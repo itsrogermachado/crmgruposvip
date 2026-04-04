@@ -156,7 +156,7 @@ export function useClients(groupId?: string | null) {
         preco_renovacao: data.preco_renovacao ? Number(data.preco_renovacao) : undefined,
         data_entrada: data.data_entrada,
         data_vencimento: data.data_vencimento,
-        status: calculateStatus(data.data_vencimento),
+        status: calculateStatus(data.data_vencimento, data.status),
         observacoes: data.observacoes || undefined,
         comprovante_url: data.comprovante_url || undefined,
         group_id: data.group_id || undefined,
