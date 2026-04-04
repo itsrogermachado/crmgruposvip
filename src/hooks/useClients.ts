@@ -326,7 +326,7 @@ export function useClients(groupId?: string | null) {
         preco: Number(c.preco),
         data_entrada: c.data_entrada,
         data_vencimento: c.data_vencimento,
-        status: calculateStatus(c.data_vencimento),
+        status: calculateStatus(c.data_vencimento, c.status),
         observacoes: c.observacoes || undefined,
         comprovante_url: c.comprovante_url || undefined,
       }));
