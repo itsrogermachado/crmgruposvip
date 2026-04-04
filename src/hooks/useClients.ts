@@ -15,7 +15,7 @@ export interface Client {
   preco_renovacao?: number;
   data_entrada: string;
   data_vencimento: string;
-  status: 'Ativo' | 'Vencido' | 'Próximo';
+  status: 'Ativo' | 'Vencido' | 'Próximo' | 'Não renovou';
   observacoes?: string;
   comprovante_url?: string;
   group_id?: string;
