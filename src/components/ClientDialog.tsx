@@ -233,21 +233,30 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
     }
   };
 
+  // Manual status override state
+  const [manualStatus, setManualStatus] = useState<string>('auto');
+
+  useEffect(() => {
+    if (client && client.status === 'Não renovou') {
+      setManualStatus('Não renovou');
+    } else {
+      setManualStatus('auto');
+    }
+  }, [client, open]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Auto-calculate status based on due date
-    const status = calculateStatus(formData.dataVencimento);
+    // Determine status: manual override or auto-calculate
+    const status = manualStatus === 'Não renovou' 
+      ? 'Não renovou' 
+      : calculateStatus(formData.dataVencimento);
     
-    // Determine payment type based on context:
-    // - New client (client === null) = 'adesao' (enrollment)
-    // - Existing client (editing) = 'renovacao' (renewal)
     const isRenovacao = client !== null;
     
     const paymentOptions: PaymentOptions = {
       registrar: registrarPagamento,
       tipo: isRenovacao ? 'renovacao' : 'adesao',
-      // Use appropriate value based on type
       valor: isRenovacao ? valorRenovacao : valorAdesao,
       valorRenovacao: valorRenovacao,
     };
@@ -255,8 +264,6 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
     onSave({
       ...(client ? { id: client.id } : {}),
       ...formData,
-      // Set preco: for new clients use valorAdesao if registering, otherwise use valorRenovacao
-      // For existing clients, keep current preco
       preco: isRenovacao ? (client?.preco || valorRenovacao) : (registrarPagamento ? valorAdesao : valorRenovacao),
       status,
       discord: formData.discord || undefined,
@@ -420,6 +427,34 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
                 rows={3}
               />
             </div>
+
+            {/* Manual status override - only show when editing */}
+            {client && (
+              <div className="space-y-2">
+                <Label>Status do Cliente</Label>
+                <Select value={manualStatus} onValueChange={setManualStatus}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="auto">
+                      <span className="flex items-center gap-2">
+                        Automático (baseado na data)
+                      </span>
+                    </SelectItem>
+                    <SelectItem value="Não renovou">
+                      <span className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-status-inactive" />
+                        Não renovou
+                      </span>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Marque "Não renovou" para manter o cliente como backup sem afetar o faturamento.
+                </p>
+              </div>
+            )}
 
             <Separator />
 

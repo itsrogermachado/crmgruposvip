@@ -28,7 +28,10 @@ export function formatToBRDate(date: Date): string {
   return `${day}/${month}/${year}`;
 }
 
-export function calculateStatus(dataVencimento: string): 'Ativo' | 'Vencido' | 'Próximo' {
+export function calculateStatus(dataVencimento: string, currentStatus?: string): 'Ativo' | 'Vencido' | 'Próximo' | 'Não renovou' {
+  // Manual status "Não renovou" should never be overridden by auto-calculation
+  if (currentStatus === 'Não renovou') return 'Não renovou';
+
   const vencimento = parseBRDate(dataVencimento);
   if (!vencimento) return 'Ativo';
   

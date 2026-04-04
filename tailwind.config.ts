@@ -72,6 +72,8 @@ export default {
           "warning-bg": "hsl(var(--status-warning-bg))",
           expired: "hsl(var(--status-expired))",
           "expired-bg": "hsl(var(--status-expired-bg))",
+          inactive: "hsl(var(--status-inactive))",
+          "inactive-bg": "hsl(var(--status-inactive-bg))",
         },
       },
       fontFamily: {

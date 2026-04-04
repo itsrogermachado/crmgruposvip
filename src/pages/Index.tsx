@@ -86,25 +86,29 @@ const Index = () => {
   }, [filteredClients]);
 
   const statsClients = useMemo(() => {
-    return clients.map((c) => ({
-      id: c.id,
-      nome: c.nome,
-      telefone: c.telefone,
-      discord: c.discord,
-      telegram: c.telegram,
-      plano: c.plano,
-      preco: c.preco,
-      dataEntrada: c.data_entrada,
-      dataVencimento: c.data_vencimento,
-      status: c.status,
-    }));
+    return clients
+      .filter((c) => c.status !== 'Não renovou')
+      .map((c) => ({
+        id: c.id,
+        nome: c.nome,
+        telefone: c.telefone,
+        discord: c.discord,
+        telegram: c.telegram,
+        plano: c.plano,
+        preco: c.preco,
+        dataEntrada: c.data_entrada,
+        dataVencimento: c.data_vencimento,
+        status: c.status,
+      }));
   }, [clients]);
 
   const faturamentoTotal = useMemo(() => {
-    return clients.reduce((total, c) => {
-      const preco = c.preco_renovacao ?? c.preco;
-      return total + (preco || 0);
-    }, 0);
+    return clients
+      .filter((c) => c.status !== 'Não renovou')
+      .reduce((total, c) => {
+        const preco = c.preco_renovacao ?? c.preco;
+        return total + (preco || 0);
+      }, 0);
   }, [clients]);
 
   // Faturamento mensal: soma dos clientes cujo vencimento está no PRÓXIMO mês
@@ -115,16 +119,18 @@ const Index = () => {
     const inicioProximoMes = startOfMonth(proximoMes);
     const fimProximoMes = endOfMonth(proximoMes);
     
-    return clients.reduce((total, c) => {
-      const dataVencimento = parseBRDate(c.data_vencimento);
-      if (!dataVencimento) return total;
-      
-      if (isWithinInterval(dataVencimento, { start: inicioProximoMes, end: fimProximoMes })) {
-        const preco = c.preco_renovacao ?? c.preco;
-        return total + (preco || 0);
-      }
-      return total;
-    }, 0);
+    return clients
+      .filter((c) => c.status !== 'Não renovou')
+      .reduce((total, c) => {
+        const dataVencimento = parseBRDate(c.data_vencimento);
+        if (!dataVencimento) return total;
+        
+        if (isWithinInterval(dataVencimento, { start: inicioProximoMes, end: fimProximoMes })) {
+          const preco = c.preco_renovacao ?? c.preco;
+          return total + (preco || 0);
+        }
+        return total;
+      }, 0);
   }, [clients]);
 
   // Navegação segura dentro de useEffect (após renderização)

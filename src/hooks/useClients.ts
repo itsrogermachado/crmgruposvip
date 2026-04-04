@@ -15,7 +15,7 @@ export interface Client {
   preco_renovacao?: number;
   data_entrada: string;
   data_vencimento: string;
-  status: 'Ativo' | 'Vencido' | 'Próximo';
+  status: 'Ativo' | 'Vencido' | 'Próximo' | 'Não renovou';
   observacoes?: string;
   comprovante_url?: string;
   group_id?: string;
@@ -81,7 +81,7 @@ export function useClients(groupId?: string | null) {
 
       const mappedClients: Client[] = (data || []).map((c) => {
         // Auto-calculate status based on due date
-        const autoStatus = calculateStatus(c.data_vencimento);
+        const autoStatus = calculateStatus(c.data_vencimento, c.status);
         
         return {
           id: c.id,
@@ -156,7 +156,7 @@ export function useClients(groupId?: string | null) {
         preco_renovacao: data.preco_renovacao ? Number(data.preco_renovacao) : undefined,
         data_entrada: data.data_entrada,
         data_vencimento: data.data_vencimento,
-        status: calculateStatus(data.data_vencimento),
+        status: calculateStatus(data.data_vencimento, data.status),
         observacoes: data.observacoes || undefined,
         comprovante_url: data.comprovante_url || undefined,
         group_id: data.group_id || undefined,
@@ -239,7 +239,7 @@ export function useClients(groupId?: string | null) {
         prev.map((c) => {
           if (c.id === id) {
             const updated = { ...c, ...clientData };
-            updated.status = calculateStatus(updated.data_vencimento);
+            updated.status = calculateStatus(updated.data_vencimento, updated.status);
             return updated;
           }
           return c;
@@ -326,7 +326,7 @@ export function useClients(groupId?: string | null) {
         preco: Number(c.preco),
         data_entrada: c.data_entrada,
         data_vencimento: c.data_vencimento,
-        status: calculateStatus(c.data_vencimento),
+        status: calculateStatus(c.data_vencimento, c.status),
         observacoes: c.observacoes || undefined,
         comprovante_url: c.comprovante_url || undefined,
       }));

@@ -117,6 +117,12 @@ export function FilterSection({
                       Vencido
                     </span>
                   </SelectItem>
+                  <SelectItem value="Não renovou">
+                    <span className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-status-inactive" />
+                      Não renovou
+                    </span>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -202,6 +208,12 @@ export function FilterSection({
                     <span className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-status-expired" />
                       Vencido
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="Não renovou">
+                    <span className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-status-inactive" />
+                      Não renovou
                     </span>
                   </SelectItem>
                 </SelectContent>

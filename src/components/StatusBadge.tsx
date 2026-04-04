@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 
 interface StatusBadgeProps {
-  status: 'Ativo' | 'Vencido' | 'Próximo';
+  status: 'Ativo' | 'Vencido' | 'Próximo' | 'Não renovou';
 }
 
 const statusConfig = {
@@ -23,6 +23,12 @@ const statusConfig = {
     border: 'border-status-warning/30',
     glow: 'status-badge-warning',
   },
+  'Não renovou': {
+    bg: 'bg-gradient-to-r from-status-inactive-bg to-status-inactive-bg/50',
+    text: 'text-status-inactive',
+    border: 'border-status-inactive/30',
+    glow: 'status-badge-inactive',
+  },
 };
 
 export function StatusBadge({ status }: StatusBadgeProps) {
@@ -40,7 +46,8 @@ export function StatusBadge({ status }: StatusBadgeProps) {
         'w-1.5 h-1.5 rounded-full',
         status === 'Ativo' && 'bg-status-active',
         status === 'Vencido' && 'bg-status-expired',
-        status === 'Próximo' && 'bg-status-warning animate-pulse'
+        status === 'Próximo' && 'bg-status-warning animate-pulse',
+        status === 'Não renovou' && 'bg-status-inactive'
       )} />
       {status}
     </span>
