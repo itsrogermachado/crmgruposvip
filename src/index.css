@@ -17,7 +17,7 @@ html.transitioning * {
 
 @layer base {
   :root {
-    --background: 220 20% 97%;
+    --background: 40 20% 98%;
     --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
@@ -26,16 +26,16 @@ html.transitioning * {
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 217 91% 60%;
+    --primary: 221 45% 23%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 14% 96%;
+    --secondary: 40 10% 94%;
     --secondary-foreground: 222 47% 11%;
 
-    --muted: 220 14% 96%;
+    --muted: 40 10% 94%;
     --muted-foreground: 220 9% 46%;
 
-    --accent: 217 91% 60%;
+    --accent: 24 95% 53%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -43,7 +43,7 @@ html.transitioning * {
 
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 217 91% 60%;
+    --ring: 221 45% 23%;
 
     --radius: 0.75rem;
 
@@ -211,11 +211,14 @@ html.transitioning * {
   }
 
   .text-responsive-xl {
-    font-size: clamp(1.25rem, 4vw, 1.5rem);
+    font-size: clamp(1.5rem, 5vw, 2.25rem);
+    line-height: 1.1;
   }
 
   .text-responsive-2xl {
-    font-size: clamp(1.5rem, 5vw, 2rem);
+    font-size: clamp(2rem, 8vw, 3.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
   }
 
   /* Premium Stat Card */

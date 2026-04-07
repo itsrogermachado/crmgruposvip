@@ -20,159 +20,134 @@ export function HeroSection() {
       />
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-4xl mx-auto text-center mb-16">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/8 border border-primary/15 mb-8 animate-fade-in">
-            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            <span className="text-sm font-medium text-primary">
-              Teste grátis por 7 dias • Sem cartão de crédito
-            </span>
-          </div>
-
-          {/* Headline */}
-          <h1 className="text-4xl md:text-[3.5rem] lg:text-[4rem] font-bold leading-[1.1] mb-6 animate-fade-in tracking-tight">
-            <span className="text-foreground">O CRM que </span>
-            <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              transforma
-            </span>
-            <br className="hidden sm:block" />
-            <span className="text-foreground"> seu Grupo VIP em máquina de receita</span>
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 animate-fade-in leading-relaxed">
-            Automatize cobranças, reduza a inadimplência e aumente sua taxa de renovação em até 40%.
-            A plataforma que gestores de grupos VIP confiam.
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 animate-fade-in">
-            <Link to="/auth">
-              <Button
-                size="lg"
-                className="text-base h-13 px-8 font-bold bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30 transition-all hover:scale-[1.02] border-0"
-              >
-                Começar Grátis
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
-            <Button
-              variant="outline"
-              size="lg"
-              className="text-base h-13 px-8 font-semibold border-border hover:bg-accent/50"
-              onClick={() =>
-                document.getElementById('como-funciona')?.scrollIntoView({ behavior: 'smooth' })
-              }
-            >
-              <Play className="w-4 h-4 mr-2" />
-              Ver como funciona
-            </Button>
-          </div>
-
-          {/* Trust pills */}
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground animate-fade-in">
-            {['Configuração em 2 min', 'Suporte via WhatsApp', '+500 grupos ativos'].map((t) => (
-              <div key={t} className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-primary/70" />
-                <span>{t}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Dashboard Preview */}
-        <div className="relative max-w-4xl mx-auto animate-fade-in">
-          <div className="absolute -inset-px rounded-2xl bg-gradient-to-b from-primary/20 via-primary/5 to-transparent" />
-          <div className="absolute -inset-8 bg-primary/[0.04] rounded-3xl blur-2xl" />
-
-          <div className="relative bg-card rounded-2xl border border-border/60 shadow-2xl shadow-primary/5 overflow-hidden">
-            {/* Browser bar */}
-            <div className="flex items-center gap-3 px-4 py-3 bg-muted/40 border-b border-border/40">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-destructive/60" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-                <div className="w-3 h-3 rounded-full bg-green-500/60" />
-              </div>
-              <div className="flex-1 flex justify-center">
-                <div className="px-6 py-1.5 bg-background/80 rounded-lg text-xs text-muted-foreground font-medium">
-                  app.crmgruposvip.com
-                </div>
-              </div>
+        <div className="grid lg:grid-cols-12 gap-12 items-center">
+          {/* Left Column: Content */}
+          <div className="lg:col-span-6 text-left">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent/10 border border-accent/20 mb-8 animate-fade-in shadow-sm">
+              <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+              <span className="text-sm font-semibold text-accent uppercase tracking-wider">
+                7 Dias Grátis • Sem Compromisso
+              </span>
             </div>
 
-            {/* Dashboard mock */}
-            <div className="p-4 md:p-6 bg-gradient-to-br from-background via-background to-muted/10">
-              {/* Stats row */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-                {[
-                  { label: 'Membros Ativos', value: '147', change: '+12%', color: 'text-primary' },
-                  { label: 'Receita Mensal', value: 'R$ 22k', change: '+8%', color: 'text-primary' },
-                  { label: 'Vencendo Hoje', value: '12', change: '', color: 'text-yellow-500' },
-                  { label: 'Taxa Renovação', value: '94%', change: '+5%', color: 'text-primary' },
-                ].map((s) => (
-                  <div
-                    key={s.label}
-                    className="p-3.5 rounded-xl bg-card border border-border/50 hover:border-primary/20 transition-colors"
-                  >
-                    <p className="text-[10px] md:text-xs text-muted-foreground mb-1.5">{s.label}</p>
-                    <div className="flex items-end gap-1.5">
-                      <p className={`text-lg md:text-xl font-bold ${s.color}`}>{s.value}</p>
-                      {s.change && (
-                        <span className="text-[10px] text-green-500 font-medium mb-0.5">
-                          {s.change}
-                        </span>
-                      )}
-                    </div>
+            {/* Headline */}
+            <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-display leading-[1.05] mb-6 animate-fade-in tracking-tight text-foreground">
+              Pare de perder membros por <br className="hidden xl:block" />
+              <span className="text-accent underline decoration-accent/30 underline-offset-8">esquecimento.</span>
+            </h1>
+
+            {/* Subtitle */}
+            <p className="text-xl md:text-22px text-muted-foreground mb-10 animate-fade-in leading-relaxed max-w-xl">
+              Automatize suas renovações no WhatsApp e Telegram. O único CRM feito para quem vive de grupos VIP.
+            </p>
+
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row items-center gap-4 mb-8 animate-fade-in">
+              <Link to="/auth" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  className="w-full sm:w-auto text-lg h-14 px-10 font-bold bg-accent hover:bg-accent/90 text-white shadow-2xl shadow-accent/20 transition-all hover:scale-[1.03] active:scale-95"
+                >
+                  Teste Grátis Agora
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto text-lg h-14 px-8 font-semibold border-2 border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-colors"
+                onClick={() =>
+                  document.getElementById('como-funciona')?.scrollIntoView({ behavior: 'smooth' })
+                }
+              >
+                <Play className="w-4 h-4 mr-2 fill-primary" />
+                Ver Demonstração
+              </Button>
+            </div>
+
+            {/* Trust pills */}
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-medium text-muted-foreground animate-fade-in opacity-80">
+              {['Configuração em 2 min', 'Suporte VIP via WhatsApp', '+50.000 cobranças feitas'].map((t) => (
+                <div key={t} className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
+                  <span>{t}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Column: Dashboard Preview */}
+          <div className="lg:col-span-6 relative animate-fade-in lg:translate-x-12">
+            <div className="absolute -inset-px rounded-3xl bg-gradient-to-tr from-accent/20 via-primary/10 to-transparent blur-xl" />
+            
+            <div className="relative bg-card rounded-3xl border-2 border-primary/10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.12)] overflow-hidden scale-105 lg:scale-110">
+              {/* Browser bar */}
+              <div className="flex items-center gap-3 px-6 py-4 bg-secondary/50 border-b border-primary/10">
+                <div className="flex gap-2">
+                  <div className="w-3.5 h-3.5 rounded-full bg-red-400/40" />
+                  <div className="w-3.5 h-3.5 rounded-full bg-amber-400/40" />
+                  <div className="w-3.5 h-3.5 rounded-full bg-emerald-400/40" />
+                </div>
+                <div className="flex-1 flex justify-center">
+                  <div className="px-8 py-1.5 bg-background/50 rounded-full text-[11px] text-muted-foreground font-semibold tracking-wide border border-primary/5">
+                    dashboard.crmgruposvip.com
                   </div>
-                ))}
+                </div>
               </div>
 
-              {/* Chart + Table */}
-              <div className="grid md:grid-cols-5 gap-3">
-                {/* Chart placeholder */}
-                <div className="md:col-span-3 rounded-xl bg-card border border-border/50 p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-semibold text-foreground">Receita Mensal</span>
-                    <span className="text-[10px] text-muted-foreground">Últimos 6 meses</span>
+              {/* Dashboard Content */}
+              <div className="p-6 md:p-8 space-y-8">
+                {/* Stats Row */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-5 rounded-2xl bg-primary/5 border border-primary/10">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Renovações Hoje</p>
+                    <div className="flex items-end gap-2">
+                      <p className="text-3xl font-black text-primary">R$ 4.280</p>
+                      <span className="text-xs font-bold text-emerald-500 mb-1">+18%</span>
+                    </div>
                   </div>
-                  <div className="flex items-end gap-2 h-24">
-                    {[40, 55, 45, 65, 58, 80].map((h, i) => (
-                      <div
-                        key={i}
-                        className="flex-1 rounded-t-md bg-gradient-to-t from-primary/30 to-primary/60 transition-all hover:from-primary/40 hover:to-primary/80"
-                        style={{ height: `${h}%` }}
-                      />
-                    ))}
+                  <div className="p-5 rounded-2xl bg-accent/5 border border-accent/10">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Taxa de Conversão</p>
+                    <div className="flex items-end gap-2">
+                      <p className="text-3xl font-black text-accent">96.4%</p>
+                      <span className="text-xs font-bold text-emerald-500 mb-1">↑ 2.4%</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Members list */}
-                <div className="md:col-span-2 rounded-xl bg-card border border-border/50 overflow-hidden">
-                  <div className="p-3 border-b border-border/40 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-foreground">Membros Recentes</span>
+                {/* Main View */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-foreground">Próximos Vencimentos</h3>
+                    <div className="w-20 h-1.5 bg-muted rounded-full overflow-hidden">
+                      <div className="w-3/4 h-full bg-accent" />
+                    </div>
                   </div>
-                  <div className="divide-y divide-border/30">
+                  
+                  <div className="space-y-3">
                     {[
-                      { name: 'João S.', status: 'Ativo' },
-                      { name: 'Maria C.', status: 'Ativo' },
-                      { name: 'Pedro L.', status: 'Vencendo' },
-                    ].map((m) => (
-                      <div key={m.name} className="px-3 py-2 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-semibold text-primary">
+                      { name: 'Ricardo Oliveira', plan: 'Trimestral', status: 'Cobrindo' },
+                      { name: 'Juliana Mendes', plan: 'Anual', status: 'Pago' },
+                      { name: 'Marcos Silva', plan: 'Mensal', status: 'Pendente' },
+                    ].map((m, i) => (
+                      <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-primary/5">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
                             {m.name.charAt(0)}
                           </div>
-                          <span className="text-xs text-foreground">{m.name}</span>
+                          <div>
+                            <p className="text-xs font-bold text-foreground">{m.name}</p>
+                            <p className="text-[10px] text-muted-foreground">{m.plan}</p>
+                          </div>
                         </div>
-                        <span
-                          className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
-                            m.status === 'Ativo'
-                              ? 'bg-green-500/10 text-green-600 dark:text-green-400'
-                              : 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'
-                          }`}
-                        >
+                        <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter ${
+                          m.status === 'Pago' ? 'bg-emerald-500/10 text-emerald-600' : 
+                          m.status === 'Cobrindo' ? 'bg-amber-500/10 text-amber-600' : 
+                          'bg-red-500/10 text-red-600'
+                        }`}>
                           {m.status}
-                        </span>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -181,6 +156,7 @@ export function HeroSection() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </section>
   );

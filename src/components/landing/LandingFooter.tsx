@@ -15,26 +15,30 @@ export function LandingFooter() {
   };
 
   return (
-    <footer className="py-12 border-t border-border/40 bg-muted/10">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+    <footer className="py-24 bg-primary text-white relative overflow-hidden border-t border-white/5">
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-20">
           {/* Brand */}
-          <div className="md:col-span-2">
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
-                <Crown className="w-4 h-4 text-primary-foreground" />
+          <div className="md:col-span-2 space-y-6">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20">
+                <Crown className="w-6 h-6 text-accent" />
               </div>
-              <span className="font-bold text-lg text-foreground">CRM Grupos VIP</span>
+              <div className="flex flex-col">
+                <span className="font-black text-xl leading-none tracking-tighter uppercase italic">
+                  CRM <span className="text-accent">VIP</span>
+                </span>
+              </div>
             </div>
-            <p className="text-muted-foreground max-w-sm text-sm leading-relaxed">
-              A plataforma completa para gestores de grupos VIP gerenciarem membros, pagamentos e escalarem seu negócio.
+            <p className="text-lg opacity-60 max-w-sm leading-relaxed font-medium">
+              A plataforma definitiva para gestores de grupos VIP. Automatize sua escala e foque no que realmente importa: seu conteúdo.
             </p>
           </div>
 
           {/* Links */}
-          <div>
-            <h4 className="font-semibold mb-4 text-sm text-foreground">Navegação</h4>
-            <ul className="space-y-2.5">
+          <div className="space-y-6">
+            <h4 className="font-black text-xs uppercase tracking-[0.2em] text-accent">Plataforma</h4>
+            <ul className="space-y-4">
               {[
                 { label: 'Recursos', id: 'beneficios' },
                 { label: 'Como Funciona', id: 'como-funciona' },
@@ -45,38 +49,39 @@ export function LandingFooter() {
                 <li key={item.id}>
                   <button
                     onClick={() => scrollToSection(item.id)}
-                    className="text-muted-foreground hover:text-foreground transition-colors text-sm"
+                    className="text-white/60 hover:text-accent transition-all text-sm font-bold uppercase tracking-widest"
                   >
                     {item.label}
                   </button>
                 </li>
               ))}
-              <li>
-                <Link
-                  to="/auth"
-                  className="text-muted-foreground hover:text-foreground transition-colors text-sm"
-                >
-                  Entrar
-                </Link>
-              </li>
             </ul>
           </div>
 
           {/* Contact */}
-          <div>
-            <h4 className="font-semibold mb-4 text-sm text-foreground">Contato</h4>
+          <div className="space-y-6">
+            <h4 className="font-black text-xs uppercase tracking-[0.2em] text-accent">Suporte</h4>
             <button
               onClick={openWhatsApp}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm"
+              className="group flex items-center gap-3 p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
             >
-              <MessageCircle className="w-4 h-4" />
-              <span>(21) 96448-8285</span>
+              <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center">
+                 <MessageCircle className="w-5 h-5 text-white" />
+              </div>
+              <div className="text-left">
+                <p className="text-[10px] font-black uppercase tracking-widest opacity-50">WhatsApp VIP</p>
+                <p className="text-base font-black tracking-tight">(21) 96448-8285</p>
+              </div>
             </button>
           </div>
         </div>
 
-        <div className="pt-6 border-t border-border/40 text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} CRM Grupos VIP. Todos os direitos reservados.
+        <div className="pt-10 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
+          <div>© {new Date().getFullYear()} CRM VIP - Powering Digital Empires</div>
+          <div className="flex gap-8">
+            <Link to="/terms" className="hover:text-accent transition-colors">Termos</Link>
+            <Link to="/privacy" className="hover:text-accent transition-colors">Privacidade</Link>
+          </div>
         </div>
       </div>
     </footer>

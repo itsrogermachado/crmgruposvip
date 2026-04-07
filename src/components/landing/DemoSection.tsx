@@ -14,88 +14,98 @@ const features = [
 
 export function DemoSection() {
   return (
-    <section className="py-24 md:py-32 relative overflow-hidden">
+    <section className="py-24 md:py-40 relative overflow-hidden bg-background">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-2 gap-12 md:gap-20 items-center max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-20 items-center max-w-7xl mx-auto">
           {/* Left - Text */}
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/8 border border-primary/15 mb-4">
-              <span className="text-xs font-semibold text-primary uppercase tracking-wider">
-                Plataforma
-              </span>
+          <div className="space-y-10">
+            <div>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 mb-6 font-bold text-xs uppercase tracking-widest text-primary">
+                O Comando Central
+              </div>
+              <h2 className="text-4xl md:text-6xl font-black mb-8 text-foreground tracking-tight leading-[1.1]">
+                Controle absoluto sobre sua <span className="text-accent italic underline decoration-accent/30 underline-offset-8 text-glow">lucratividade.</span>
+              </h2>
+              <p className="text-xl text-muted-foreground leading-relaxed font-medium">
+                Uma interface cirúrgica. Sem distrações. Apenas os dados que você precisa para tomar decisões rápidas e escalar seu faturamento.
+              </p>
             </div>
-            <h2 className="text-3xl md:text-[2.5rem] font-bold mb-6 text-foreground leading-tight">
-              Interface intuitiva{' '}
-              <span className="text-primary">projetada para você</span>
-            </h2>
-            <p className="text-muted-foreground mb-8 leading-relaxed">
-              Sem complicação. Tudo o que você precisa para gerenciar seu grupo VIP está em uma interface limpa, rápida e moderna.
-            </p>
 
-            <ul className="space-y-3 mb-8">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {features.map((f) => (
-                <li key={f} className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-muted-foreground">{f}</span>
+                <li key={f} className="flex items-center gap-4 group">
+                  <div className="w-8 h-8 rounded-xl bg-accent/10 flex items-center justify-center shrink-0 group-hover:bg-accent/20 transition-colors">
+                    <CheckCircle2 className="w-5 h-5 text-accent" />
+                  </div>
+                  <span className="text-base font-bold text-foreground tracking-tight">{f}</span>
                 </li>
               ))}
             </ul>
 
-            <Link to="/auth">
-              <Button className="font-semibold bg-primary hover:bg-primary/90 shadow-md shadow-primary/15">
-                Experimentar Agora
-                <ArrowRight className="w-4 h-4 ml-2" />
+            <Link to="/auth" className="inline-block">
+              <Button className="h-16 px-10 rounded-[2rem] font-black uppercase tracking-widest bg-primary hover:bg-primary/90 text-white shadow-2xl shadow-primary/20 transition-all hover:scale-105 active:scale-95 border-0">
+                Acesse o Painel Agora
+                <ArrowRight className="w-6 h-6 ml-3" />
               </Button>
             </Link>
           </div>
 
           {/* Right - Dashboard mock */}
-          <div className="relative">
-            <div className="absolute -inset-4 bg-gradient-to-r from-primary/5 to-primary/[0.02] rounded-3xl blur-xl" />
-            <div className="relative bg-card rounded-2xl border border-border shadow-2xl overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3 bg-muted/40 border-b border-border/40">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-destructive/60" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-                  <div className="w-3 h-3 rounded-full bg-green-500/60" />
+          <div className="relative lg:scale-110 lg:translate-x-10">
+            <div className="absolute -inset-10 bg-gradient-to-tr from-accent/20 via-primary/10 to-transparent rounded-[3rem] blur-[80px] opacity-50" />
+            
+            <div className="relative bg-card rounded-[2.5rem] border-4 border-primary/5 shadow-[0_64px_128px_-32px_rgba(0,0,0,0.15)] overflow-hidden transition-all duration-700 hover:rotate-1 hover:scale-105">
+              <div className="flex items-center gap-2 px-6 py-4 bg-primary text-white border-b border-white/5">
+                <div className="flex gap-2">
+                  <div className="w-3.5 h-3.5 rounded-full bg-white/20" />
+                  <div className="w-3.5 h-3.5 rounded-full bg-white/20" />
+                  <div className="w-3.5 h-3.5 rounded-full bg-white/20" />
                 </div>
                 <div className="flex-1 flex justify-center">
-                  <div className="px-4 py-1 bg-background/80 rounded-lg text-xs text-muted-foreground">
-                    app.crmgruposvip.com
+                  <div className="px-5 py-1.5 bg-white/10 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-white/50">
+                    app.crmvip.com
                   </div>
                 </div>
               </div>
 
-              <div className="p-5 bg-gradient-to-br from-background to-muted/10">
-                <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="p-8 space-y-8 bg-gradient-to-br from-card to-background">
+                <div className="grid grid-cols-2 gap-4">
                   {[
-                    { label: 'Membros Ativos', value: '147' },
-                    { label: 'Faturamento', value: 'R$ 22.050' },
-                    { label: 'A Vencer', value: '12' },
-                    { label: 'Renovações', value: '94%' },
+                    { label: 'Faturamento Mensal', value: 'R$ 48.920', trend: '+12%' },
+                    { label: 'Taxa de Retenção', value: '96.4%', trend: '+2%' },
                   ].map((stat) => (
-                    <div key={stat.label} className="p-3 rounded-xl bg-card border border-border/50">
-                      <p className="text-[10px] text-muted-foreground mb-1">{stat.label}</p>
-                      <p className="text-sm font-bold text-primary">{stat.value}</p>
+                    <div key={stat.label} className="p-6 rounded-3xl bg-primary/5 border border-primary/5 hover:border-accent/20 transition-all group">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">{stat.label}</p>
+                      <div className="flex items-end gap-3">
+                        <p className="text-2xl font-black text-primary tracking-tighter">{stat.value}</p>
+                        <span className="text-[10px] font-black text-green-500 mb-1">{stat.trend}</span>
+                      </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="rounded-xl bg-card border border-border/50 overflow-hidden">
-                  <div className="p-3 border-b border-border/40 flex items-center justify-between">
-                    <span className="text-xs font-semibold">Membros Recentes</span>
+                <div className="rounded-3xl bg-white/5 border border-primary/5 overflow-hidden">
+                  <div className="p-5 border-b border-primary/5 flex items-center justify-between">
+                    <span className="text-xs font-black uppercase tracking-widest text-primary">Atividade Recente</span>
                   </div>
-                  <div className="divide-y divide-border/30">
-                    {['João Silva', 'Maria Santos', 'Pedro Costa'].map((name) => (
-                      <div key={name} className="p-2.5 flex items-center justify-between">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-semibold text-primary">
-                            {name.charAt(0)}
+                  <div className="divide-y divide-primary/5">
+                    {[
+                      { name: 'Ricardo Alvez', plan: 'Anual', time: 'Há 2 min' },
+                      { name: 'Sofia Marinho', plan: 'Semestral', time: 'Há 15 min' },
+                      { name: 'Carlos Eduardo', plan: 'Anual', time: 'Há 1 hora' },
+                    ].map((user) => (
+                      <div key={user.name} className="p-4 flex items-center justify-between group hover:bg-primary/5 transition-all">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center text-xs font-black text-white shadow-lg">
+                            {user.name.charAt(0)}
                           </div>
-                          <span className="text-xs">{name}</span>
+                          <div>
+                            <p className="text-xs font-black uppercase tracking-tight text-foreground">{user.name}</p>
+                            <p className="text-[9px] font-black uppercase tracking-widest text-accent">Plano {user.plan}</p>
+                          </div>
                         </div>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 font-medium">
-                          Ativo
+                        <span className="text-[9px] font-black uppercase tracking-widest opacity-30">
+                          {user.time}
                         </span>
                       </div>
                     ))}

@@ -40,35 +40,32 @@ const faqs = [
 
 export function FAQSection() {
   return (
-    <section id="faq" className="py-24 md:py-32 scroll-mt-20">
+    <section id="faq" className="py-24 md:py-40 scroll-mt-20 bg-background">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/8 border border-primary/15 mb-4">
-            <span className="text-xs font-semibold text-primary uppercase tracking-wider">
-              FAQ
-            </span>
+        <div className="text-center max-w-3xl mx-auto mb-20">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 mb-6 font-bold text-xs uppercase tracking-widest text-primary">
+            Dúvidas
           </div>
-          <h2 className="text-3xl md:text-[2.75rem] font-bold mb-4 text-foreground leading-tight">
-            Perguntas{' '}
-            <span className="text-primary">frequentes</span>
+          <h2 className="text-4xl md:text-5xl font-black mb-6 text-foreground tracking-tight leading-tight">
+            Perguntas <span className="text-accent underline decoration-accent/30 underline-offset-8">frequentes</span>
           </h2>
-          <p className="text-muted-foreground text-base">
-            Tire suas dúvidas antes de começar
+          <p className="text-lg text-muted-foreground">
+            Tudo o que você precisa saber antes de escalar sua operação VIP.
           </p>
         </div>
 
-        <div className="max-w-2xl mx-auto">
-          <Accordion type="single" collapsible className="space-y-3">
+        <div className="max-w-3xl mx-auto">
+          <Accordion type="single" collapsible className="space-y-4">
             {faqs.map((faq, index) => (
               <AccordionItem
                 key={index}
                 value={`item-${index}`}
-                className="bg-card border border-border/50 rounded-xl px-6 data-[state=open]:border-primary/25 data-[state=open]:shadow-sm transition-all"
+                className="bg-card border-2 border-primary/5 rounded-[2rem] px-8 data-[state=open]:border-accent/20 data-[state=open]:shadow-xl transition-all duration-500 overflow-hidden"
               >
-                <AccordionTrigger className="text-left font-semibold hover:no-underline py-5 text-foreground text-sm">
+                <AccordionTrigger className="text-left font-black hover:no-underline py-6 text-foreground text-base md:text-lg uppercase tracking-tight">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground text-sm pb-5 leading-relaxed">
+                <AccordionContent className="text-muted-foreground text-sm md:text-base pb-8 leading-relaxed font-medium">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>

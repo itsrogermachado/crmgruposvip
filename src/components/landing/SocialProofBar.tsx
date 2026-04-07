@@ -7,18 +7,17 @@ export function SocialProofBar() {
   ];
 
   return (
-    <section className="py-10 md:py-14 border-y border-border/40 bg-muted/20">
+    <section className="py-12 bg-primary/5 border-y-2 border-primary/10 overflow-hidden">
       <div className="container mx-auto px-4">
-        <p className="text-center text-xs font-medium text-muted-foreground uppercase tracking-widest mb-8">
-          Números que comprovam resultados
-        </p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 items-center">
           {stats.map((s) => (
-            <div key={s.label} className="text-center">
-              <p className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
+            <div key={s.label} className="text-center group">
+              <p className="text-4xl md:text-5xl font-black text-primary tracking-tighter group-hover:scale-110 transition-transform duration-500">
                 {s.value}
               </p>
-              <p className="text-sm text-muted-foreground mt-1">{s.label}</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-2 opacity-60">
+                {s.label}
+              </p>
             </div>
           ))}
         </div>
