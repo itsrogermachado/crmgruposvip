@@ -32,26 +32,24 @@ export function PricingSection() {
       : null;
 
   return (
-    <section id="planos" className="py-24 md:py-40 scroll-mt-20 bg-background relative overflow-hidden">
-      {/* Decorative background */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
-
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center max-w-3xl mx-auto mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent/10 border border-accent/20 mb-6">
-            <span className="text-sm font-bold text-accent uppercase tracking-widest">
-              Investimento
+    <section id="planos" className="py-24 md:py-32 scroll-mt-20 bg-muted/20">
+      <div className="container mx-auto px-4">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/8 border border-primary/15 mb-4">
+            <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+              Planos
             </span>
           </div>
-          <h2 className="text-4xl md:text-6xl font-black mb-6 text-foreground tracking-tight">
-            Planos que <span className="text-primary italic">escalam</span> com você.
+          <h2 className="text-3xl md:text-[2.75rem] font-bold mb-4 text-foreground leading-tight">
+            Escolha o plano{' '}
+            <span className="text-primary">ideal para você</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Comece grátis por 7 dias. Sem pegadinhas, sem contratos de fidelidade. Escolha a melhor opção para sua operação.
+          <p className="text-muted-foreground text-base">
+            Todos os planos incluem 7 dias de teste grátis. Cancele quando quiser.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto items-center">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto">
           {sortedPlans.map((plan) => {
             const isPopular = plan.id === annualPlanId;
             const priceFormatted = (plan.price_cents / 100).toLocaleString('pt-BR', {
@@ -59,83 +57,65 @@ export function PricingSection() {
               currency: 'BRL',
             });
 
-            let periodLabel = ' /mês';
-            if (plan.duration_days >= 365) periodLabel = ' /ano';
-            else if (plan.duration_days >= 90) periodLabel = ' /trim';
+            let periodLabel = '/mês';
+            if (plan.duration_days >= 365) periodLabel = '/ano';
+            else if (plan.duration_days >= 90) periodLabel = '/trimestre';
 
             return (
               <div
                 key={plan.id}
-                className={`relative rounded-[2.5rem] transition-all duration-500 overflow-hidden group ${
+                className={`relative rounded-2xl transition-all duration-300 ${
                   isPopular
-                    ? 'bg-primary text-white shadow-[0_40px_80px_-15px_rgba(30,58,138,0.3)] scale-105 z-20 py-12 md:py-16'
-                    : 'bg-card border-2 border-primary/5 hover:border-primary/20 shadow-xl hover:shadow-2xl py-10 md:py-12 translate-y-2 hover:-translate-y-0'
+                    ? 'bg-card border-2 border-primary/30 shadow-xl shadow-primary/10 scale-[1.02]'
+                    : 'bg-card border border-border/50 hover:border-primary/20 hover:shadow-md'
                 }`}
               >
                 {isPopular && (
-                  <div className="absolute top-0 right-0 p-8 opacity-20 pointer-events-none">
-                    <Flame className="w-32 h-32 rotate-12" />
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center gap-1.5 shadow-lg shadow-primary/25">
+                    <Flame className="w-3.5 h-3.5" />
+                    Mais Popular
                   </div>
                 )}
 
-                <div className="px-8 md:px-12 relative z-10">
-                  {isPopular && (
-                    <div className="inline-block px-4 py-1 rounded-full bg-accent text-[10px] font-black uppercase tracking-[0.2em] mb-6">
-                      Mais Escolhido
-                    </div>
-                  )}
-
-                  <h3 className={`text-2xl font-black mb-2 ${isPopular ? 'text-white' : 'text-foreground'}`}>
+                <div className="p-7">
+                  <h3 className="text-lg font-bold text-center mb-1 text-foreground mt-1">
                     {plan.name}
                   </h3>
-                  
-                  <div className="mb-8 items-baseline gap-1 flex">
-                    <span className={`text-5xl font-black ${isPopular ? 'text-white' : 'text-primary'}`}>
-                      {priceFormatted}
-                    </span>
-                    <span className={`text-sm font-bold opacity-60`}>{periodLabel}</span>
+
+                  <div className="text-center mb-6 mt-4">
+                    <span className="text-4xl font-bold text-foreground">{priceFormatted}</span>
+                    <span className="text-muted-foreground text-sm">{periodLabel}</span>
                   </div>
 
-                  <div className={`h-px w-full mb-8 ${isPopular ? 'bg-white/20' : 'bg-primary/10'}`} />
-
-                  <ul className="space-y-4 mb-10">
+                  <ul className="space-y-3 mb-8">
                     {features.map((feature) => (
                       <li key={feature} className="flex items-center gap-3">
-                        <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          isPopular ? 'bg-white/20' : 'bg-primary/10'
-                        }`}>
-                          <Check className={`w-3 h-3 ${isPopular ? 'text-white' : 'text-primary'}`} />
+                        <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Check className="w-3 h-3 text-primary" />
                         </div>
-                        <span className={`text-sm font-medium ${isPopular ? 'text-white/80' : 'text-muted-foreground'}`}>
-                          {feature}
-                        </span>
+                        <span className="text-sm text-muted-foreground">{feature}</span>
                       </li>
                     ))}
                   </ul>
 
-                  <Link to="/auth" className="block">
+                  <Link to="/auth">
                     <Button
-                      size="lg"
-                      className={`w-full h-14 rounded-2xl text-lg font-black transition-all ${
+                      className={`w-full font-semibold h-11 ${
                         isPopular
-                          ? 'bg-accent hover:bg-accent/90 text-white shadow-xl shadow-black/20'
-                          : 'bg-primary/5 hover:bg-primary/10 text-primary border-2 border-primary/20'
+                          ? 'bg-primary hover:bg-primary/90 shadow-md shadow-primary/15 border-0'
+                          : ''
                       }`}
+                      variant={isPopular ? 'default' : 'outline'}
+                      size="lg"
                     >
-                      {isPopular ? 'Quero Escalar Agora' : 'Começar Teste'}
+                      Começar Grátis
                     </Button>
                   </Link>
-
-                  <p className={`text-center mt-6 text-[10px] font-bold uppercase tracking-widest opacity-40`}>
-                    Cancele a qualquer momento
-                  </p>
                 </div>
               </div>
             );
           })}
         </div>
-      </div>
-    </section>
 
         <p className="text-center text-muted-foreground mt-10 text-sm">
           <span className="inline-flex items-center gap-1.5">

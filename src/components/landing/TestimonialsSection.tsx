@@ -33,49 +33,48 @@ const testimonials = [
 
 export function TestimonialsSection() {
   return (
-    <section id="depoimentos" className="py-24 md:py-36 scroll-mt-20 bg-background relative">
+    <section id="depoimentos" className="py-24 md:py-32 scroll-mt-20 bg-muted/20">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-3xl mx-auto mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 mb-6 font-bold text-xs uppercase tracking-widest text-primary">
-            Resultados Reais
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/8 border border-primary/15 mb-4">
+            <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+              Depoimentos
+            </span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-black mb-6 text-foreground tracking-tight leading-tight">
-            Quem vive de grupos, <span className="text-accent underline decoration-accent/30 underline-offset-8">recomenda.</span>
+          <h2 className="text-3xl md:text-[2.75rem] font-bold mb-4 text-foreground leading-tight">
+            Quem usa,{' '}
+            <span className="text-primary">recomenda</span>
           </h2>
-          <p className="text-lg text-muted-foreground">
-            Gestores que escalaram suas operações e profissionalizaram seus negócios com o CRM VIP.
+          <p className="text-muted-foreground text-base">
+            Veja o que gestores de grupos VIP dizem sobre a plataforma
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {testimonials.map((t, i) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 max-w-4xl mx-auto">
+          {testimonials.map((t) => (
             <div
               key={t.name}
-              className={`group relative p-8 md:p-10 rounded-[2.5rem] bg-card border-2 border-primary/5 hover:border-accent/20 transition-all duration-500 hover:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] ${
-                i % 2 === 1 ? 'md:translate-y-8' : ''
-              }`}
+              className="relative p-6 rounded-2xl bg-card border border-border/50 hover:border-primary/20 transition-all duration-300 hover:shadow-md"
             >
-              <div className="absolute top-8 right-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Quote className="w-12 h-12 text-primary" />
-              </div>
+              <Quote className="w-8 h-8 text-primary/10 absolute top-5 right-5" />
 
-              <div className="flex gap-1 mb-6">
+              <div className="flex gap-0.5 mb-4">
                 {Array.from({ length: t.stars }).map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-accent text-accent" />
+                  <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
                 ))}
               </div>
 
-              <p className="text-lg md:text-xl font-medium text-foreground leading-relaxed mb-8 italic">
+              <p className="text-sm text-muted-foreground leading-relaxed mb-6">
                 "{t.text}"
               </p>
 
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-sm font-black text-white shadow-lg shadow-primary/20">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
                   {t.avatar}
                 </div>
                 <div>
-                  <p className="font-black text-base text-foreground tracking-tight uppercase">{t.name}</p>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-accent">{t.role}</p>
+                  <p className="font-semibold text-sm text-foreground">{t.name}</p>
+                  <p className="text-xs text-muted-foreground">{t.role}</p>
                 </div>
               </div>
             </div>

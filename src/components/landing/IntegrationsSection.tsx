@@ -11,48 +11,33 @@ const integrations = [
 
 export function IntegrationsSection() {
   return (
-    <section className="py-24 md:py-32 bg-primary dark:bg-card text-white overflow-hidden relative">
-      {/* Background patterns */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_30%,_var(--tw-gradient-stops))] from-accent/40 via-transparent to-transparent" />
-      </div>
-
-      <div className="container mx-auto px-4 relative z-10 text-center">
-        <div className="max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 mb-6 font-bold text-xs uppercase tracking-widest">
-            Ecossistema
+    <section className="py-20 md:py-28">
+      <div className="container mx-auto px-4">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/8 border border-primary/15 mb-4">
+            <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+              Integrações
+            </span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight leading-tight">
-            O hub central para <span className="text-accent underline decoration-accent/30 underline-offset-8">sua operação</span> escalar.
+          <h2 className="text-3xl md:text-[2.75rem] font-bold mb-4 text-foreground leading-tight">
+            Conectado com as ferramentas{' '}
+            <span className="text-primary">que você já usa</span>
           </h2>
-          <p className="text-lg opacity-70">
-            Conectamos as ferramentas que você já usa para criar um fluxo de trabalho imbatível. 
-            Mais automação, menos trabalho manual.
-          </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 max-w-5xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-4xl mx-auto">
           {integrations.map((i) => (
             <div
               key={i.name}
-              className="flex flex-col items-center justify-center p-8 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-accent/40 transition-all duration-500 group relative"
+              className="flex flex-col items-center p-5 rounded-2xl bg-card border border-border/50 hover:border-primary/20 hover:shadow-md transition-all duration-300 text-center group"
             >
-              <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-accent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
-                <i.icon className="w-8 h-8 text-white group-hover:text-accent transition-colors" />
+              <div className="w-12 h-12 rounded-xl bg-primary/8 flex items-center justify-center mb-3 group-hover:bg-primary/15 transition-colors">
+                <i.icon className="w-6 h-6 text-primary" />
               </div>
-              <p className="text-base font-black uppercase tracking-tighter">{i.name}</p>
-              <p className="text-[10px] opacity-50 font-bold uppercase tracking-widest mt-1">{i.desc}</p>
+              <p className="text-sm font-semibold text-foreground">{i.name}</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">{i.desc}</p>
             </div>
           ))}
-        </div>
-
-        <div className="mt-20 pt-10 border-t border-white/10 inline-flex flex-wrap items-center justify-center gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
-           {/* These would be real corporate logos if we had them, using placeholders for now */}
-           <span className="text-xl font-black tracking-tighter">STRIPE</span>
-           <span className="text-xl font-black tracking-tighter">MERCADO PAGO</span>
-           <span className="text-xl font-black tracking-tighter">PAGSMILE</span>
-           <span className="text-xl font-black tracking-tighter">HOTMART</span>
         </div>
       </div>
     </section>

@@ -79,7 +79,6 @@ export default {
       fontFamily: {
         sans: ['DM Sans', 'system-ui', 'sans-serif'],
         heading: ['Space Grotesk', 'system-ui', 'sans-serif'],
-        display: ['Space Grotesk', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",

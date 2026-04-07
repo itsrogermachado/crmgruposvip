@@ -36,36 +36,33 @@ export function LandingHeader() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'py-3 bg-background/80 backdrop-blur-2xl border-b border-primary/5 shadow-2xl shadow-primary/5'
-          : 'py-6 bg-transparent'
+          ? 'bg-background/90 backdrop-blur-xl border-b border-border/50 shadow-sm'
+          : 'bg-transparent'
       }`}
     >
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between h-16 md:h-[72px]">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-11 h-11 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-accent/40 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6">
-              <Crown className="w-6 h-6 text-white group-hover:text-accent transition-colors" />
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-all duration-300 group-hover:scale-105">
+              <Crown className="w-4.5 h-4.5 text-primary-foreground" />
             </div>
             <div className="flex flex-col">
-              <span className="font-black text-xl leading-none text-foreground tracking-tighter uppercase italic">
-                CRM <span className="text-accent">VIP</span>
-              </span>
-              <span className="text-[9px] font-black tracking-[0.3em] text-muted-foreground uppercase mt-0.5">
-                Powering Groups
+              <span className="font-bold text-lg leading-tight text-foreground tracking-tight">
+                CRM Grupos VIP
               </span>
             </div>
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-2">
+          <nav className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
               <button
                 key={link.href}
                 onClick={() => scrollToSection(link.href)}
-                className="px-5 py-2 text-muted-foreground hover:text-primary transition-all text-xs font-black uppercase tracking-widest rounded-full hover:bg-primary/5"
+                className="px-3.5 py-2 text-muted-foreground hover:text-foreground transition-colors text-sm font-medium rounded-lg hover:bg-muted/50"
               >
                 {link.label}
               </button>
@@ -73,13 +70,15 @@ export function LandingHeader() {
           </nav>
 
           {/* Desktop CTAs */}
-          <div className="hidden lg:flex items-center gap-6">
-            <Link to="/auth" className="text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">
-              Entrar
+          <div className="hidden lg:flex items-center gap-3">
+            <Link to="/auth">
+              <Button variant="ghost" className="font-medium text-sm">
+                Entrar
+              </Button>
             </Link>
             <Link to="/auth">
-              <Button className="h-12 px-8 rounded-2xl font-black text-xs uppercase tracking-widest bg-accent hover:bg-accent/90 text-white shadow-xl shadow-accent/20 transition-all hover:scale-105 active:scale-95 border-0">
-                Teste Grátis
+              <Button className="font-semibold text-sm bg-primary hover:bg-primary/90 shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition-all">
+                Experimente Grátis
               </Button>
             </Link>
           </div>
