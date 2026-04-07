@@ -75,6 +75,10 @@ export default {
           inactive: "hsl(var(--status-inactive))",
           "inactive-bg": "hsl(var(--status-inactive-bg))",
         },
+        cta: {
+          DEFAULT: "hsl(var(--cta-orange))",
+          hover: "hsl(var(--cta-orange-hover))",
+        },
       },
       fontFamily: {
         sans: ['DM Sans', 'system-ui', 'sans-serif'],
