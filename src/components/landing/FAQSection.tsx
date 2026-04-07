@@ -40,19 +40,22 @@ const faqs = [
 
 export function FAQSection() {
   return (
-    <section id="faq" className="py-24 md:py-32 scroll-mt-20">
+    <section id="faq" className="py-24 md:py-40 scroll-mt-20 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/8 border border-primary/15 mb-4">
-            <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 mb-6">
+            <span className="text-[11px] font-bold text-primary uppercase tracking-[0.2em]">
               FAQ
             </span>
           </div>
-          <h2 className="text-3xl md:text-[2.75rem] font-bold mb-4 text-foreground leading-tight">
+          <h2 className="font-heading text-3xl md:text-[2.75rem] font-extrabold mb-4 text-primary leading-tight tracking-tight">
             Perguntas{' '}
-            <span className="text-primary">frequentes</span>
+            <span className="relative inline-block">
+              <span className="text-accent">frequentes</span>
+              <span className="absolute -bottom-1.5 left-0 right-0 h-[4px] bg-accent/25 rounded-full" />
+            </span>
           </h2>
-          <p className="text-muted-foreground text-base">
+          <p className="text-muted-foreground text-base md:text-lg font-medium">
             Tire suas dúvidas antes de começar
           </p>
         </div>
@@ -63,12 +66,12 @@ export function FAQSection() {
               <AccordionItem
                 key={index}
                 value={`item-${index}`}
-                className="bg-card border border-border/50 rounded-xl px-6 data-[state=open]:border-primary/25 data-[state=open]:shadow-sm transition-all"
+                className="bg-[#FAFAFA] border border-primary/10 rounded-xl px-6 data-[state=open]:border-accent/25 data-[state=open]:shadow-md data-[state=open]:shadow-accent/5 transition-all duration-300"
               >
-                <AccordionTrigger className="text-left font-semibold hover:no-underline py-5 text-foreground text-sm">
+                <AccordionTrigger className="text-left font-heading font-bold hover:no-underline py-5 text-primary text-base">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground text-sm pb-5 leading-relaxed">
+                <AccordionContent className="text-muted-foreground text-sm pb-6 leading-relaxed font-medium">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
