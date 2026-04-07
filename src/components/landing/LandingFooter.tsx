@@ -15,25 +15,25 @@ export function LandingFooter() {
   };
 
   return (
-    <footer className="py-12 border-t border-border/40 bg-muted/10">
+    <footer className="py-14 border-t border-white/10 bg-[#1a2d4d]">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           {/* Brand */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
-                <Crown className="w-4 h-4 text-primary-foreground" />
+              <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
+                <Crown className="w-4 h-4 text-white" />
               </div>
-              <span className="font-bold text-lg text-foreground">CRM Grupos VIP</span>
+              <span className="font-heading font-extrabold text-lg text-white">CRM Grupos VIP</span>
             </div>
-            <p className="text-muted-foreground max-w-sm text-sm leading-relaxed">
+            <p className="text-white/50 max-w-sm text-sm leading-relaxed font-medium">
               A plataforma completa para gestores de grupos VIP gerenciarem membros, pagamentos e escalarem seu negócio.
             </p>
           </div>
 
           {/* Links */}
           <div>
-            <h4 className="font-semibold mb-4 text-sm text-foreground">Navegação</h4>
+            <h4 className="font-heading font-extrabold mb-4 text-[11px] text-white uppercase tracking-[0.2em]">Navegação</h4>
             <ul className="space-y-2.5">
               {[
                 { label: 'Recursos', id: 'beneficios' },
@@ -45,7 +45,7 @@ export function LandingFooter() {
                 <li key={item.id}>
                   <button
                     onClick={() => scrollToSection(item.id)}
-                    className="text-muted-foreground hover:text-foreground transition-colors text-sm"
+                    className="text-white/50 hover:text-white transition-colors duration-300 text-sm font-medium"
                   >
                     {item.label}
                   </button>
@@ -54,7 +54,7 @@ export function LandingFooter() {
               <li>
                 <Link
                   to="/auth"
-                  className="text-muted-foreground hover:text-foreground transition-colors text-sm"
+                  className="text-white/50 hover:text-white transition-colors duration-300 text-sm font-medium"
                 >
                   Entrar
                 </Link>
@@ -64,10 +64,10 @@ export function LandingFooter() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-semibold mb-4 text-sm text-foreground">Contato</h4>
+            <h4 className="font-heading font-extrabold mb-4 text-[11px] text-white uppercase tracking-[0.2em]">Contato</h4>
             <button
               onClick={openWhatsApp}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm"
+              className="flex items-center gap-2 text-white/50 hover:text-white transition-colors duration-300 text-sm font-medium"
             >
               <MessageCircle className="w-4 h-4" />
               <span>(21) 96448-8285</span>
@@ -75,7 +75,7 @@ export function LandingFooter() {
           </div>
         </div>
 
-        <div className="pt-6 border-t border-border/40 text-center text-xs text-muted-foreground">
+        <div className="pt-6 border-t border-white/10 text-center text-xs text-white/30 font-medium">
           © {new Date().getFullYear()} CRM Grupos VIP. Todos os direitos reservados.
         </div>
       </div>

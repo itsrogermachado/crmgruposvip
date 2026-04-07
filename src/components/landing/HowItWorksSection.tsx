@@ -23,39 +23,44 @@ const steps = [
 
 export function HowItWorksSection() {
   return (
-    <section id="como-funciona" className="py-24 md:py-32 scroll-mt-20 relative bg-muted/20">
+    <section id="como-funciona" className="py-24 md:py-40 scroll-mt-20 relative bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/8 border border-primary/15 mb-4">
-            <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+        <div className="text-center max-w-2xl mx-auto mb-20">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 mb-6">
+            <span className="text-[11px] font-bold text-primary uppercase tracking-[0.2em]">
               Simples
             </span>
           </div>
-          <h2 className="text-3xl md:text-[2.75rem] font-bold mb-4 text-foreground leading-tight">
+          <h2 className="font-heading text-3xl md:text-[2.75rem] font-extrabold mb-4 text-primary leading-tight tracking-tight">
             Comece em{' '}
-            <span className="text-primary">3 passos simples</span>
+            <span className="relative inline-block">
+              <span className="text-accent">3 passos simples</span>
+              <span className="absolute -bottom-1.5 left-0 right-0 h-[4px] bg-accent/25 rounded-full" />
+            </span>
           </h2>
-          <p className="text-muted-foreground text-base">
+          <p className="text-muted-foreground text-base md:text-lg font-medium">
             Do cadastro ao primeiro cliente em menos de 5 minutos
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto relative">
-          {/* Connector lines (desktop) */}
-          <div className="hidden md:block absolute top-14 left-[20%] right-[20%] h-px bg-gradient-to-r from-primary/20 via-primary/30 to-primary/20" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto relative">
+          {/* Connector line (desktop) */}
+          <div className="hidden md:block absolute top-16 left-[20%] right-[20%] h-[2px] bg-gradient-to-r from-accent/20 via-accent/40 to-accent/20" />
 
           {steps.map((s) => (
             <div key={s.step} className="relative text-center group">
               <div className="relative z-10 inline-flex flex-col items-center">
-                <div className="w-[72px] h-[72px] rounded-2xl bg-card border-2 border-primary/20 flex items-center justify-center mb-5 group-hover:border-primary/40 group-hover:shadow-lg group-hover:shadow-primary/10 transition-all duration-300">
-                  <s.icon className="w-7 h-7 text-primary" />
+                {/* Step badge */}
+                <div className="absolute -top-3 -right-3 z-20 w-9 h-9 rounded-full bg-accent text-white flex items-center justify-center text-xs font-extrabold rotate-12 shadow-lg shadow-accent/30">
+                  {s.step}
+                </div>
+                
+                <div className="w-[80px] h-[80px] rounded-[2rem] bg-white border-2 border-primary/15 flex items-center justify-center mb-6 group-hover:border-accent/40 group-hover:shadow-xl group-hover:shadow-accent/10 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500">
+                  <s.icon className="w-8 h-8 text-primary" />
                 </div>
 
-                <span className="text-xs font-bold text-primary/50 uppercase tracking-[0.2em] mb-2">
-                  Passo {s.step}
-                </span>
-                <h3 className="text-lg font-bold text-foreground mb-2">{s.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed max-w-[260px]">
+                <h3 className="font-heading text-lg font-extrabold text-primary mb-2 uppercase tracking-tight">{s.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed max-w-[260px] font-medium">
                   {s.description}
                 </p>
               </div>

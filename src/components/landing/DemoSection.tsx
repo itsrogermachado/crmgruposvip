@@ -1,7 +1,6 @@
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
 
 const features = [
   'Dashboard completo com métricas em tempo real',
@@ -14,91 +13,113 @@ const features = [
 
 export function DemoSection() {
   return (
-    <section className="py-24 md:py-32 relative overflow-hidden">
+    <section className="py-24 md:py-40 relative overflow-hidden bg-white">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-2 gap-12 md:gap-20 items-center max-w-6xl mx-auto">
-          {/* Left - Text */}
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/8 border border-primary/15 mb-4">
-              <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+        <div className="grid md:grid-cols-12 gap-12 md:gap-16 items-center max-w-6xl mx-auto">
+          {/* Left - Text (5 cols) */}
+          <div className="md:col-span-5">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 mb-6">
+              <span className="text-[11px] font-bold text-primary uppercase tracking-[0.2em]">
                 Plataforma
               </span>
             </div>
-            <h2 className="text-3xl md:text-[2.5rem] font-bold mb-6 text-foreground leading-tight">
+            <h2 className="font-heading text-3xl md:text-[2.5rem] font-extrabold mb-6 text-primary leading-tight tracking-tight">
               Interface intuitiva{' '}
-              <span className="text-primary">projetada para você</span>
+              <span className="relative inline-block">
+                <span className="text-accent">projetada para você</span>
+                <span className="absolute -bottom-1.5 left-0 right-0 h-[4px] bg-accent/25 rounded-full" />
+              </span>
             </h2>
-            <p className="text-muted-foreground mb-8 leading-relaxed">
+            <p className="text-muted-foreground mb-8 leading-relaxed text-base font-medium">
               Sem complicação. Tudo o que você precisa para gerenciar seu grupo VIP está em uma interface limpa, rápida e moderna.
             </p>
 
-            <ul className="space-y-3 mb-8">
+            <ul className="space-y-3.5 mb-8">
               {features.map((f) => (
                 <li key={f} className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-muted-foreground">{f}</span>
+                  <CheckCircle2 className="w-5 h-5 text-accent mt-0.5 flex-shrink-0" />
+                  <span className="text-sm text-muted-foreground font-medium">{f}</span>
                 </li>
               ))}
             </ul>
 
             <Link to="/auth">
-              <Button className="font-semibold bg-primary hover:bg-primary/90 shadow-md shadow-primary/15">
+              <Button className="font-extrabold uppercase tracking-[0.1em] text-xs bg-accent hover:bg-accent/90 text-white shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/35 transition-all duration-300 h-12 px-8 border-0">
                 Experimentar Agora
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
           </div>
 
-          {/* Right - Dashboard mock */}
-          <div className="relative">
-            <div className="absolute -inset-4 bg-gradient-to-r from-primary/5 to-primary/[0.02] rounded-3xl blur-xl" />
-            <div className="relative bg-card rounded-2xl border border-border shadow-2xl overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3 bg-muted/40 border-b border-border/40">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-destructive/60" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-                  <div className="w-3 h-3 rounded-full bg-green-500/60" />
-                </div>
-                <div className="flex-1 flex justify-center">
-                  <div className="px-4 py-1 bg-background/80 rounded-lg text-xs text-muted-foreground">
-                    app.crmgruposvip.com
+          {/* Right - Dashboard mock (7 cols) */}
+          <div className="md:col-span-7">
+            <div className="relative">
+              <div className="absolute -inset-4 bg-accent/[0.04] rounded-3xl blur-xl" />
+              <div className="relative bg-white rounded-2xl border border-primary/10 shadow-2xl shadow-primary/10 overflow-hidden">
+                <div className="flex items-center gap-2 px-4 py-3 bg-primary/[0.03] border-b border-primary/10">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-400/70" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-400/70" />
+                    <div className="w-3 h-3 rounded-full bg-green-400/70" />
                   </div>
-                </div>
-              </div>
-
-              <div className="p-5 bg-gradient-to-br from-background to-muted/10">
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  {[
-                    { label: 'Membros Ativos', value: '147' },
-                    { label: 'Faturamento', value: 'R$ 22.050' },
-                    { label: 'A Vencer', value: '12' },
-                    { label: 'Renovações', value: '94%' },
-                  ].map((stat) => (
-                    <div key={stat.label} className="p-3 rounded-xl bg-card border border-border/50">
-                      <p className="text-[10px] text-muted-foreground mb-1">{stat.label}</p>
-                      <p className="text-sm font-bold text-primary">{stat.value}</p>
+                  <div className="flex-1 flex justify-center">
+                    <div className="px-4 py-1 bg-primary/5 rounded-lg text-[10px] text-primary/60 font-bold tracking-wider uppercase">
+                      app.crmgruposvip.com
                     </div>
-                  ))}
+                  </div>
                 </div>
 
-                <div className="rounded-xl bg-card border border-border/50 overflow-hidden">
-                  <div className="p-3 border-b border-border/40 flex items-center justify-between">
-                    <span className="text-xs font-semibold">Membros Recentes</span>
-                  </div>
-                  <div className="divide-y divide-border/30">
-                    {['João Silva', 'Maria Santos', 'Pedro Costa'].map((name) => (
-                      <div key={name} className="p-2.5 flex items-center justify-between">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-semibold text-primary">
-                            {name.charAt(0)}
-                          </div>
-                          <span className="text-xs">{name}</span>
+                <div className="p-5 bg-[#FAFAFA]">
+                  {/* Stats cards */}
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    {[
+                      { label: 'Receita Mensal', value: 'R$ 22.050', icon: '📈' },
+                      { label: 'Clientes Ativos', value: '147', icon: '👥' },
+                      { label: 'Taxa Renovação', value: '94%', icon: '🔄' },
+                    ].map((stat) => (
+                      <div key={stat.label} className="p-3.5 rounded-xl bg-white border border-primary/10">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-base">{stat.icon}</span>
+                          <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">{stat.label}</p>
                         </div>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 font-medium">
-                          Ativo
-                        </span>
+                        <p className="text-lg font-extrabold text-primary font-heading">{stat.value}</p>
                       </div>
                     ))}
+                  </div>
+
+                  {/* Mini table */}
+                  <div className="rounded-xl bg-white border border-primary/10 overflow-hidden">
+                    <div className="p-3 border-b border-primary/10 flex items-center justify-between">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-primary">Clientes</span>
+                      <span className="text-[10px] text-muted-foreground font-medium">Últimos adicionados</span>
+                    </div>
+                    <div className="divide-y divide-primary/5">
+                      {[
+                        { name: 'João Silva', status: 'Ativo', value: 'R$ 197' },
+                        { name: 'Maria Santos', status: 'Ativo', value: 'R$ 297' },
+                        { name: 'Pedro Costa', status: 'Vencendo', value: 'R$ 147' },
+                        { name: 'Ana Lima', status: 'Ativo', value: 'R$ 197' },
+                      ].map((row) => (
+                        <div key={row.name} className="p-2.5 flex items-center justify-between">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-extrabold text-primary font-heading">
+                              {row.name.charAt(0)}
+                            </div>
+                            <span className="text-xs font-medium text-primary">{row.name}</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
+                              row.status === 'Ativo'
+                                ? 'bg-green-500/10 text-green-600'
+                                : 'bg-yellow-500/10 text-yellow-600'
+                            }`}>
+                              {row.status}
+                            </span>
+                            <span className="text-xs font-bold text-primary">{row.value}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
