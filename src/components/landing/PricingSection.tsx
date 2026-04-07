@@ -17,9 +17,9 @@ export function PricingSection() {
 
   if (isLoading) {
     return (
-      <section id="planos" className="py-24 md:py-40 scroll-mt-20">
+      <section id="planos" className="py-24 md:py-32 scroll-mt-20">
         <div className="container mx-auto px-4 flex justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-accent" />
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
       </section>
     );
@@ -32,27 +32,24 @@ export function PricingSection() {
       : null;
 
   return (
-    <section id="planos" className="py-24 md:py-40 scroll-mt-20 bg-[#FAFAFA]">
+    <section id="planos" className="py-24 md:py-32 scroll-mt-20 bg-muted/20">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 mb-6">
-            <span className="text-[11px] font-bold text-primary uppercase tracking-[0.2em]">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/8 border border-primary/15 mb-4">
+            <span className="text-xs font-semibold text-primary uppercase tracking-wider">
               Planos
             </span>
           </div>
-          <h2 className="font-heading text-3xl md:text-[2.75rem] font-extrabold mb-4 text-primary leading-tight tracking-tight">
+          <h2 className="text-3xl md:text-[2.75rem] font-bold mb-4 text-foreground leading-tight">
             Escolha o plano{' '}
-            <span className="relative inline-block">
-              <span className="text-accent">ideal para você</span>
-              <span className="absolute -bottom-1.5 left-0 right-0 h-[4px] bg-accent/25 rounded-full" />
-            </span>
+            <span className="text-primary">ideal para você</span>
           </h2>
-          <p className="text-muted-foreground text-base md:text-lg font-medium">
+          <p className="text-muted-foreground text-base">
             Todos os planos incluem 7 dias de teste grátis. Cancele quando quiser.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto items-end">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto">
           {sortedPlans.map((plan) => {
             const isPopular = plan.id === annualPlanId;
             const priceFormatted = (plan.price_cents / 100).toLocaleString('pt-BR', {
@@ -67,46 +64,46 @@ export function PricingSection() {
             return (
               <div
                 key={plan.id}
-                className={`relative rounded-2xl transition-all duration-500 ${
+                className={`relative rounded-2xl transition-all duration-300 ${
                   isPopular
-                    ? 'bg-white border-2 border-accent/40 shadow-2xl shadow-accent/15 scale-[1.04] z-10'
-                    : 'bg-white border border-primary/10 hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5'
+                    ? 'bg-card border-2 border-primary/30 shadow-xl shadow-primary/10 scale-[1.02]'
+                    : 'bg-card border border-border/50 hover:border-primary/20 hover:shadow-md'
                 }`}
               >
                 {isPopular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-5 py-1.5 rounded-full bg-accent text-white text-[11px] font-extrabold uppercase tracking-[0.15em] flex items-center gap-1.5 shadow-lg shadow-accent/30">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center gap-1.5 shadow-lg shadow-primary/25">
                     <Flame className="w-3.5 h-3.5" />
-                    Melhor Valor
+                    Mais Popular
                   </div>
                 )}
 
-                <div className={`p-7 ${isPopular ? 'py-10' : ''}`}>
-                  <h3 className="font-heading text-lg font-extrabold text-center mb-1 text-primary mt-1 uppercase tracking-tight">
+                <div className="p-7">
+                  <h3 className="text-lg font-bold text-center mb-1 text-foreground mt-1">
                     {plan.name}
                   </h3>
 
-                  <div className="text-center mb-8 mt-5">
-                    <span className="font-heading text-5xl font-extrabold text-primary tracking-tight">{priceFormatted}</span>
-                    <span className="text-muted-foreground text-sm font-medium">{periodLabel}</span>
+                  <div className="text-center mb-6 mt-4">
+                    <span className="text-4xl font-bold text-foreground">{priceFormatted}</span>
+                    <span className="text-muted-foreground text-sm">{periodLabel}</span>
                   </div>
 
-                  <ul className="space-y-3.5 mb-8">
+                  <ul className="space-y-3 mb-8">
                     {features.map((feature) => (
                       <li key={feature} className="flex items-center gap-3">
-                        <div className="w-5 h-5 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
-                          <Check className="w-3 h-3 text-accent" />
+                        <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Check className="w-3 h-3 text-primary" />
                         </div>
-                        <span className="text-sm text-muted-foreground font-medium">{feature}</span>
+                        <span className="text-sm text-muted-foreground">{feature}</span>
                       </li>
                     ))}
                   </ul>
 
                   <Link to="/auth">
                     <Button
-                      className={`w-full font-extrabold h-12 uppercase tracking-[0.1em] text-xs transition-all duration-300 ${
+                      className={`w-full font-semibold h-11 ${
                         isPopular
-                          ? 'bg-accent hover:bg-accent/90 shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/35 text-white border-0 hover:scale-[1.02]'
-                          : 'border-primary/20 text-primary hover:bg-primary/5'
+                          ? 'bg-primary hover:bg-primary/90 shadow-md shadow-primary/15 border-0'
+                          : ''
                       }`}
                       variant={isPopular ? 'default' : 'outline'}
                       size="lg"
@@ -120,9 +117,9 @@ export function PricingSection() {
           })}
         </div>
 
-        <p className="text-center text-muted-foreground mt-12 text-sm font-medium">
+        <p className="text-center text-muted-foreground mt-10 text-sm">
           <span className="inline-flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-green-500" />
+            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
             7 dias grátis para testar • Sem cartão de crédito
           </span>
         </p>
