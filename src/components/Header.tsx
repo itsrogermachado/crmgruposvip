@@ -116,6 +116,7 @@ export function Header({
               Admin
             </Button>
           )}
+          <NotificationBell />
           
           <Button 
             variant="ghost" 
