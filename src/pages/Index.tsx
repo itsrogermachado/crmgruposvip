@@ -2,7 +2,7 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ExcelJS from 'exceljs';
 import { startOfMonth, endOfMonth, addMonths, isWithinInterval } from 'date-fns';
-import { parseBRDate } from '@/lib/dateUtils';
+import { parseBRDate, formatToBRDate } from '@/lib/dateUtils';
 import { Header } from '@/components/Header';
 import { StatsGrid } from '@/components/StatsGrid';
 import { DashboardCharts } from '@/components/DashboardCharts';
@@ -68,21 +68,28 @@ const Index = () => {
   }, [clients, searchTerm, statusFilter, planoFilter]);
 
   const tableClients = useMemo(() => {
-    return filteredClients.map((c) => ({
-      id: c.id,
-      nome: c.nome,
-      telefone: c.telefone,
-      discord: c.discord,
-      telegram: c.telegram,
-      plano: c.plano,
-      // Use renewal price if available, otherwise fallback to base price
-      preco: c.preco_renovacao ?? c.preco,
-      dataEntrada: c.data_entrada,
-      dataVencimento: c.data_vencimento,
-      status: c.status,
-      comprovanteUrl: c.comprovante_url,
-      observacoes: c.observacoes,
-    }));
+    return filteredClients.map((c) => {
+      const formatDate = (dateStr: string) => {
+        const parsed = parseBRDate(dateStr);
+        return parsed ? formatToBRDate(parsed) : dateStr;
+      };
+
+      return {
+        id: c.id,
+        nome: c.nome,
+        telefone: c.telefone,
+        discord: c.discord,
+        telegram: c.telegram,
+        plano: c.plano,
+        // Use renewal price if available, otherwise fallback to base price
+        preco: c.preco_renovacao ?? c.preco,
+        dataEntrada: formatDate(c.data_entrada),
+        dataVencimento: formatDate(c.data_vencimento),
+        status: c.status,
+        comprovanteUrl: c.comprovante_url,
+        observacoes: c.observacoes,
+      };
+    });
   }, [filteredClients]);
 
   const statsClients = useMemo(() => {
