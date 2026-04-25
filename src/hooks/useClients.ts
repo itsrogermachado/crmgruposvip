@@ -80,9 +80,10 @@ export function useClients(groupId?: string | null) {
       if (error) throw error;
 
       const mappedClients: Client[] = (data || []).map((c) => {
-        // Auto-calculate status based on due date
+        // Auto-calculate status based on due date. 
+        // Pass current DB status to check for manual "Não renovou" override
         const autoStatus = calculateStatus(c.data_vencimento, c.status);
-        
+
         return {
           id: c.id,
           nome: c.nome,
