@@ -3,8 +3,6 @@ import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuHeader,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -13,7 +11,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { toast } from 'sonner';
 
 interface Notification {
   id: string;
@@ -49,9 +46,8 @@ export function NotificationBell() {
           setNotifications((prev) => [newNotification, ...prev]);
           setUnreadCount((prev) => prev + 1);
           
-          // Request push permission if not granted
           if (Notification.permission === 'default') {
-            requestNotificationPermission();
+            Notification.requestPermission();
           }
         }
       )
@@ -93,32 +89,6 @@ export function NotificationBell() {
       prev.map((n) => (n.id === id ? { ...n, read: true } : n))
     );
     setUnreadCount((prev) => Math.max(0, prev - 1));
-  };
-
-  const requestNotificationPermission = async () => {
-    if (!('Notification' in window)) return;
-    
-    const permission = await Notification.requestPermission();
-    if (permission === 'granted') {
-      registerServiceWorker();
-    }
-  };
-
-  const registerServiceWorker = async () => {
-    try {
-      const registration = await navigator.serviceWorker.ready;
-      
-      // We'll need the VAPID Public Key from the user eventually
-      // For now, we'll just show a toast if it's missing
-      const { data: secrets } = await supabase.rpc('get_secret_placeholder', { name: 'VAPID_PUBLIC_KEY' });
-      // Wait, I can't easily get secrets from client side unless exposed.
-      // I'll assume it will be set up.
-      
-      // For now, just a placeholder for the registration logic
-      console.log('Push notification permission granted');
-    } catch (error) {
-      console.error('Service Worker registration failed:', error);
-    }
   };
 
   return (
