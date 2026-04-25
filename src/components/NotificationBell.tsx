@@ -103,15 +103,43 @@ export function NotificationBell() {
       return;
     }
 
-    const permission = await Notification.requestPermission();
-    if (permission === 'granted') {
-      toast.success('Notificações ativadas com sucesso!');
-      // Here we would normally register the push subscription with the server
-      // But it requires a VAPID Public Key
-    } else {
-      toast.error('Permissão de notificação negada.');
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        const registration = await navigator.serviceWorker.ready;
+        const publicVapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+
+        if (!publicVapidKey) {
+          console.error('VAPID Public Key not found in environment variables');
+          return;
+        }
+
+        const subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+        });
+
+        const { error } = await supabase
+          .from('push_subscriptions')
+          .upsert({
+            user_id: session?.user?.id,
+            subscription: JSON.parse(JSON.stringify(subscription))
+          }, {
+            onConflict: 'user_id'
+          });
+
+        if (error) throw error;
+
+        toast.success('Notificações push ativadas com sucesso!');
+      } else {
+        toast.error('Permissão de notificação negada.');
+      }
+    } catch (error) {
+      console.error('Error subscribing to push notifications:', error);
+      toast.error('Erro ao ativar notificações push.');
     }
   };
+
 
   return (
     <DropdownMenu>
