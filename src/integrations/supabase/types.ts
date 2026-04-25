@@ -77,7 +77,6 @@ export type Database = {
           telegram: string | null
           updated_at: string
           user_id: string
-          vencimento_notificado: boolean | null
         }
         Insert: {
           comprovante_url?: string | null
@@ -97,7 +96,6 @@ export type Database = {
           telegram?: string | null
           updated_at?: string
           user_id: string
-          vencimento_notificado?: boolean | null
         }
         Update: {
           comprovante_url?: string | null
@@ -117,7 +115,6 @@ export type Database = {
           telegram?: string | null
           updated_at?: string
           user_id?: string
-          vencimento_notificado?: boolean | null
         }
         Relationships: [
           {
@@ -213,44 +210,6 @@ export type Database = {
         }
         Relationships: []
       }
-      notifications: {
-        Row: {
-          client_id: string | null
-          created_at: string
-          id: string
-          message: string
-          read: boolean
-          title: string
-          user_id: string
-        }
-        Insert: {
-          client_id?: string | null
-          created_at?: string
-          id?: string
-          message: string
-          read?: boolean
-          title: string
-          user_id: string
-        }
-        Update: {
-          client_id?: string | null
-          created_at?: string
-          id?: string
-          message?: string
-          read?: boolean
-          title?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "notifications_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       payments: {
         Row: {
           amount_cents: number
@@ -333,27 +292,6 @@ export type Database = {
           group_name?: string | null
           id?: string
           updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      push_subscriptions: {
-        Row: {
-          created_at: string
-          id: string
-          subscription: Json
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          subscription: Json
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          subscription?: Json
           user_id?: string
         }
         Relationships: []
