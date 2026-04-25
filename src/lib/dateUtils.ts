@@ -8,17 +8,37 @@ export function getSaoPauloDate(): Date {
 }
 
 export function parseBRDate(dateStr: string): Date | null {
-  // Parse DD/MM/YYYY format
-  const parts = dateStr.split('/');
-  if (parts.length !== 3) return null;
+  if (!dateStr) return null;
+
+  // Handle ISO format YYYY-MM-DD
+  if (dateStr.includes('-')) {
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+        return new Date(year, month, day);
+      }
+    }
+  }
+
+  // Handle DD/MM/YYYY format
+  if (dateStr.includes('/')) {
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const year = parseInt(parts[2], 10);
+      if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+        return new Date(year, month, day);
+      }
+    }
+  }
   
-  const day = parseInt(parts[0], 10);
-  const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
-  const year = parseInt(parts[2], 10);
-  
-  if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
-  
-  return new Date(year, month, day);
+  // Fallback to native Date parsing for other formats
+  const date = new Date(dateStr);
+  return isNaN(date.getTime()) ? null : date;
 }
 
 export function formatToBRDate(date: Date): string {

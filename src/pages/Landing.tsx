@@ -1,3 +1,6 @@
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 import { LandingHeader } from '@/components/landing/LandingHeader';
 import { HeroSection } from '@/components/landing/HeroSection';
 import { SocialProofBar } from '@/components/landing/SocialProofBar';
@@ -8,14 +11,23 @@ import { IntegrationsSection } from '@/components/landing/IntegrationsSection';
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
 import { PricingSection } from '@/components/landing/PricingSection';
 import { FAQSection } from '@/components/landing/FAQSection';
-
 import { FinalCTASection } from '@/components/landing/FinalCTASection';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { FloatingWhatsApp } from '@/components/landing/FloatingWhatsApp';
 import { useTheme } from '@/hooks/useTheme';
 
 export default function Landing() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
   useTheme();
+
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/dashboard');
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) return null;
 
   return (
     <div className="min-h-screen bg-background text-foreground scroll-smooth overflow-x-hidden">
