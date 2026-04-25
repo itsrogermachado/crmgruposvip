@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { toast } from 'sonner';
 
 interface Notification {
   id: string;
@@ -46,8 +47,11 @@ export function NotificationBell() {
           setNotifications((prev) => [newNotification, ...prev]);
           setUnreadCount((prev) => prev + 1);
           
-          if (Notification.permission === 'default') {
-            Notification.requestPermission();
+          if (Notification.permission === 'granted') {
+            new Notification(newNotification.title, {
+              body: newNotification.message,
+              icon: '/pwa-192x192.png'
+            });
           }
         }
       )
@@ -91,21 +95,44 @@ export function NotificationBell() {
     setUnreadCount((prev) => Math.max(0, prev - 1));
   };
 
+  const handleRequestPermission = async () => {
+    if (!('Notification' in window)) {
+      toast.error('Seu navegador não suporta notificações.');
+      return;
+    }
+
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      toast.success('Notificações ativadas com sucesso!');
+      // Here we would normally register the push subscription with the server
+      // But it requires a VAPID Public Key
+    } else {
+      toast.error('Permissão de notificação negada.');
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative hover:bg-primary/10 transition-all duration-300">
-          <Bell className="h-5 w-5" />
-          {unreadCount > 0 && (
-            <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] text-destructive-foreground animate-pulse">
-              {unreadCount}
-            </span>
-          )}
-        </Button>
+        <div className="relative inline-block">
+          <Button variant="ghost" size="icon" className="relative hover:bg-primary/10 transition-all duration-300">
+            <Bell className="h-5 w-5" />
+            {unreadCount > 0 && (
+              <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] text-destructive-foreground animate-pulse">
+                {unreadCount}
+              </span>
+            )}
+          </Button>
+        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80 p-0 shadow-2xl border-primary/20 overflow-hidden">
-        <div className="p-4 border-b border-primary/10 bg-muted/30">
+        <div className="p-4 border-b border-primary/10 bg-muted/30 flex items-center justify-between">
           <h3 className="font-bold text-sm">Notificações</h3>
+          {Notification.permission !== 'granted' && (
+            <Button variant="ghost" size="sm" className="h-7 text-[10px] px-2" onClick={handleRequestPermission}>
+              Ativar Push
+            </Button>
+          )}
         </div>
         <ScrollArea className="h-80">
           {notifications.length === 0 ? (
