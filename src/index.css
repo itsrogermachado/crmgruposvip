@@ -253,13 +253,11 @@ html.transitioning * {
 
   /* Safe area for mobile bottom nav */
   .safe-area-pb {
-    padding-bottom: 5rem;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
-  @supports (padding-bottom: env(safe-area-inset-bottom)) {
-    .safe-area-pb {
-      padding-bottom: calc(5rem + env(safe-area-inset-bottom));
-    }
+  .main-content-pb {
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
   }
 
   @media (min-width: 768px) {
