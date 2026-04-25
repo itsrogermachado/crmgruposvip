@@ -361,7 +361,7 @@ const Index = () => {
   return (
     <SubscriptionRequired>
       {showTutorial && <OnboardingTutorial onComplete={handleTutorialComplete} />}
-      <div className="min-h-screen animated-bg dark:animated-bg animated-bg-light safe-area-pb">
+      <div className="min-h-screen animated-bg dark:animated-bg animated-bg-light main-content-pb">
         <Header
           onImport={handleImport}
           onExport={handleExport}
