@@ -8,6 +8,7 @@ import { SubscriptionCountdown } from './SubscriptionCountdown';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { WhatsAppSupport } from './WhatsAppSupport';
 import { GlobalSearch } from './GlobalSearch';
+import { NotificationBell } from './NotificationBell';
 import { Client } from '@/hooks/useClients';
 
 interface HeaderProps {
@@ -115,6 +116,7 @@ export function Header({
               Admin
             </Button>
           )}
+          <NotificationBell />
           
           <Button 
             variant="ghost" 
