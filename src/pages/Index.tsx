@@ -199,34 +199,46 @@ const Index = () => {
   };
 
   const handleSaveClient = async (clientData: { id?: string; nome: string; telefone: string; discord?: string; telegram?: string; plano: string; preco: number; dataEntrada: string; dataVencimento: string; status: string; comprovanteUrl?: string; observacoes?: string }, paymentOptions: PaymentOptions) => {
-    if (clientData.id) {
-      await updateClient(clientData.id, {
-        nome: clientData.nome,
-        telefone: clientData.telefone,
-        discord: clientData.discord,
-        telegram: clientData.telegram,
-        plano: clientData.plano as Client['plano'],
-        preco: clientData.preco,
-        data_entrada: clientData.dataEntrada,
-        data_vencimento: clientData.dataVencimento,
-        status: clientData.status as Client['status'],
-        comprovante_url: clientData.comprovanteUrl,
-        observacoes: clientData.observacoes,
-      }, paymentOptions);
-    } else {
-      await addClient({
-        nome: clientData.nome,
-        telefone: clientData.telefone,
-        discord: clientData.discord,
-        telegram: clientData.telegram,
-        plano: clientData.plano as Client['plano'],
-        preco: clientData.preco,
-        data_entrada: clientData.dataEntrada,
-        data_vencimento: clientData.dataVencimento,
-        status: clientData.status as Client['status'],
-        comprovante_url: clientData.comprovanteUrl,
-        observacoes: clientData.observacoes,
-      }, paymentOptions);
+    console.log('handleSaveClient chamado no Index.tsx', { clientData, paymentOptions });
+    try {
+      if (clientData.id) {
+        await updateClient(clientData.id, {
+          nome: clientData.nome,
+          telefone: clientData.telefone,
+          discord: clientData.discord,
+          telegram: clientData.telegram,
+          plano: clientData.plano as Client['plano'],
+          preco: clientData.preco,
+          data_entrada: clientData.dataEntrada,
+          data_vencimento: clientData.dataVencimento,
+          status: clientData.status as Client['status'],
+          comprovante_url: clientData.comprovanteUrl,
+          observacoes: clientData.observacoes,
+        }, paymentOptions);
+      } else {
+        console.log('Tentando adicionar novo cliente via addClient...');
+        const result = await addClient({
+          nome: clientData.nome,
+          telefone: clientData.telefone,
+          discord: clientData.discord,
+          telegram: clientData.telegram,
+          plano: clientData.plano as Client['plano'],
+          preco: clientData.preco,
+          data_entrada: clientData.dataEntrada,
+          data_vencimento: clientData.dataVencimento,
+          status: clientData.status as Client['status'],
+          comprovante_url: clientData.comprovanteUrl,
+          observacoes: clientData.observacoes,
+        }, paymentOptions);
+        console.log('Resultado do addClient:', result);
+      }
+    } catch (err) {
+      console.error('Erro no handleSaveClient:', err);
+      toast({
+        title: "Erro inesperado",
+        description: "Ocorreu um erro ao tentar salvar o cliente.",
+        variant: "destructive",
+      });
     }
   };
 
