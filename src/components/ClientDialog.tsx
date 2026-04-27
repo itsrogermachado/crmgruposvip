@@ -666,9 +666,8 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
             <Button 
               type="submit" 
               form="client-form"
-              className="w-full sm:w-auto"
             >
-              {client ? 'Salvar Alterações' : 'Criar Novo Cliente'}
+              {client ? 'Salvar' : 'Criar Cliente'}
             </Button>
           </DialogFooter>
         </DialogContent>
