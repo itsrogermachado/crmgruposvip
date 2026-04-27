@@ -182,11 +182,11 @@ export function useClients(groupId?: string | null) {
       });
 
       return newClient;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao adicionar cliente:', error);
       toast({
         title: 'Erro',
-        description: 'Não foi possível adicionar o cliente.',
+        description: error.message || 'Não foi possível adicionar o cliente.',
         variant: 'destructive',
       });
       return null;
