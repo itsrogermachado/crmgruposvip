@@ -285,7 +285,7 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
             </DialogDescription>
           </DialogHeader>
           
-          <form id="client-form" onSubmit={handleSubmit} className="space-y-4">
+          <form id="client-form" onSubmit={handleSubmit} className="space-y-4" onClick={(e) => e.stopPropagation()}>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="nome">Nome</Label>
