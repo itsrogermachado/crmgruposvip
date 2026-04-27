@@ -251,11 +251,11 @@ export function useClients(groupId?: string | null) {
       });
 
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao atualizar cliente:', error);
       toast({
         title: 'Erro',
-        description: 'Não foi possível atualizar o cliente.',
+        description: error.message || 'Não foi possível atualizar o cliente.',
         variant: 'destructive',
       });
       return false;
