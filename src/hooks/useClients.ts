@@ -302,8 +302,8 @@ export function useClients(groupId?: string | null) {
         telegram: c.telegram || null,
         plano: c.plano,
         preco: c.preco,
-        data_entrada: c.data_entrada,
-        data_vencimento: c.data_vencimento,
+        data_entrada: formatToISODate(c.data_entrada),
+        data_vencimento: formatToISODate(c.data_vencimento),
         status: c.status,
         observacoes: c.observacoes || null,
       }));
