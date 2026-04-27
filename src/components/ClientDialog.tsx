@@ -247,6 +247,7 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('handleSubmit disparado', formData);
+    console.log('onSave prop:', onSave);
     
     // Determine status: manual override or auto-calculate
     const status = manualStatus === 'Não renovou' 
