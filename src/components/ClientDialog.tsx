@@ -246,8 +246,6 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('handleSubmit disparado', formData);
-    console.log('onSave prop:', onSave);
     
     // Determine status: manual override or auto-calculate
     const status = manualStatus === 'Não renovou' 
@@ -263,13 +261,6 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
       valorRenovacao: valorRenovacao,
     };
     
-    console.log('Chamando onSave com dados:', {
-      ...(client ? { id: client.id } : {}),
-      ...formData,
-      preco: isRenovacao ? (client?.preco || valorRenovacao) : (registrarPagamento ? valorAdesao : valorRenovacao),
-      status,
-    });
-
     onSave({
       ...(client ? { id: client.id } : {}),
       ...formData,
@@ -280,7 +271,6 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
       observacoes: formData.observacoes || undefined,
       comprovanteUrl: formData.comprovanteUrl || undefined,
     }, paymentOptions);
-    
     onOpenChange(false);
   };
 
