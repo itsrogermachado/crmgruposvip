@@ -197,22 +197,20 @@ export function useClients(groupId?: string | null) {
     try {
       const currentClient = clients.find((c) => c.id === id);
 
-      // Only update preco_renovacao if provided
-      const updateData: Record<string, unknown> = {
-        nome: clientData.nome,
-        telefone: clientData.telefone,
-        discord: clientData.discord || null,
-        telegram: clientData.telegram || null,
-        plano: clientData.plano,
-        preco: clientData.preco,
-        data_entrada: clientData.data_entrada,
-        data_vencimento: clientData.data_vencimento,
-        status: clientData.status,
-        observacoes: clientData.observacoes || null,
-        comprovante_url: clientData.comprovante_url || null,
-        group_id: clientData.group_id || null,
-      };
-
+      const updateData: Record<string, any> = {};
+      if (clientData.nome !== undefined) updateData.nome = clientData.nome;
+      if (clientData.telefone !== undefined) updateData.telefone = clientData.telefone;
+      if (clientData.discord !== undefined) updateData.discord = clientData.discord || null;
+      if (clientData.telegram !== undefined) updateData.telegram = clientData.telegram || null;
+      if (clientData.plano !== undefined) updateData.plano = clientData.plano;
+      if (clientData.preco !== undefined) updateData.preco = clientData.preco;
+      if (clientData.data_entrada !== undefined) updateData.data_entrada = formatToISODate(clientData.data_entrada);
+      if (clientData.data_vencimento !== undefined) updateData.data_vencimento = formatToISODate(clientData.data_vencimento);
+      if (clientData.status !== undefined) updateData.status = clientData.status;
+      if (clientData.observacoes !== undefined) updateData.observacoes = clientData.observacoes || null;
+      if (clientData.comprovante_url !== undefined) updateData.comprovante_url = clientData.comprovante_url || null;
+      if (clientData.group_id !== undefined) updateData.group_id = clientData.group_id || null;
+      
       if (paymentOptions?.valorRenovacao !== undefined) {
         updateData.preco_renovacao = paymentOptions.valorRenovacao;
       }
