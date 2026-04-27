@@ -653,7 +653,9 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
-            <Button type="submit" form="client-form">
+            <Button type="submit" form="client-form" onClick={(e) => {
+              console.log('Botão Criar Cliente clicado');
+            }}>
               {client ? 'Salvar' : 'Criar Cliente'}
             </Button>
           </DialogFooter>
