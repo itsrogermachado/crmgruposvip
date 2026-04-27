@@ -338,11 +338,11 @@ export function useClients(groupId?: string | null) {
       });
 
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao importar clientes:', error);
       toast({
         title: 'Erro',
-        description: 'Não foi possível importar os clientes.',
+        description: error.message || 'Não foi possível importar os clientes.',
         variant: 'destructive',
       });
       return false;
