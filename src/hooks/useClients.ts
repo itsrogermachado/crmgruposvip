@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
-import { calculateStatus } from '@/lib/dateUtils';
+import { calculateStatus, formatToISODate } from '@/lib/dateUtils';
 
 export interface Client {
   id: string;
@@ -134,8 +134,8 @@ export function useClients(groupId?: string | null) {
           plano: clientData.plano,
           preco: clientData.preco,
           preco_renovacao: paymentOptions?.valorRenovacao || null,
-          data_entrada: clientData.data_entrada,
-          data_vencimento: clientData.data_vencimento,
+          data_entrada: formatToISODate(clientData.data_entrada),
+          data_vencimento: formatToISODate(clientData.data_vencimento),
           status: clientData.status,
           observacoes: clientData.observacoes || null,
           comprovante_url: clientData.comprovante_url || null,
@@ -182,11 +182,11 @@ export function useClients(groupId?: string | null) {
       });
 
       return newClient;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao adicionar cliente:', error);
       toast({
         title: 'Erro',
-        description: 'Não foi possível adicionar o cliente.',
+        description: error.message || 'Não foi possível adicionar o cliente.',
         variant: 'destructive',
       });
       return null;
@@ -197,22 +197,20 @@ export function useClients(groupId?: string | null) {
     try {
       const currentClient = clients.find((c) => c.id === id);
 
-      // Only update preco_renovacao if provided
-      const updateData: Record<string, unknown> = {
-        nome: clientData.nome,
-        telefone: clientData.telefone,
-        discord: clientData.discord || null,
-        telegram: clientData.telegram || null,
-        plano: clientData.plano,
-        preco: clientData.preco,
-        data_entrada: clientData.data_entrada,
-        data_vencimento: clientData.data_vencimento,
-        status: clientData.status,
-        observacoes: clientData.observacoes || null,
-        comprovante_url: clientData.comprovante_url || null,
-        group_id: clientData.group_id || null,
-      };
-
+      const updateData: Record<string, any> = {};
+      if (clientData.nome !== undefined) updateData.nome = clientData.nome;
+      if (clientData.telefone !== undefined) updateData.telefone = clientData.telefone;
+      if (clientData.discord !== undefined) updateData.discord = clientData.discord || null;
+      if (clientData.telegram !== undefined) updateData.telegram = clientData.telegram || null;
+      if (clientData.plano !== undefined) updateData.plano = clientData.plano;
+      if (clientData.preco !== undefined) updateData.preco = clientData.preco;
+      if (clientData.data_entrada !== undefined) updateData.data_entrada = formatToISODate(clientData.data_entrada);
+      if (clientData.data_vencimento !== undefined) updateData.data_vencimento = formatToISODate(clientData.data_vencimento);
+      if (clientData.status !== undefined) updateData.status = clientData.status;
+      if (clientData.observacoes !== undefined) updateData.observacoes = clientData.observacoes || null;
+      if (clientData.comprovante_url !== undefined) updateData.comprovante_url = clientData.comprovante_url || null;
+      if (clientData.group_id !== undefined) updateData.group_id = clientData.group_id || null;
+      
       if (paymentOptions?.valorRenovacao !== undefined) {
         updateData.preco_renovacao = paymentOptions.valorRenovacao;
       }
@@ -253,11 +251,11 @@ export function useClients(groupId?: string | null) {
       });
 
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao atualizar cliente:', error);
       toast({
         title: 'Erro',
-        description: 'Não foi possível atualizar o cliente.',
+        description: error.message || 'Não foi possível atualizar o cliente.',
         variant: 'destructive',
       });
       return false;
@@ -304,8 +302,8 @@ export function useClients(groupId?: string | null) {
         telegram: c.telegram || null,
         plano: c.plano,
         preco: c.preco,
-        data_entrada: c.data_entrada,
-        data_vencimento: c.data_vencimento,
+        data_entrada: formatToISODate(c.data_entrada),
+        data_vencimento: formatToISODate(c.data_vencimento),
         status: c.status,
         observacoes: c.observacoes || null,
       }));
@@ -340,11 +338,11 @@ export function useClients(groupId?: string | null) {
       });
 
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao importar clientes:', error);
       toast({
         title: 'Erro',
-        description: 'Não foi possível importar os clientes.',
+        description: error.message || 'Não foi possível importar os clientes.',
         variant: 'destructive',
       });
       return false;
