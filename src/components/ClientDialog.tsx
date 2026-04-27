@@ -302,8 +302,25 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
                 <Input
                   id="telefone"
                   value={formData.telefone}
-                  onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
-                  placeholder="+55 00 00000-0000"
+                  onChange={(e) => {
+                    let val = e.target.value.replace(/\D/g, "");
+                    if (val.length > 11) val = val.slice(0, 11);
+                    
+                    let formatted = "";
+                    if (val.length > 0) {
+                      formatted = "(" + val.slice(0, 2);
+                      if (val.length > 2) {
+                        formatted += ") " + val.slice(2, 7);
+                        if (val.length > 7) {
+                          formatted += "-" + val.slice(7);
+                        }
+                      } else if (val.length === 2) {
+                        formatted += ")";
+                      }
+                    }
+                    setFormData({ ...formData, telefone: formatted });
+                  }}
+                  placeholder="(00) 00000-0000"
                   required
                 />
               </div>
