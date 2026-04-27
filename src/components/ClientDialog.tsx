@@ -263,6 +263,13 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
       valorRenovacao: valorRenovacao,
     };
     
+    console.log('Chamando onSave com dados:', {
+      ...(client ? { id: client.id } : {}),
+      ...formData,
+      preco: isRenovacao ? (client?.preco || valorRenovacao) : (registrarPagamento ? valorAdesao : valorRenovacao),
+      status,
+    });
+
     onSave({
       ...(client ? { id: client.id } : {}),
       ...formData,
@@ -273,6 +280,7 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
       observacoes: formData.observacoes || undefined,
       comprovanteUrl: formData.comprovanteUrl || undefined,
     }, paymentOptions);
+    
     onOpenChange(false);
   };
 
